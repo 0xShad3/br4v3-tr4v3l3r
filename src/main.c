@@ -19,8 +19,6 @@ int main(int argc,char *argv[]){
         redprint("Nope :( . You are not supposed to use arguments");
         exit(0);
     }
-
-
     //typing effect for terminal
     printf("\033[0;31m"); //set color to red
     while(welcome_msg[i]!='\0'){
