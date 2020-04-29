@@ -13,6 +13,7 @@
 char welcome_msg[] = "Hello stranger..\n";
 char wrong_creds[] = "[-] Wrong username or password. Exiting....";
 char waiting_game[] = "[+] Please wait while the game is loading...";
+
 char username[50];
 char password[50];
 
@@ -37,14 +38,14 @@ int main(int argc, char *argv[])
     }
     printf("\033[0;0m"); // color reset
 
-    printf("Select a mode:\n[1] Single-Player\n[2] Multi-Player\n");
+    printf("Select a mode:\n[1] Single-Player\n[2] Multi-Player\n[3] Exit\n");
     scanf("%d", &selection);
-    while (selection != 2 && selection != 1)
+    while (selection != 2 && selection != 1 && selection !=3)
     {
         printf("\033[0;31m");
         printf("[-] Try again..\n");
         printf("\033[0;0m");
-        printf("Select a mode:\n[1] Single-Player\n[2] Multi-Player\n");
+        printf("Select a mode:\n[1] Single-Player\n[2] Multi-Player\n[3] Exit\n");
         scanf("%d", &selection);
     }
 
@@ -52,14 +53,14 @@ int main(int argc, char *argv[])
     if (selection == 1)
     {
         selection = 0;
-        printf("[1] Login\n[2] Register\n");
+        printf("[1] Login\n[2] Register and play\n[3] Exit\n");
         scanf("%d", &selection);
-        while (selection != 2 && selection != 1)
+        while (selection != 2 && selection != 1 && selection !=3)
         {
             printf("\033[0;31m");
             printf("[-] Try again..\n");
             printf("\033[0;0m");
-            printf("[1] Login\n[2] Register\n");
+            printf("[1] Login\n[2] Register and play\n");
             scanf("%d", &selection);
         }
         //login action check
@@ -87,9 +88,11 @@ int main(int argc, char *argv[])
             }
 
             //login success
+            login_check(username,password);
+            //print welcome message
             printf("Hello %s. \n", username);
-            i = 0;
-            while (wrong_creds[i] != '\0')
+            int i = 0;
+            while (waiting_game[i] != '\0')
             {
                 printf("%c", waiting_game[i]);
                 fflush(stdout);
@@ -97,7 +100,6 @@ int main(int argc, char *argv[])
                 i++;
             }
             printf("\n");
-            
             // Starting game on single player mode
             init_game(SINGLE_PLR);
         }
@@ -111,20 +113,37 @@ int main(int argc, char *argv[])
             scanf("%s", password);
             if (strlen(username) != 0 && strlen(password) != 0)
             {
-                if (do_register(username, password) != 0)
+               
+                do_register(username, password);
+                login_check(username,password);
+                printf("Hello %s. \n", username);
+                i = 0;
+                while (waiting_game[i] != '\0')
                 {
-                    redprint("[-] Fatal error at registring. Try later");
+                    printf("%c", waiting_game[i]);
+                    fflush(stdout);
+                    usleep(70000);
+                    i++;
                 }
+                init_game(SINGLE_PLR);
             }
             else
             {
                 redprint("What are you trying to do...");
             }
         }
+
+        if (selection == 3){
+            exit_choice();
+        }
     }
 
     if (selection == 2)
     {
         //TODO add multiplayer code
+    }
+
+    if (selection == 3){
+        exit_choice();
     }
 }
