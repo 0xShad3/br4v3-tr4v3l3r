@@ -1,4 +1,6 @@
 #include "map.h"
+#include "chest.h"
+#include "monster.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -142,13 +144,21 @@ void map_parser(map_t *map)
 		for (j = 0; j < MAP_WIDTH; j++)
 		{
 
-			if (hold_buffer[j * 2] == '1')
+			if (hold_buffer[j * 2] == '0')
+			{
+				map->map_array[i][j] = MAP_P_SYMBOL;
+			}
+			else if (hold_buffer[j * 2] == '1')
 			{
 				map->map_array[i][j] = MAP_W_SYMBOL;
 			}
-			else if (hold_buffer[j * 2] == '0')
+			else if (hold_buffer[j * 2] == '2')
 			{
-				map->map_array[i][j] = MAP_P_SYMBOL;
+				map->map_array[i][j] = CSYMBOL;
+			}
+			else if (hold_buffer[j * 2] == '3')
+			{
+				map->map_array[i][j] == MSYMBOL;
 			}
 		}
 

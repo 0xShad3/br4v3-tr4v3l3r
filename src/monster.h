@@ -2,7 +2,7 @@
 #define MONSTER_H_
 //#include "player.h"
 #define MCOLOR "[0;31m"
-#define MSYMBOL 'M'
+#define MSYMBOL '@'
 
 typedef struct monster_t{
     int x,y,health,armor,attack,accuracy,monster_type,monster_id,isDead;
