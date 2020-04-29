@@ -100,9 +100,10 @@ void print_map(map_t *map){
 	int j;
 
 	for(i=0; i < MAP_HEIGHT;i++){
-		for(j=0 ; j< MAP_HEIGHT; j++){
+		for(j=0 ; j< MAP_WIDTH-1; j++){
 			printf("%c",map->map_array[i][j]);
 		}
+		printf("\n");
 	}	
 }
 
@@ -136,17 +137,20 @@ void map_parser(map_t* map){
 
 		fread(hold_buffer,101,sizeof(char),fd);		
 		hold_buffer[101]='\0';
-
+		//printf(hold_buffer);
 		for (j=0;j<MAP_WIDTH;j++){
 
 			if (hold_buffer[j*2] == '1'){
 				map->map_array[i][j] = MAP_W_SYMBOL;
 
 			}
-			else{
+			else if (hold_buffer[j*2] == '0'){
 				map->map_array[i][j] = MAP_P_SYMBOL;
-			}			
+			}
+
 		}
+		
+		map->map_array[i][MAP_WIDTH-1] = '\0';
 	}
 
 	fclose(fd);
