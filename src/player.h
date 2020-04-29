@@ -10,7 +10,7 @@ typedef struct player_t{
     char* pcolor ;
     char psymbol;
 }player_t;
-void init_default(player_t  *player);
+void init_player(player_t  *player);
 void move(player_t *player,char input);
 void die(player_t *player);
 #endif

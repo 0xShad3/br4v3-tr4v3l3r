@@ -3,8 +3,8 @@
 #include "player.h"
 
 
-void init_default(player_t  *player){
-    player->x=1;//gia na ksekinaei apo katw aristera 
+void init_player(player_t  *player){
+    player->x=18;//gia na ksekinaei apo katw aristera 
     player->y=48;
     player->health=50;
     player->armor=50;
@@ -37,6 +37,6 @@ void move(player_t *player,char input){
         printf("wrong input");
     }
 }
-void die(struct player_t *player){
+void die(player_t *player){
     player->isDead=1;
 }
