@@ -9,7 +9,8 @@
 /*
 	initialises the map
 */
-void init_map(map_t *map){
+void init_map(map_t* map){
+	map->level = 1;
 	map_constr_fn(map);
 	map_parser(map);
 	

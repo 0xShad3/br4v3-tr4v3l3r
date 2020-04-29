@@ -5,7 +5,7 @@
 #define CSV_LN 15
 
 #define MAP_HEIGHT 50
-#define MAP_WIDTH 50
+#define MAP_WIDTH 51
 
 /* map game characteristics*/
 #define MAP_W_SYMBOL '*'
