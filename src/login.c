@@ -27,9 +27,10 @@ int login_check(char *username,char *password){
         printf("Login error!");
         exit(EXIT_FAILURE);
     }
+
     while(getline(&line, &len, fp) != -1) {
-        temp_username = strtok(line," ");
-        temp_password = strtok(NULL," ");
+        temp_username = strtok(line,",");
+        temp_password = strtok(NULL,",");
         temp_id = atoi(strtok(NULL,"\n"));
         //printf("\nTemp username is '%s' and temp password is '%s' and id is '%d'\n",temp_username,temp_password,temp_id);
         //printf("\nUsername is %s and password is %s\n",username,password);
@@ -54,7 +55,7 @@ int do_register(char *username,char *password){
         printf("Register error!");
         exit(EXIT_FAILURE);
     }
-    fprintf(fp,"\n%s %s %d,",username,password,get_lastid()+1); //create new line + add username/password
+    fprintf(fp,"\n%s,%s,%d",username,password,get_lastid()+1); //create new line + add username/password
     fclose(fp);
     return 0;
 }
@@ -77,8 +78,8 @@ int get_lastid(){
     } 
 
     //split the last line to username,password,id 
-    strtok(line," ");
-    strtok(NULL," ");
+    strtok(line,",");
+    strtok(NULL,",");
     id = atoi(strtok(NULL,"\n"));
 
     fclose(fp);
