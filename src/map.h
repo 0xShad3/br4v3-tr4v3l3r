@@ -34,6 +34,7 @@ char* itoa(int num, char* str, int base);
 void print_map(map_t *map);
 void map_constr_fn(map_t *map);
 void map_parser(map_t* map);
+int map_set(map_t* map,char symbol,int x, int y);
 
 
 
