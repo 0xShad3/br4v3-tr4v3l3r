@@ -1,3 +1,6 @@
+#ifndef PLAYER_H_
+#define PLAYER_H_
+
 #define PCOLOR "[0;34m"
 #define PSYMBOL 'Y'
 
@@ -10,3 +13,4 @@ typedef struct player_t{
 void init_default(player_t  *player);
 void move(player_t *player,char input);
 void die(player_t *player);
+#endif
