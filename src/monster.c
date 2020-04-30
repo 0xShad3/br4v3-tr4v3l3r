@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "monster.h"
 
-void init_monster(monster_t *monster, int x1, int y1)
+void init_monster(monster_t *monster,int id, int x1, int y1)
 {
     monster->monster_type = 0;
     monster->attack = 10;
@@ -14,5 +14,5 @@ void init_monster(monster_t *monster, int x1, int y1)
     monster->isDead = 0;
     monster->msymbol = MSYMBOL;
     monster->mcolor = MCOLOR;
-    monster->monster_id = 0;
+    monster->monster_id = id;
 }

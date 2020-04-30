@@ -16,13 +16,18 @@ void init_game(int mode)
 
     map_t map;
     player_t player;
+    map.level = 7;
+    monster_t* mons_arr = (monster_t*)calloc(sizeof(monster_t),map.level+3);
+    chest_t* chest_arr = (chest_t*)calloc(sizeof(chest_t),map.level);
+    
     system("clear");
 
+
     init_player(&player);
-    init_map(&map);
-    // Set player in map
+    init_map(&map,mons_arr,chest_arr);
     map_set(&map,player.psymbol,player.x,player.y);
     //struct_array = malloc(MaxNumElements * sizeof(struct data));
+    print_map(&map);
 
 
 }

@@ -1,22 +1,24 @@
-#include "map.h"
-#include "chest.h"
-#include "monster.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "map.h"
+#include "chest.h"
+#include "monster.h"
+#include "util.h"
+
 
 /*
 	initialises the map
 */
-void init_map(map_t *map)
+void init_map(map_t *map,monster_t mons_arr[],chest_t chest_arr[])
 {
-	map->level = 1;
-	map_constr_fn(map);
-	map_parser(map);
-
 	map->monsters_num = map->level + 3;
 	map->chests_num = map->level;
+	map_constr_fn(map);
+	map_parser(map,mons_arr,chest_arr);
+
+	
 }
 
 /* 
@@ -31,64 +33,6 @@ void map_constr_fn(map_t *map)
 	strcpy(map->filename, "map");
 	strcat(map->filename, itoa(map->level, str, 10));
 	strcat(map->filename, ".csv\0");
-}
-
-/* A utility function to reverse a string  */
-void reverse(char str[], int length)
-{
-	int temp;
-	int start = 0;
-	int end = length - 1;
-	while (start < end)
-	{
-		temp = str[start];
-		str[start] = str[end];
-		str[end] = temp;
-		start++;
-		end--;
-	}
-}
-
-// Implementation of itoa()
-char *itoa(int num, char *str, int base)
-{
-	int i = 0;
-	int isNegative = 0;
-
-	/* Handle 0 explicitely, otherwise empty string is printed for 0 */
-	if (num == 0)
-	{
-		str[i++] = '0';
-		str[i] = '\0';
-		return str;
-	}
-
-	// In standard itoa(), negative numbers are handled only with
-	// base 10. Otherwise numbers are considered unsigned.
-	if (num < 0 && base == 10)
-	{
-		isNegative = 1;
-		num = -num;
-	}
-
-	// Process individual digits
-	while (num != 0)
-	{
-		int rem = num % base;
-		str[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
-		num = num / base;
-	}
-
-	// If number is negative, append '-'
-	if (isNegative)
-		str[i++] = '-';
-
-	str[i] = '\0'; // Append string terminator
-
-	// Reverse the string
-	reverse(str, i);
-
-	return str;
 }
 
 /*
@@ -117,11 +61,14 @@ void print_map(map_t *map)
 		Else it will give segmentation
 
 */
-void map_parser(map_t *map)
+void map_parser(map_t *map,monster_t mons_arr[],chest_t chest_arr[])
 {
 
 	char hold_buffer[101] = "./maps/";
-	;
+	int monster_counter = 0;
+	int chest_counter = 0;
+	int mons_id;
+	int chest_id;
 	int i = 0;
 	int j;
 
@@ -155,10 +102,20 @@ void map_parser(map_t *map)
 			else if (hold_buffer[j * 2] == '2')
 			{
 				map->map_array[i][j] = CSYMBOL;
+				chest_id = map->chests_num - (map->chests_num - chest_counter);
+				chest_arr[chest_counter].chest_id = chest_id;
+				chest_arr[chest_counter].x = i;
+				chest_arr[chest_counter].y = j;
+				chest_counter++;
 			}
 			else if (hold_buffer[j * 2] == '3')
 			{
-				map->map_array[i][j] == MSYMBOL;
+				map->map_array[i][j] = MSYMBOL;
+				mons_id = map->monsters_num - (map->monsters_num - monster_counter);
+				mons_arr[monster_counter].monster_id = mons_id;
+				mons_arr[monster_counter].x = j;
+				mons_arr[monster_counter].y = i;
+				monster_counter++;
 			}
 		}
 

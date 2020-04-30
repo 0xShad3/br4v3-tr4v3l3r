@@ -1,6 +1,8 @@
 #ifndef MAP_H_
 #define MAP_H_
 
+#include "monster.h"
+#include "chest.h"
 
 #define CSV_LN 15
 
@@ -28,12 +30,10 @@ typedef struct map_t
 }map_t;
 
 
-void init_map(map_t *map);
-void reverse(char str[], int length);
-char* itoa(int num, char* str, int base);
+void init_map(map_t *map,monster_t mons_array[],chest_t chest_arr[]);
 void print_map(map_t *map);
+void map_parser(map_t* map,monster_t mons_array[],chest_t chest_arr[]);
 void map_constr_fn(map_t *map);
-void map_parser(map_t* map);
 int map_set(map_t* map,char symbol,int x, int y);
 
 
