@@ -29,34 +29,18 @@ void move(map_t *map, player_t *player)
     int temp_y = player->y;
     if (player->direction == RIGHT_C || player->direction == RIGHT_S)
     {
-        if (player->prev_direction == LEFT_C || player->prev_direction == LEFT_S)
-        {
-            player->x--;
-        }
         player->x++;
     }
     else if (player->direction == LEFT_C || player->direction == LEFT_S)
     {
-        if (player->prev_direction == RIGHT_C || player->prev_direction == RIGHT_S)
-        {
-            player->x++;
-        }
         player->x--;
     }
     else if (player->direction == UP_C || player->direction == UP_S)
     {
-        if (player->prev_direction == DOWN_C || player->prev_direction == DOWN_S)
-        {
-            player->y++;
-        }
         player->y--;
     }
     else if (player->direction == DOWN_C || player->direction == DOWN_S)
     {
-        if (player->prev_direction == UP_C || player->prev_direction == UP_S)
-        {
-            player->y--;
-        }
         player->y++;
     }
     map_set(map, MAP_P_SYMBOL, temp_x, temp_y);
