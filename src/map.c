@@ -71,11 +71,17 @@ void map_parser(map_t *map,monster_t mons_arr[],chest_t chest_arr[])
 	int chest_id;
 	int i = 0;
 	int j;
-
+	/*
+		Over here hold buffer is used to construct the file name of
+		the csv map file
+	
+	*/
 	strcat(hold_buffer, map->filename);
 	FILE *fd = fopen(hold_buffer, "r");
-
-	if (!fd)
+	/*
+		Debug for error
+	*/
+	if (fd == NULL)
 	{
 		printf("An error occured, the map could not be loaded,exitting....");
 		fclose(fd);
@@ -90,7 +96,11 @@ void map_parser(map_t *map,monster_t mons_arr[],chest_t chest_arr[])
 		//printf(hold_buffer);
 		for (j = 0; j < MAP_WIDTH; j++)
 		{
-
+			/*
+				Hold buffer skips the comma chars 
+				parses the map to 2d map array 
+			*/
+		
 			if (hold_buffer[j * 2] == '0')
 			{
 				map->map_array[i][j] = MAP_P_SYMBOL;

@@ -1,16 +1,45 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 
+#include "map.h"
 #define PCOLOR "[0;34m"
 #define PSYMBOL 'Y'
 
-typedef struct player_t{
-    int x,y,health,armor,attack,accuracy,level,wins,loses,id,isOnline,isDead;
-    char* name;
-    char* pcolor ;
+#define UP_C 'W'
+#define UP_S 'w'
+
+#define DOWN_C 'S'
+#define DOWN_S 's'
+
+#define LEFT_C 'A'
+#define LEFT_S 'a'
+
+#define RIGHT_C 'D'
+#define RIGHT_S 'd'
+
+typedef struct player_t
+{
+    int x;
+    int y;
+    int health;
+    int armor;
+    int attack;
+    int accuracy;
+    char direction;
+    char prev_direction;
+    int level;
+    int wins;
+    int loses;
+    int id;
+    int isOnline;
+    int isDead;
+    char *name;
+    char *pcolor;
     char psymbol;
-}player_t;
-void init_player(player_t  *player);
-void move(player_t *player,char input);
+
+} player_t;
+
+void init_player(player_t *player);
+void move(map_t* map,player_t *player);
 void die(player_t *player);
 #endif

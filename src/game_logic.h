@@ -3,5 +3,6 @@
 
 
 void init_game(int mode);
+char key_input(char* key);
 
 #endif

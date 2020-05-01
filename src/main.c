@@ -20,7 +20,7 @@ char password[50];
 int main(int argc, char *argv[])
 {
     int i = 0;
-    int selection; //used for all main menu selections
+    int selection = 0; //used for all main menu selections
     if (argc != 1)
     {
         redprint("Nope :( . You are not supposed to use arguments");
