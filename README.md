@@ -25,6 +25,8 @@ We higly recommend you to run this and have fun with our mini game. But we sugge
 
 ## Developed by
 Zisimopoulos **"datcord"** Theodore  
+
 Kalaitzidis **"0xShad3"** Angelos Taxiarchis
+
 Restemis **"restylianos"** Stelios
 
