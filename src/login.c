@@ -1,8 +1,10 @@
-#include "login.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include "player.h"
+#include "login.h"
+
 
 int id=0;
 int temp_id=0; //used for debuging and get id function.

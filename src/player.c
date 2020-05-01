@@ -23,8 +23,8 @@ void init_player(player_t *player)
     player->psymbol = PSYMBOL;
 }
 
-void move(map_t* map,player_t *player)
-{   
+void move(map_t *map, player_t *player)
+{
     int temp_x = player->x;
     int temp_y = player->y;
     if (player->direction == RIGHT_C || player->direction == RIGHT_S)
@@ -59,10 +59,9 @@ void move(map_t* map,player_t *player)
         }
         player->y++;
     }
-    map_set(map,MAP_P_SYMBOL,temp_x,temp_y);
-    map_set(map,PSYMBOL,player->x,player->y);
+    map_set(map, MAP_P_SYMBOL, temp_x, temp_y);
+    map_set(map, PSYMBOL, player->x, player->y);
 }
-
 
 void die(player_t *player)
 {
