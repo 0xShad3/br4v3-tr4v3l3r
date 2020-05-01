@@ -20,6 +20,8 @@ void init_player(player_t  *player){
     player->pcolor=PCOLOR;
     player->psymbol=PSYMBOL;
 }
+
+
 void move(player_t *player,char input){
     if(input == 'D') input = 'd';
 	else if(input == 'S') input = 's';
@@ -37,6 +39,8 @@ void move(player_t *player,char input){
         printf("wrong input");
     }
 }
+
+
 void die(player_t *player){
     player->isDead=1;
 }

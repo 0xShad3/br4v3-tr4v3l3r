@@ -6,6 +6,7 @@
 #include "chest.h"
 #include "monster.h"
 #include "util.h"
+#include "custom_effects.h"
 
 
 /*
@@ -48,7 +49,22 @@ void print_map(map_t *map)
 	{
 		for (j = 0; j < MAP_WIDTH - 1; j++)
 		{
-			printf("%c", map->map_array[i][j]);
+			if(map->map_array[i][j] == '@'){
+				redprint_char(map->map_array[i][j]);
+			}
+
+			else if(map->map_array[i][j] == '$'){
+				yellowprint_char(map->map_array[i][j]);
+			}
+
+			else if(map->map_array[i][j] == 'Y'){
+				greenprint_char(map->map_array[i][j]);
+			}
+
+			else{
+				printf("%c",map->map_array[i][j]);
+			}
+
 		}
 		printf("\n");
 	}

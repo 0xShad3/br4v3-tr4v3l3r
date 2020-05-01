@@ -5,6 +5,7 @@
 #include "login.h"
 #include "custom_effects.h"
 #include "game_logic.h"
+#include "player.h"
 
 
 #define SINGLE_PLR 0
