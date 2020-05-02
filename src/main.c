@@ -14,7 +14,6 @@ char welcome_msg[] = "Hello stranger..\n";
 char wrong_creds[] = "[-] Wrong username or password. Exiting....";
 char waiting_game[] = "[+] Please wait while the game is loading...";
 
-
 int main(int argc, char *argv[])
 {
     int i = 0;
@@ -97,8 +96,11 @@ int main(int argc, char *argv[])
                 i++;
             }
             printf("\n");
+
+            // Construct the file path
+            save_constr_fn(&account);
             // Starting game on single player mode
-            init_game(SINGLE_PLR,account.id);
+            init_game(&account, SINGLE_PLR);
         }
 
         if (selection == 2)
@@ -124,7 +126,11 @@ int main(int argc, char *argv[])
                     usleep(70000);
                     i++;
                 }
-                init_game(SINGLE_PLR,account.id);
+
+                // Construct the file path
+                save_constr_fn(&account);
+                // Starting game on single player mode
+                init_game(&account, SINGLE_PLR);
             }
         }
     }

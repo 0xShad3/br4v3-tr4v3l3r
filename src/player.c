@@ -5,7 +5,7 @@
 #include "monster.h"
 #include "custom_effects.h"
 
-void init_player(player_t *player)
+void init_player(player_t *player,int account_id)
 {
     player->x = 18; //gia na ksekinaei apo katw aristera
     player->y = 48;
@@ -18,7 +18,7 @@ void init_player(player_t *player)
     player->level = 0;
     player->wins = 0;
     player->loses = 0;
-    player->id = 0;
+    player->id = account_id;
     player->isOnline = 0;
     player->isDead = 0;
     player->name = malloc(50 * sizeof(char));

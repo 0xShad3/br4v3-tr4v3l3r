@@ -4,7 +4,9 @@ typedef struct account_t
 {
     char username[50];
     char password[50];
+    char save_file[15];
     int id;
+    
 }account_t;
 
 //Contains login and register functions
@@ -14,4 +16,5 @@ int login_check(account_t* login);
 int get_lastid();
 void exit_choice();
 void exists_error();
+void save_constr_fn(account_t* account);
 #endif

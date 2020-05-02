@@ -40,7 +40,7 @@ typedef struct player_t
 
 } player_t;
 
-void init_player(player_t *player);
+void init_player(player_t *player,int account_id);
 void move(map_t* map,player_t *player);
 void die(player_t *player);
 void get_stats(player_t *player, monster_t monsters[],map_t *map);
