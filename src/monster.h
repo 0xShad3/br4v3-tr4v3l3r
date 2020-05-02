@@ -11,7 +11,7 @@ typedef struct monster_t{
     int armor;
     int attack;
     int accuracy;
-    int monster_type;
+    int is_boss; //renamed cuz monster type was not needed
     int monster_id;
     int isDead;
     char msymbol;

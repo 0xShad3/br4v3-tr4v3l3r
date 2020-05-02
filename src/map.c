@@ -7,6 +7,7 @@
 #include "monster.h"
 #include "util.h"
 #include "custom_effects.h"
+#include "player.h"
 
 
 /*
@@ -30,10 +31,11 @@ void init_map(map_t *map,monster_t mons_arr[],chest_t chest_arr[])
 void map_constr_fn(map_t *map)
 {
 	const char base[] = "map";
+	const char file_extension[] = ".csv\0";
 	char str[10];
-	strcpy(map->filename, "map");
+	strcpy(map->filename, base);
 	strcat(map->filename, itoa(map->level, str, 10));
-	strcat(map->filename, ".csv\0");
+	strcat(map->filename, file_extension);
 }
 
 /*
@@ -66,6 +68,7 @@ void print_map(map_t *map)
 			}
 
 		}
+		printf("\n");
 		printf("\n");
 	}
 }

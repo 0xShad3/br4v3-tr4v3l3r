@@ -7,7 +7,6 @@
 #include "game_logic.h"
 #include "player.h"
 
-
 #define SINGLE_PLR 0
 #define MULTI_PLR 1
 
@@ -15,13 +14,12 @@ char welcome_msg[] = "Hello stranger..\n";
 char wrong_creds[] = "[-] Wrong username or password. Exiting....";
 char waiting_game[] = "[+] Please wait while the game is loading...";
 
-char username[50];
-char password[50];
-
 int main(int argc, char *argv[])
 {
     int i = 0;
-    int selection = 0; //used for all main menu selections
+    int selection = 0;
+    account_t account;
+    //used for all main menu selections
     if (argc != 1)
     {
         redprint("Nope :( . You are not supposed to use arguments");
@@ -41,7 +39,7 @@ int main(int argc, char *argv[])
 
     printf("Select a mode:\n[1] Single-Player\n[2] Multi-Player\n[3] Exit\n");
     scanf("%d", &selection);
-    while (selection != 2 && selection != 1 && selection !=3)
+    while (selection != 2 && selection != 1 && selection != 3)
     {
         printf("\033[0;31m");
         printf("[-] Try again..\n");
@@ -56,7 +54,7 @@ int main(int argc, char *argv[])
         selection = 0;
         printf("[1] Login\n[2] Register and play\n[3] Exit\n");
         scanf("%d", &selection);
-        while (selection != 2 && selection != 1 && selection !=3)
+        while (selection != 2 && selection != 1 && selection != 3)
         {
             printf("\033[0;31m");
             printf("[-] Try again..\n");
@@ -68,12 +66,12 @@ int main(int argc, char *argv[])
         if (selection == 1)
         {
             greenprint("[+]Enter your username and password:\nUsername: ");
-            scanf("%s", username);
+            scanf("%s", account.username);
 
             greenprint("Password: ");
-            scanf("%s", password);
+            scanf("%s", account.password);
 
-            if (login_check(username, password) != 0)
+            if (login_check(&account) != 0)
             {
                 i = 0;
                 printf("\033[0;31m"); //set color to red
@@ -88,10 +86,7 @@ int main(int argc, char *argv[])
                 return 0;
             }
 
-            //login success
-            login_check(username,password);
-            //print welcome message
-            printf("Hello %s. \n", username);
+            printf("Hello %s. \n", account.username);
             int i = 0;
             while (waiting_game[i] != '\0')
             {
@@ -101,23 +96,28 @@ int main(int argc, char *argv[])
                 i++;
             }
             printf("\n");
+
+            // Construct the file path
+            save_constr_fn(&account);
             // Starting game on single player mode
-            init_game(SINGLE_PLR);
+            init_game(&account, SINGLE_PLR);
         }
 
         if (selection == 2)
         {
             orangeprint("[+]Enter your player`s username and password:\n");
             greenprint("Username: ");
-            scanf("%s", username);
+            scanf("%s", account.username);
             greenprint("Password: ");
-            scanf("%s", password);
-            if (strlen(username) != 0 && strlen(password) != 0)
+            scanf("%s", account.password);
+            if (!strlen(account.username) || !strlen(account.password))
             {
-               
-                do_register(username, password);
-                login_check(username,password);
-                printf("Hello %s. \n", username);
+                redprint("What are you trying to do...");
+            }
+            else
+            {
+                do_register(account.username, account.password);
+                printf("Hello %s. \n", account.username);
                 i = 0;
                 while (waiting_game[i] != '\0')
                 {
@@ -126,25 +126,22 @@ int main(int argc, char *argv[])
                     usleep(70000);
                     i++;
                 }
-                init_game(SINGLE_PLR);
-            }
-            else
-            {
-                redprint("What are you trying to do...");
-            }
-        }
 
-        if (selection == 3){
-            exit_choice();
+                // Construct the file path
+                save_constr_fn(&account);
+                // Starting game on single player mode
+                init_game(&account, SINGLE_PLR);
+            }
         }
     }
-
     if (selection == 2)
     {
         //TODO add multiplayer code
     }
 
-    if (selection == 3){
+    if (selection == 3)
+    {
         exit_choice();
     }
+    return EXIT_SUCCESS;
 }
