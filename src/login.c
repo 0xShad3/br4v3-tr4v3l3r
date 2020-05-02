@@ -18,7 +18,7 @@ this functon will be stored in player.c file
 */
 
 
-int login_check(char *username,char *password){
+int login_check(account_t* account){
     char *temp_username;
     char *temp_password;
     FILE *fp;
@@ -37,14 +37,12 @@ int login_check(char *username,char *password){
         temp_id = atoi(strtok(NULL,"\n"));
         //printf("\nTemp username is '%s' and temp password is '%s' and id is '%d'\n",temp_username,temp_password,temp_id);
         //printf("\nUsername is %s and password is %s\n",username,password);
-        if(strcmp(username,temp_username)!=0 || strcmp(password,temp_password)!=0){
-            continue; //keeps searching if given username and password are not found in credentials.csv
-        }
-        else{
+        if(!strcmp(account->username,temp_username) && !strcmp(account->password,temp_password)){
+            // if found returns 0
+            account->id = temp_id;
             fclose(fp);
             free(line);
-            return 0; // if found returns 0
-
+            return 0;
         }
     }
     return -1;
@@ -133,10 +131,7 @@ int account_exists(char *username,char *password){ //check if account already ex
         temp_id = atoi(strtok(NULL,"\n"));
         //printf("\nTemp username is '%s' and temp password is '%s' and id is '%d'\n",temp_username,temp_password,temp_id);
         //printf("\nUsername is %s and password is %s\n",username,password);
-        if(strcmp(username,temp_username)!=0 || strcmp(password,temp_password)!=0){
-            continue;
-        }
-        else{
+        if(!strcmp(username,temp_username) && !strcmp(password,temp_password)){
             return 1;
         }
     }

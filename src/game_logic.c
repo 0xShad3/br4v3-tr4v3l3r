@@ -16,7 +16,7 @@
     @purpose init and run the game
 */
 
-void init_game(int mode)
+void init_game(int mode,int account_id)
 {
     char key_press = ' ';
     char key[2];
@@ -44,7 +44,6 @@ void init_game(int mode)
             move(&map,&player);
         }
         system("clear");
-        //print_map(&map);
         to_print(&map,&player,mons_arr,chest_arr);
         sleep(1);
     }
