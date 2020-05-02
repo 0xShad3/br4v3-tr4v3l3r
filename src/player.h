@@ -41,5 +41,6 @@ typedef struct player_t
 
 void init_player(player_t *player);
 void move(map_t* map,player_t *player);
+//void attack_player(map_t *map, player_t *player,monster_t *monster);
 void die(player_t *player);
 #endif

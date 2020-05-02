@@ -45,7 +45,7 @@ void init_game(int mode)
         }
         system("clear");
         print_map(&map);
-        sleep(1);
+        usleep(500000);
     }
     
     
