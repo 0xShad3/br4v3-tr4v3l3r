@@ -7,6 +7,7 @@
 #include "monster.h"
 #include "util.h"
 #include "custom_effects.h"
+#include "player.h"
 
 
 /*
@@ -66,6 +67,7 @@ void print_map(map_t *map)
 			}
 
 		}
+		printf("\n");
 		printf("\n");
 	}
 }

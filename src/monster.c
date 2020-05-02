@@ -4,7 +4,7 @@
 
 void init_monster(monster_t *monster,int id, int x1, int y1)
 {
-    monster->monster_type = 0;
+    monster->is_boss = 0;
     monster->attack = 10;
     monster->health = 10;
     monster->armor = 10;

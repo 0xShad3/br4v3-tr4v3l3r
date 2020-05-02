@@ -2,6 +2,7 @@
 #define PLAYER_H_
 
 #include "map.h"
+#include "monster.h"
 #define PCOLOR "[0;34m"
 #define PSYMBOL 'Y'
 
@@ -42,4 +43,5 @@ typedef struct player_t
 void init_player(player_t *player);
 void move(map_t* map,player_t *player);
 void die(player_t *player);
+void get_stats(player_t *player, monster_t monsters[],map_t *map);
 #endif

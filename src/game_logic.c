@@ -22,7 +22,7 @@ void init_game(int mode)
     char key[2];
     map_t map;
     player_t player;
-    map.level = 8;
+    map.level = 2;
     monster_t *mons_arr = (monster_t *)calloc(sizeof(monster_t), map.level + 3);
     chest_t *chest_arr = (chest_t *)calloc(sizeof(chest_t), map.level);
 
@@ -44,7 +44,8 @@ void init_game(int mode)
             move(&map,&player);
         }
         system("clear");
-        print_map(&map);
+        //print_map(&map);
+        to_print(&map,&player,mons_arr,chest_arr);
         sleep(1);
     }
     
@@ -56,16 +57,10 @@ void init_game(int mode)
 
 }
 
-void to_print(map_t *map, player_t player, monster_t *monsters[], chest_t *chests[])
+void to_print(map_t *map, player_t *player, monster_t monsters[], chest_t chests[])
 {
-    /* 
-        code that prints all the compontents
-        components are updated in the while true look, length for the monsters/chest arrays 
-        can be found using level(map) characteristics (check struct)
-
-
-        also accuracy damage healt etc...
-    */
+    print_map(map);
+    get_stats(player,monsters,map);
 }
 
 void add_stats(player_t  *player){
@@ -83,7 +78,7 @@ void add_stats(player_t  *player){
         left_points -= temp_health;
         printf("Points left: %d\n", left_points);
 
-        redprint("Health points: ");
+        redprint("Attack points: ");
         scanf("%d",&temp_damage);
         left_points -= temp_damage;
         printf("Points left: %d\n", left_points);
