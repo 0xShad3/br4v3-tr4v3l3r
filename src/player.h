@@ -53,4 +53,7 @@ void move(map_t* map,player_t *player);
 int *check_obj(map_t *map,player_t *player,int obj_array[2]);
 void die(player_t *player);
 void get_stats(player_t *player, monster_t monsters[],map_t *map);
+int attack(int accuracy,int damage);
+
+
 #endif

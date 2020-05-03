@@ -132,13 +132,20 @@ void get_stats(player_t *player, monster_t monsters[],map_t *map){
 
     printf("\033[1;32m");
     printf("Wins: ");
+    printf("%d", player->wins);
     printf("\033[0m");
-    printf("[ %d ]", player->wins);
 
     printf("\033[1;31m");
-    printf(" Loses: ");
+    printf("   Loses: ");
+    printf("%d",player->loses);
     printf("\033[0m");
-    printf("[ %d ]\n",player->loses);
+    
+
+    printf("\033[1;37m");
+    printf("  Level: ");
+    printf("%d\n",map->level);
+    printf("\033[0m");
+    
 
     printf("Monsters left:   [");
 
@@ -154,6 +161,11 @@ void get_stats(player_t *player, monster_t monsters[],map_t *map){
         }
     }
     printf("]\n");
+}
 
-
+int attack(int accuracy,int damage){
+    int rand_num = (rand() % (101)); 
+    if(rand_num < accuracy) return damage;
+    else return 0; //miss
+    //function for miss / hit. Might need to change later
 }
