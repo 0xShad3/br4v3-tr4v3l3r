@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                do_register(account.username, account.password);
+                do_register(&account);
                 printf("Hello %s. \n", account.username);
                 i = 0;
                 while (waiting_game[i] != '\0')

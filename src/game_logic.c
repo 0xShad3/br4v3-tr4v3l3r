@@ -101,11 +101,30 @@ void init_game(account_t *account, int mode)
     {
 
         key_press = key_input(key);
-        if (key_press != ' ')
+        if (key_press == LEFT_C ||
+            key_press == LEFT_S ||
+            key_press == RIGHT_C ||
+            key_press == RIGHT_S ||
+            key_press == UP_C ||
+            key_press == UP_S ||
+            key_press == DOWN_C ||
+            key_press == DOWN_S)
         {
             player.prev_direction = player.direction;
             player.direction = key_press;
             move(&map, &player);
+        }
+        else if (key_press == '#')
+        {
+            if (!save_game(&map, account, &player, mons_arr, chest_arr))
+            {
+                redprint("CRASH ERROR!");
+                exit(EXIT_FAILURE);
+            }
+            else
+            {
+                exit(EXIT_SUCCESS);
+            }
         }
         system("clear");
         /**
@@ -209,7 +228,6 @@ int load_game(account_t *account, map_t *map, player_t *player, int mons_buffer[
     }
 
     fread(load_buffer, 1024, sizeof(char), fd);
-    printf("%s\n", load_buffer);
     char *token;
     token = strtok(load_buffer, "\n");
     int i = 0;
@@ -289,6 +307,52 @@ int load_game(account_t *account, map_t *map, player_t *player, int mons_buffer[
         mons_buffer[j][MONS_ID] = atoi(player_buff[MONS_ID]);
         mons_buffer[j][MONS_HP] = atoi(player_buff[MONS_HP]);
     }
+    fclose(fd);
+    return 1;
+}
+
+int save_game(map_t *map, account_t *account, player_t *player, monster_t mons_arr[], chest_t chest_arr[])
+{
+    char buffer[200];
+    int counter = 1;
+    int offset = 0;
+    int i;
+    FILE *fd = fopen(account->save_file, "w+");
+    if (fd == NULL)
+    {
+        redprint("There was an error saving your game!Exiting...");
+        return 0;
+    }
+    fprintf(fd, "%d\n", map->level);
+    fprintf(fd, "%d,%d,%d,%d,%d,%d,%d,%d,%d\n", player->id, player->x, player->y, player->health, player->armor, player->attack, player->accuracy, player->wins, player->loses);
+    for (i = 0; i < map->chests_num; i++)
+    {
+        if (chest_arr[i].isOpen == FALSE)
+        {
+            offset += sprintf(buffer + offset, "%d,", chest_arr[i].chest_id);
+            counter++;
+        }
+    }
+    fprintf(fd, "%d\n", counter);
+    fprintf(fd, "%s", buffer);
+    fseek(fd, -1, SEEK_CUR);
+    fprintf(fd, "\n");
+    memset(buffer, '0', sizeof(buffer));
+    offset = 0;
+    counter = 0;
+    for (i = 0; i < map->monsters_num; i++)
+    {
+        if (!mons_arr[i].isDead)
+        {
+            offset += sprintf(buffer + offset, "%d,%d\n", mons_arr[i].health, mons_arr[i].monster_id);
+            counter++;
+        }
+    }
+    fprintf(fd, "%d\n", counter);
+    fprintf(fd, "%s", buffer);
+    system("clear");
+    redprint_slow("Your game has been saved successfully!\nC0ntr0l 1s 4n 1llus10n!\n");
+    fclose(fd);
     return 1;
 }
 
@@ -342,22 +406,39 @@ void pass_object_values(monster_t mons_arr[], chest_t chest_arr[], int mons_buff
 	 * Set these chests to unopened
 	 */
 
-    for (j = 0; j < map->level; j++)
+    for (j = 0; j < map->chests_num; j++)
     {
         chest_arr[j].isOpen = TRUE;
     }
+
     for (i = 0; i < MAX_CHESTS; i++)
     {
-        if (!chest_buffer[i])
-            break;
-
-        for (j = 0; j < map->level; j++)
+        if (chest_buffer[i] == 0 && i != 0)
         {
-            if (chest_arr[j].chest_id == chest_buffer[i]){
+            break;
+        }
+
+        for (j = 0; j < map->chests_num; j++)
+        {
+           // printf("%d:%d\n", chest_arr[j].chest_id, chest_buffer[i]);
+            if (chest_arr[j].chest_id == chest_buffer[i])
+            {
+                printf("PASS!!\n");
                 chest_arr[j].isOpen = FALSE;
             }
         }
     }
+    /**
+     * Here is where the chest bug lies
+     */
+
+
+
+    for (j = 0; j < map->chests_num; j++)
+    {
+        printf("%d:%d\n", chest_arr[j].chest_id, chest_arr[j].isOpen);
+    }
+
 }
 /**
  * Updates objects depending if they are alive or dead for monsters
@@ -367,12 +448,12 @@ void pass_object_values(monster_t mons_arr[], chest_t chest_arr[], int mons_buff
 void update_objects(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
 {
     int i, j;
-    for (j = 0; j < map->level + 3; j++)
+    for (j = 0; j < map->monsters_num; j++)
     {
         if (mons_arr[j].isDead == TRUE)
             map_set(map, MAP_P_SYMBOL, mons_arr[j].x, mons_arr[j].y);
     }
-    for (j = 0; j < map->level; j++)
+    for (j = 0; j < map->chests_num; j++)
     {
         if (chest_arr[j].isOpen == TRUE)
             map_set(map, MAP_P_SYMBOL, chest_arr[j].x, chest_arr[j].y);
@@ -398,17 +479,21 @@ char key_input(char *key)
     return key[0];
 }
 
-void level_up(player_t *player,monster_t monsters[], map_t *map){
+void level_up(player_t *player, monster_t monsters[], map_t *map)
+{
     int i;
     //go through all monsters find boss and check if it boos is dead
-    for(i=0;i<map->level+3;i++){
-        if((monsters[i].is_boss == 1) && (monsters[i].isDead == 1)){
+    for (i = 0; i < map->monsters_num; i++)
+    {
+        if ((monsters[i].is_boss == 1) && (monsters[i].isDead == 1))
+        {
             map->level++;
-            if(map->level == 11) win(player);
+            if (map->level == 11)
+                win(player);
             player->wins++;
             player->level++;
             map->level++;
-            printf("\nCongrats! Level %d is next. Get ready! \n\n",map->level);
+            printf("\nCongrats! Level %d is next. Get ready! \n\n", map->level);
             sleep(2);
             /*TODO:
                 Place the save function here which will save the player stats
@@ -421,8 +506,9 @@ void level_up(player_t *player,monster_t monsters[], map_t *map){
     return;
 }
 
-void win(player_t *player){
-    int i=0;
+void win(player_t *player)
+{
+    int i = 0;
     system("clear");
     printf("\033[0;31m"); //set color to red
     while (win_msg[i] != '\0')
@@ -436,16 +522,18 @@ void win(player_t *player){
     printf("\033[0;0m\n\n"); // color reset
 
     printf("\033[1;33m");
-    printf("The game was created by:\n[1] %s\n[2] %s\n[3]%s\n","Angelos Kalaitzidis","Theodore Zisimopoulos","Stelios Restemis");
+    printf("The game was created by:\n[1] %s\n[2] %s\n[3]%s\n", "Angelos Kalaitzidis", "Theodore Zisimopoulos", "Stelios Restemis");
     printf("\033[0;0m\n");
     printf("Thanks for playing. The game will exit in 5 seconds. See you soon...maybe\n");
-    
+
     sleep(5);
     exit(EXIT_SUCCESS);
 }
 
-void game_over(player_t *player){
-    if (player->isDead == 1){
+void game_over(player_t *player)
+{
+    if (player->isDead == TRUE)
+    {
         /*load the player stats with the load function
         Each time player dies stats shoud be autoloaded from
         the .rpg file. The map level should be the same as last game.

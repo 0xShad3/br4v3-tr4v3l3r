@@ -51,9 +51,10 @@ int login_check(account_t *account)
     return -1;
 }
 
-int do_register(char *username, char *password)
+int do_register(account_t* login)
 {
-    if (account_exists(username, password) == 1)
+    login->id = get_lastid() + 1 ;
+    if (account_exists(login->username, login->password) == 1)
     {
         exists_error();
         exit(0);
@@ -66,7 +67,7 @@ int do_register(char *username, char *password)
         printf("Register error!");
         exit(EXIT_FAILURE);
     }
-    fprintf(fp, "\n%s,%s,%d", username, password, get_lastid() + 1); //create new line + add username/password
+    fprintf(fp, "\n%s,%s,%d", login->username, login->password, login->id); //create new line + add username/password
     fclose(fp);
     return 0;
 }

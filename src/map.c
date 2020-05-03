@@ -85,8 +85,8 @@ void map_parser(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
 	char hold_buffer[101] = "./maps/";
 	int monster_counter = 0;
 	int chest_counter = 0;
-	int mons_id;
-	int chest_id;
+	int mons_id = 0;
+	int chest_id = 0;
 	int i = 0;
 	int j;
 	/*
@@ -130,7 +130,7 @@ void map_parser(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
 			else if (hold_buffer[j * 2] == '2')
 			{
 				map->map_array[i][j] = CSYMBOL;
-				chest_arr[chest_counter].isOpen = FALSE;
+				chest_arr[chest_counter].isOpen = TRUE;
 				chest_id = map->chests_num - (map->chests_num - chest_counter);
 				chest_arr[chest_counter].chest_id = chest_id;
 				chest_arr[chest_counter].x = i;
@@ -151,7 +151,6 @@ void map_parser(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
 
 		map->map_array[i][MAP_WIDTH - 1] = '\0';
 	}
-
 	fclose(fd);
 }
 
