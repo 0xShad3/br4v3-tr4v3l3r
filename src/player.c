@@ -64,6 +64,8 @@ void attack_player(map_t *map, player_t *player,monster_t *monster)
         monster->health-=((player->accuracy*player->attack)/100-(monster->armor)/10);
     }
 }*/
+
+
 int *check_obj(map_t *map,player_t *player,int obj_array[2]){
     if(map->map_array[player->y+1][player->x]!=' ' || map->map_array[player->y+1][player->x]!='*'){
         if(map->map_array[player->y+1][player->x]=='@'){
@@ -168,4 +170,50 @@ int attack(int accuracy,int damage){
     if(rand_num < accuracy) return damage;
     else return 0; //miss
     //function for miss / hit. Might need to change later
+}
+/**
+ * adds stats to player when opened
+ * */
+void open_chest(chest_t chest,player_t *player){
+    chest.isOpen=1;
+    player->health+=(chest.level)*10;
+    player->armor+=(chest.level)*10;
+    player->attack+=(chest.level)*10;
+    player->accuracy+=(chest.level)*10;
+}
+
+/**
+ * checks if there is an object near the player
+ * when found,if it is a monster executes attack or if it is a chest opens it
+ * OUSIASTIKA just attack or open chest when moving next to an object 
+ * it doesn't consider the diagonal position
+ **/ 
+void object_found(map_t *map,player_t *player, monster_t mons_arr[], chest_t chest_arr[]){
+    int i;
+    int attack_val;
+    for(i = 0; i < map->level + 3; i++)
+    {
+        if(mons_arr[i].x==map->map_array[player->y+1][player->x] ||
+            mons_arr[i].x==map->map_array[player->y-1][player->x]||
+            mons_arr[i].x==map->map_array[player->y][player->x+1]||
+            mons_arr[i].x==map->map_array[player->y][player->x-1])
+            {
+                attack_val=((player->attack)-(mons_arr[i].armor))/10;
+                mons_arr[i].health-=attack(player->accuracy,attack_val);
+                
+                if(mons_arr[i].health<=0){
+                    monster_die(mons_arr[i]);
+                }
+            }    
+    }
+    for (i = 0; i < map->level; i++)
+    {
+        if(chest_arr[i].x==map->map_array[player->y+1][player->x] ||
+            chest_arr[i].x==map->map_array[player->y-1][player->x]||
+            chest_arr[i].x==map->map_array[player->y][player->x+1]||
+            chest_arr[i].x==map->map_array[player->y][player->x-1])
+            {
+                open_chest(chest_arr[i],player);
+            }
+    }
 }

@@ -17,6 +17,6 @@ void init_monster(monster_t *monster,int id, int x1, int y1)
     monster->monster_id = id;
 }
 
-void monster_die(monster_t *monster){
-    monster->isDead=1;
+void monster_die(monster_t monster){
+    monster.isDead=1;
 }
