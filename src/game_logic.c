@@ -52,7 +52,7 @@ void init_game(account_t *account, int mode)
     init_player(&player, account->id);
     /**
      *  When a save game is found load the values from that file and start
-     *  the game.
+     *  the game. Else create a file for that player and start a game from level 0
      *  
      */
 
@@ -99,7 +99,9 @@ void init_game(account_t *account, int mode)
 
     while (1)
     {
-
+        /**
+         * Movement keys
+         */ 
         key_press = key_input(key);
         if (key_press == LEFT_C ||
             key_press == LEFT_S ||
@@ -114,6 +116,9 @@ void init_game(account_t *account, int mode)
             player.direction = key_press;
             move(&map, &player);
         }
+        /**
+         * To save the game press #
+         */
         else if (key_press == '#')
         {
             if (!save_game(&map, account, &player, mons_arr, chest_arr))
@@ -311,6 +316,13 @@ int load_game(account_t *account, map_t *map, player_t *player, int mons_buffer[
     return 1;
 }
 
+/**
+ * Saves the current game with the format [id].rpg in
+ * the saves directory
+ * @returns 0 on error
+ * @returns 1 on normal execution
+ */ 
+
 int save_game(map_t *map, account_t *account, player_t *player, monster_t mons_arr[], chest_t chest_arr[])
 {
     char buffer[200];
@@ -355,7 +367,9 @@ int save_game(map_t *map, account_t *account, player_t *player, monster_t mons_a
     fclose(fd);
     return 1;
 }
-
+/**
+ *  Setting the values of the two arrays to 0
+ */
 void memset_arrays(int mons_buffer[MONS_ELMNTS][MAX_MONSTERS], int chest_buffer[MAX_CHESTS])
 {
     int i, j;
