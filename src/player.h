@@ -18,6 +18,13 @@
 #define RIGHT_C 'D'
 #define RIGHT_S 'd'
 
+#define MONSTER 1  //gia thn check_obj
+#define CHEST 2
+#define UP_OBJ 1
+#define DOWN_OBJ 2
+#define LEFT_OBJ 3
+#define RIGHT_OBJ 4
+
 typedef struct player_t
 {
     int x;
@@ -42,6 +49,11 @@ typedef struct player_t
 
 void init_player(player_t *player,int account_id);
 void move(map_t* map,player_t *player);
+//void attack_player(map_t *map, player_t *player,monster_t *monster);
+int *check_obj(map_t *map,player_t *player,int obj_array[2]);
 void die(player_t *player);
 void get_stats(player_t *player, monster_t monsters[],map_t *map);
+int attack(int accuracy,int damage);
+
+
 #endif

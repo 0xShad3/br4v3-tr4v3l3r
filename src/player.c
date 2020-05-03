@@ -32,24 +32,81 @@ void move(map_t *map, player_t *player)
     int temp_y = player->y;
     if (player->direction == RIGHT_C || player->direction == RIGHT_S)
     {
-        player->x++;
+        if(map->map_array[player->y][player->x+1]==' '){
+            player->x++;
+        }
     }
     else if (player->direction == LEFT_C || player->direction == LEFT_S)
     {
-        player->x--;
+        if(map->map_array[player->y][player->x-1]==' '){
+            player->x--;
+        }
     }
     else if (player->direction == UP_C || player->direction == UP_S)
     {
-        player->y--;
+        if(map->map_array[player->y-1][player->x]==' '){
+            player->y--;
+        }
     }
     else if (player->direction == DOWN_C || player->direction == DOWN_S)
     {
-        player->y++;
+        if(map->map_array[player->y+1][player->x]==' '){
+            player->y++;
+        }
     }
     map_set(map, MAP_P_SYMBOL, temp_x, temp_y);
     map_set(map, PSYMBOL, player->x, player->y);
 }
-
+/*
+void attack_player(map_t *map, player_t *player,monster_t *monster)
+{
+    if(map->map_array[player->y+1][player->x]=='@' || map->map_array[player->y+1][player->x]=='@' || map->map_array[player->y+1][player->x]=='@' || map->map_array[player->y+1][player->x]=='@'){
+        monster->health-=((player->accuracy*player->attack)/100-(monster->armor)/10);
+    }
+}*/
+int *check_obj(map_t *map,player_t *player,int obj_array[2]){
+    if(map->map_array[player->y+1][player->x]!=' ' || map->map_array[player->y+1][player->x]!='*'){
+        if(map->map_array[player->y+1][player->x]=='@'){
+            obj_array[0]=DOWN_OBJ;
+            obj_array[1]=MONSTER;
+            return obj_array;
+        }else if(map->map_array[player->y+1][player->x]=='$'){
+            obj_array[0]=DOWN_OBJ;
+            obj_array[1]=CHEST;
+            return obj_array;
+        }
+    }else if(map->map_array[player->y-1][player->x]!=' ' || map->map_array[player->y-1][player->x]!='*'){
+        if(map->map_array[player->y-1][player->x]=='@'){
+            obj_array[0]=UP_OBJ;
+            obj_array[1]=MONSTER;
+            return obj_array;
+        }else if(map->map_array[player->y-1][player->x]=='$'){
+            obj_array[0]=UP_OBJ;
+            obj_array[1]=CHEST;
+            return obj_array;
+        }
+    }else if(map->map_array[player->y][player->x-1]!=' ' || map->map_array[player->y][player->x-1]!='*'){
+        if(map->map_array[player->y][player->x-1]=='@'){
+            obj_array[0]=LEFT_OBJ;
+            obj_array[1]=MONSTER;
+            return obj_array;
+        }else if(map->map_array[player->y][player->x-1]=='$'){
+            obj_array[0]=LEFT_OBJ;
+            obj_array[1]=CHEST;
+            return obj_array;
+        }
+    }else if(map->map_array[player->y][player->x+1]!=' ' || map->map_array[player->y][player->x+1]!='*'){
+        if(map->map_array[player->y][player->x+1]=='@'){
+            obj_array[0]=RIGHT_OBJ;
+            obj_array[1]=MONSTER;
+            return obj_array;
+        }else if(map->map_array[player->y][player->x+1]=='$'){
+            obj_array[0]=RIGHT_OBJ;
+            obj_array[1]=CHEST;
+            return obj_array;
+        }
+    }
+}
 void die(player_t *player)
 {
     player->isDead = 1;
@@ -75,13 +132,20 @@ void get_stats(player_t *player, monster_t monsters[],map_t *map){
 
     printf("\033[1;32m");
     printf("Wins: ");
+    printf("%d", player->wins);
     printf("\033[0m");
-    printf("[ %d ]", player->wins);
 
     printf("\033[1;31m");
-    printf(" Loses: ");
+    printf("   Loses: ");
+    printf("%d",player->loses);
     printf("\033[0m");
-    printf("[ %d ]\n",player->loses);
+    
+
+    printf("\033[1;37m");
+    printf("  Level: ");
+    printf("%d\n",map->level);
+    printf("\033[0m");
+    
 
     printf("Monsters left:   [");
 
@@ -97,6 +161,11 @@ void get_stats(player_t *player, monster_t monsters[],map_t *map){
         }
     }
     printf("]\n");
+}
 
-
+int attack(int accuracy,int damage){
+    int rand_num = (rand() % (101)); 
+    if(rand_num < accuracy) return damage;
+    else return 0; //miss
+    //function for miss / hit. Might need to change later
 }

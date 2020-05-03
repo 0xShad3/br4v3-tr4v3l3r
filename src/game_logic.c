@@ -25,6 +25,8 @@
         -everything
 */
 
+char *win_msg = "Congratulations! You are a br4v3 tr4v3l3r!";
+
 /*
     Connector library
     @purpose init and run the game
@@ -111,7 +113,7 @@ void init_game(account_t *account, int mode)
          */
         update_objects(&map, mons_arr, chest_arr);
         to_print(&map, &player, mons_arr, chest_arr);
-        sleep(1);
+        usleep(500000);
     }
 
     free(mons_arr);
@@ -394,4 +396,59 @@ char key_input(char *key)
     system("/bin/stty cooked");
 
     return key[0];
+}
+
+void level_up(player_t *player,monster_t monsters[], map_t *map){
+    int i;
+    //go through all monsters find boss and check if it boos is dead
+    for(i=0;i<map->level+3;i++){
+        if((monsters[i].is_boss == 1) && (monsters[i].isDead == 1)){
+            map->level++;
+            if(map->level == 11) win(player);
+            player->wins++;
+            player->level++;
+            map->level++;
+            printf("\nCongrats! Level %d is next. Get ready! \n\n",map->level);
+            sleep(2);
+            /*TODO:
+                Place the save function here which will save the player stats
+                and reload them at the next level. Ex. player hp=20 at=70 ar=65 ac=55
+                These values should be saved at the .rpg file so we can keep the player`s
+                stats for the next level. Each monster should be saved + players stats
+            */
+        }
+    }
+    return;
+}
+
+void win(player_t *player){
+    int i=0;
+    system("clear");
+    printf("\033[0;31m"); //set color to red
+    while (win_msg[i] != '\0')
+    {
+
+        printf("%c", win_msg[i]);
+        fflush(stdout);
+        usleep(80000);
+        i++;
+    }
+    printf("\033[0;0m\n\n"); // color reset
+
+    printf("\033[1;33m");
+    printf("The game was created by:\n[1] %s\n[2] %s\n[3]%s\n","Angelos Kalaitzidis","Theodore Zisimopoulos","Stelios Restemis");
+    printf("\033[0;0m\n");
+    printf("Thanks for playing. The game will exit in 5 seconds. See you soon...maybe\n");
+    
+    sleep(5);
+    exit(EXIT_SUCCESS);
+}
+
+void game_over(player_t *player){
+    if (player->isDead == 1){
+        /*load the player stats with the load function
+        Each time player dies stats shoud be autoloaded from
+        the .rpg file. The map level should be the same as last game.
+        */
+    }
 }

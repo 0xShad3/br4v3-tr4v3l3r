@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <time.h>
 #include "login.h"
 #include "custom_effects.h"
 #include "game_logic.h"
@@ -16,6 +17,7 @@ char waiting_game[] = "[+] Please wait while the game is loading...";
 
 int main(int argc, char *argv[])
 {
+    srand(time(NULL));
     int i = 0;
     int selection = 0;
     account_t account;
