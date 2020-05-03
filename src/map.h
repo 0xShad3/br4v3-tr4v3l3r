@@ -12,6 +12,11 @@
 /* map game characteristics*/
 #define MAP_W_SYMBOL '*'
 #define MAP_P_SYMBOL ' '
+#define MAX_MONSTERS 13
+#define MAX_CHESTS 10
+#define MONS_ID 1
+#define MONS_HP 0
+#define MONS_ELMNTS 2
 
 
 
@@ -30,7 +35,7 @@ typedef struct map_t
 }map_t;
 
 
-void init_map(map_t *map,monster_t mons_array[],chest_t chest_arr[]);
+void load_map(map_t *map,monster_t mons_array[],chest_t chest_arr[]);
 void print_map(map_t *map);
 void map_parser(map_t* map,monster_t mons_array[],chest_t chest_arr[]);
 void map_constr_fn(map_t *map);

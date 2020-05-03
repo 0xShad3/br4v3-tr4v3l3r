@@ -3,6 +3,8 @@
 //#include "player.h"
 #define MCOLOR "[0;31m"
 #define MSYMBOL '@'
+#define FALSE 0
+#define TRUE 1
 
 typedef struct monster_t{
     int x;

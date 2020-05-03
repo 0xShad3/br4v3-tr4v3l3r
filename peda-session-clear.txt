@@ -1,0 +1,3 @@
+break game_logic.c:56
+disable $bpnum
+

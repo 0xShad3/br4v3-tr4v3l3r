@@ -9,18 +9,15 @@
 #include "custom_effects.h"
 #include "player.h"
 
-
 /*
 	initialises the map
 */
-void init_map(map_t *map,monster_t mons_arr[],chest_t chest_arr[])
+void load_map(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
 {
 	map->monsters_num = map->level + 3;
 	map->chests_num = map->level;
 	map_constr_fn(map);
-	map_parser(map,mons_arr,chest_arr);
-
-	
+	map_parser(map, mons_arr, chest_arr);
 }
 
 /* 
@@ -51,24 +48,26 @@ void print_map(map_t *map)
 	{
 		for (j = 0; j < MAP_WIDTH - 1; j++)
 		{
-			if(map->map_array[i][j] == '@'){
+			if (map->map_array[i][j] == '@')
+			{
 				redprint_char(map->map_array[i][j]);
 			}
 
-			else if(map->map_array[i][j] == '$'){
+			else if (map->map_array[i][j] == '$')
+			{
 				yellowprint_char(map->map_array[i][j]);
 			}
 
-			else if(map->map_array[i][j] == 'Y'){
+			else if (map->map_array[i][j] == 'Y')
+			{
 				greenprint_char(map->map_array[i][j]);
 			}
 
-			else{
-				printf("%c",map->map_array[i][j]);
+			else
+			{
+				printf("%c", map->map_array[i][j]);
 			}
-
 		}
-		printf("\n");
 		printf("\n");
 	}
 }
@@ -80,7 +79,7 @@ void print_map(map_t *map)
 		Else it will give segmentation
 
 */
-void map_parser(map_t *map,monster_t mons_arr[],chest_t chest_arr[])
+void map_parser(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
 {
 
 	char hold_buffer[101] = "./maps/";
@@ -119,7 +118,7 @@ void map_parser(map_t *map,monster_t mons_arr[],chest_t chest_arr[])
 				Hold buffer skips the comma chars 
 				parses the map to 2d map array 
 			*/
-		
+
 			if (hold_buffer[j * 2] == '0')
 			{
 				map->map_array[i][j] = MAP_P_SYMBOL;
@@ -131,6 +130,7 @@ void map_parser(map_t *map,monster_t mons_arr[],chest_t chest_arr[])
 			else if (hold_buffer[j * 2] == '2')
 			{
 				map->map_array[i][j] = CSYMBOL;
+				chest_arr[chest_counter].isOpen = FALSE;
 				chest_id = map->chests_num - (map->chests_num - chest_counter);
 				chest_arr[chest_counter].chest_id = chest_id;
 				chest_arr[chest_counter].x = i;
@@ -140,6 +140,7 @@ void map_parser(map_t *map,monster_t mons_arr[],chest_t chest_arr[])
 			else if (hold_buffer[j * 2] == '3')
 			{
 				map->map_array[i][j] = MSYMBOL;
+				mons_arr[monster_counter].isDead = FALSE;
 				mons_id = map->monsters_num - (map->monsters_num - monster_counter);
 				mons_arr[monster_counter].monster_id = mons_id;
 				mons_arr[monster_counter].x = j;
