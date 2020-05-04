@@ -193,10 +193,10 @@ void object_found(map_t *map,player_t *player, monster_t mons_arr[], chest_t che
     int attack_val;
     for(i = 0; i < map->level + 3; i++)
     {
-        if(mons_arr[i].x==map->map_array[player->y+1][player->x] ||
-            mons_arr[i].x==map->map_array[player->y-1][player->x]||
-            mons_arr[i].x==map->map_array[player->y][player->x+1]||
-            mons_arr[i].x==map->map_array[player->y][player->x-1])
+        if((mons_arr[i].y== player->y+1 && mons_arr[i].x==player->x) ||
+            (mons_arr[i].y==player->y-1 && mons_arr[i].x==player->x) ||
+            (mons_arr[i].y==player->y && mons_arr[i].x==player->x+1) ||
+            (mons_arr[i].y==player->y && mons_arr[i].x==player->x-1) )
             {
                 attack_val=((player->attack)-(mons_arr[i].armor))/10;
                 mons_arr[i].health-=attack(player->accuracy,attack_val);
@@ -208,10 +208,10 @@ void object_found(map_t *map,player_t *player, monster_t mons_arr[], chest_t che
     }
     for (i = 0; i < map->level; i++)
     {
-        if(chest_arr[i].x==map->map_array[player->y+1][player->x] ||
-            chest_arr[i].x==map->map_array[player->y-1][player->x]||
-            chest_arr[i].x==map->map_array[player->y][player->x+1]||
-            chest_arr[i].x==map->map_array[player->y][player->x-1])
+        if((chest_arr[i].y== player->y+1 && chest_arr[i].x==player->x) ||
+            (chest_arr[i].y==player->y-1 && chest_arr[i].x==player->x) ||
+            (chest_arr[i].y==player->y && chest_arr[i].x==player->x+1) ||
+            (chest_arr[i].y==player->y && chest_arr[i].x==player->x-1) )
             {
                 open_chest(chest_arr[i],player);
             }
