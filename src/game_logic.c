@@ -46,7 +46,7 @@ void init_game(account_t *account, int mode)
      * To pass the values from the loaded save file to current game
      */
 
-    int mons_buffer[MONS_ELMNTS][MAX_MONSTERS];
+    int mons_buffer[MAX_MONSTERS][MONS_ELMNTS];
     int chest_buffer[MAX_CHESTS];
 
     init_player(&player, account->id);
@@ -103,6 +103,7 @@ void init_game(account_t *account, int mode)
          * Movement keys
          */
         key_press = key_input(key);
+        //key_press = '#';
         if (key_press == LEFT_C ||
             key_press == LEFT_S ||
             key_press == RIGHT_C ||
@@ -217,7 +218,7 @@ void add_stats(player_t *player)
  * Save game file parser
  * @returns 0 on error
  */
-int load_game(account_t *account, map_t *map, player_t *player, int mons_buffer[MONS_ELMNTS][MAX_MONSTERS], int chest_buffer[MAX_CHESTS])
+int load_game(account_t *account, map_t *map, player_t *player, int mons_buffer[MAX_MONSTERS][MONS_ELMNTS], int chest_buffer[MAX_CHESTS])
 {
     char load_buffer[1024];
     char line_buff[MAX_LINES][40];
@@ -354,7 +355,7 @@ int save_game(map_t *map, account_t *account, player_t *player, monster_t mons_a
     counter = 0;
     for (i = 0; i < map->monsters_num; i++)
     {
-        if (!mons_arr[i].isDead)
+        if (mons_arr[i].isDead == FALSE)
         {
             offset += sprintf(buffer + offset, "%d,%d\n", mons_arr[i].health, mons_arr[i].monster_id);
             counter++;
@@ -370,7 +371,7 @@ int save_game(map_t *map, account_t *account, player_t *player, monster_t mons_a
 /**
  *  Setting the values of the two arrays to 0
  */
-void memset_arrays(int mons_buffer[MONS_ELMNTS][MAX_MONSTERS], int chest_buffer[MAX_CHESTS])
+void memset_arrays(int mons_buffer[MAX_MONSTERS][MONS_ELMNTS], int chest_buffer[MAX_CHESTS])
 {
     int i, j;
     for (i = 0; i < MAX_CHESTS; i++)
@@ -378,9 +379,9 @@ void memset_arrays(int mons_buffer[MONS_ELMNTS][MAX_MONSTERS], int chest_buffer[
         chest_buffer[i] = 0;
     }
 
-    for (i = 0; i < MONS_ELMNTS; i++)
+    for (i = 0; i < MAX_MONSTERS; i++)
     {
-        for (j = 0; j < MAX_MONSTERS; j++)
+        for (j = 0; j < MONS_ELMNTS; j++)
         {
             mons_buffer[i][j] = 0;
         }
@@ -391,11 +392,11 @@ void memset_arrays(int mons_buffer[MONS_ELMNTS][MAX_MONSTERS], int chest_buffer[
  * THERE IS A BUG ON THE NUMBER OF MONSTERS AND CHESTS GETTING PRINTED
  * 
  */
-void pass_object_values(monster_t mons_arr[], chest_t chest_arr[], int mons_buffer[MONS_ELMNTS][MAX_MONSTERS], int chest_buffer[MAX_CHESTS], map_t *map)
+void pass_object_values(monster_t mons_arr[], chest_t chest_arr[], int mons_buffer[MAX_MONSTERS][MONS_ELMNTS], int chest_buffer[MAX_CHESTS], map_t *map)
 {
     int i, j;
 
-    for (j = 0; j < map->level + 3; j++)
+    for (j = 0; j < map->monsters_num; j++)
     {
 
         mons_arr[j].isDead = TRUE;
@@ -405,7 +406,7 @@ void pass_object_values(monster_t mons_arr[], chest_t chest_arr[], int mons_buff
         if (mons_buffer[i][MONS_ID] == mons_buffer[i - 1][MONS_ID] && mons_buffer[i][MONS_HP] == mons_buffer[i - 1][MONS_HP])
             break;
 
-        for (j = 0; j < map->level + 3; j++)
+        for (j = 0; j < map->monsters_num; j++)
         {
             if (mons_arr[j].monster_id == mons_buffer[i][MONS_ID])
             {
@@ -442,14 +443,7 @@ void pass_object_values(monster_t mons_arr[], chest_t chest_arr[], int mons_buff
             }
         }
     }
-    /**
-     * Here is where the chest bug lies
-     */
 
-    for (j = 0; j < map->chests_num; j++)
-    {
-        printf("%d:%d\n", chest_arr[j].chest_id, chest_arr[j].isOpen);
-    }
 }
 /**
  * Updates objects depending if they are alive or dead for monsters
