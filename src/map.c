@@ -130,7 +130,7 @@ void map_parser(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
 			else if (hold_buffer[j * 2] == '2')
 			{
 				map->map_array[i][j] = CSYMBOL;
-				chest_arr[chest_counter].isOpen = TRUE;
+				chest_arr[chest_counter].isOpen = FALSE;
 				chest_id = map->chests_num - (map->chests_num - chest_counter);
 				chest_arr[chest_counter].chest_id = chest_id;
 				chest_arr[chest_counter].x = i;
@@ -143,8 +143,9 @@ void map_parser(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
 				mons_arr[monster_counter].isDead = FALSE;
 				mons_id = map->monsters_num - (map->monsters_num - monster_counter);
 				mons_arr[monster_counter].monster_id = mons_id;
-				mons_arr[monster_counter].x = j;
-				mons_arr[monster_counter].y = i;
+				mons_arr[monster_counter].x = i;
+				mons_arr[monster_counter].y = j;
+				mons_arr[monster_counter].health = 10;
 				monster_counter++;
 			}
 		}
@@ -158,7 +159,7 @@ void map_parser(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
 	On error return 1;
 	Generic function to set an array symbol;
 */
-int map_set(map_t *map, char symbol, int x, int y)
+int map_set(map_t *map, char symbol, int y, int x)
 {
 	if (x == 0 || y == 0 || y == MAP_HEIGHT - 1 || x == MAP_WIDTH - 1)
 	{
@@ -166,7 +167,7 @@ int map_set(map_t *map, char symbol, int x, int y)
 	}
 	else
 	{
-		map->map_array[y][x] = symbol;
+		map->map_array[x][y] = symbol;
 		return 0;
 	}
 }

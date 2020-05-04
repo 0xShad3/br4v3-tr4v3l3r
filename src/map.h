@@ -39,7 +39,7 @@ void load_map(map_t *map,monster_t mons_array[],chest_t chest_arr[]);
 void print_map(map_t *map);
 void map_parser(map_t* map,monster_t mons_array[],chest_t chest_arr[]);
 void map_constr_fn(map_t *map);
-int map_set(map_t* map,char symbol,int x, int y);
+int map_set(map_t* map,char symbol,int y, int x);
 
 
 

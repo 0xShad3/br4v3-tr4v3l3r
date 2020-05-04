@@ -101,7 +101,7 @@ void init_game(account_t *account, int mode)
     {
         /**
          * Movement keys
-         */ 
+         */
         key_press = key_input(key);
         if (key_press == LEFT_C ||
             key_press == LEFT_S ||
@@ -321,12 +321,12 @@ int load_game(account_t *account, map_t *map, player_t *player, int mons_buffer[
  * the saves directory
  * @returns 0 on error
  * @returns 1 on normal execution
- */ 
+ */
 
 int save_game(map_t *map, account_t *account, player_t *player, monster_t mons_arr[], chest_t chest_arr[])
 {
     char buffer[200];
-    int counter = 1;
+    int counter = 0;
     int offset = 0;
     int i;
     FILE *fd = fopen(account->save_file, "w+");
@@ -434,7 +434,7 @@ void pass_object_values(monster_t mons_arr[], chest_t chest_arr[], int mons_buff
 
         for (j = 0; j < map->chests_num; j++)
         {
-           // printf("%d:%d\n", chest_arr[j].chest_id, chest_buffer[i]);
+            // printf("%d:%d\n", chest_arr[j].chest_id, chest_buffer[i]);
             if (chest_arr[j].chest_id == chest_buffer[i])
             {
                 printf("PASS!!\n");
@@ -446,13 +446,10 @@ void pass_object_values(monster_t mons_arr[], chest_t chest_arr[], int mons_buff
      * Here is where the chest bug lies
      */
 
-
-
     for (j = 0; j < map->chests_num; j++)
     {
         printf("%d:%d\n", chest_arr[j].chest_id, chest_arr[j].isOpen);
     }
-
 }
 /**
  * Updates objects depending if they are alive or dead for monsters
@@ -465,12 +462,12 @@ void update_objects(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
     for (j = 0; j < map->monsters_num; j++)
     {
         if (mons_arr[j].isDead == TRUE)
-            map_set(map, MAP_P_SYMBOL, mons_arr[j].x, mons_arr[j].y);
+            map_set(map, MAP_P_SYMBOL, mons_arr[j].y, mons_arr[j].x);
     }
     for (j = 0; j < map->chests_num; j++)
     {
         if (chest_arr[j].isOpen == TRUE)
-            map_set(map, MAP_P_SYMBOL, chest_arr[j].x, chest_arr[j].y);
+            map_set(map, MAP_P_SYMBOL, chest_arr[j].y, chest_arr[j].x);
     }
 }
 
