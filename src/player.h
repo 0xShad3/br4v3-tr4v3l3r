@@ -54,7 +54,7 @@ void object_found(map_t *map,player_t *player, monster_t mons_arr[], chest_t che
 int *check_obj(map_t *map,player_t *player,int obj_array[2]);
 void die(player_t *player);
 void get_stats(player_t *player, monster_t monsters[],map_t *map);
-int attack(int accuracy,int damage);
+int attack(int accuracy,int damage,int armor);
 void open_chest(chest_t chest,player_t *player);
 
 

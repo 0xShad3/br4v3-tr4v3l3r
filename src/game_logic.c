@@ -493,8 +493,7 @@ void level_up(player_t *player, monster_t monsters[], map_t *map)
         if ((monsters[i].is_boss == 1) && (monsters[i].isDead == 1))
         {
             map->level++;
-            if (map->level == 11)
-                win(player);
+            if (map->level == 11) win(player);
             player->wins++;
             player->level++;
             map->level++;

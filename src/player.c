@@ -163,11 +163,12 @@ void get_stats(player_t *player, monster_t monsters[],map_t *map){
         }
     }
     printf("]\n");
+    printf("Save and exit by pressing #\n");
 }
 
-int attack(int accuracy,int damage){
+int attack(int accuracy,int damage,int armor){
     int rand_num = (rand() % (101)); 
-    if(rand_num < accuracy) return damage;
+    if(rand_num < accuracy) return (1 - (armor * 0,01) /2 ) * damage;
     else return 0; //miss
     //function for miss / hit. Might need to change later
 }
@@ -198,8 +199,8 @@ void object_found(map_t *map,player_t *player, monster_t mons_arr[], chest_t che
             (mons_arr[i].y==player->y && mons_arr[i].x==player->x+1) ||
             (mons_arr[i].y==player->y && mons_arr[i].x==player->x-1) )
             {
-                attack_val=((player->attack)-(mons_arr[i].armor))/10;
-                mons_arr[i].health-=attack(player->accuracy,attack_val);
+                //attack_val=((player->attack)-(mons_arr[i].armor))/10;
+                mons_arr[i].health -= attack(player->accuracy,player->attack,mons_arr[i].armor);
                 
                 if(mons_arr[i].health<=0){
                     monster_die(mons_arr[i]);
