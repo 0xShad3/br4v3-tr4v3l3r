@@ -23,4 +23,8 @@ void level_up(player_t *player,monster_t monsters[], map_t *map);
 void win(player_t *player);
 void game_over(player_t *player);
 
+
+
+void kill_all(monster_t mons_arr[],map_t* map);
+
 #endif

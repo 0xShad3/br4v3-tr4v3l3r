@@ -159,6 +159,7 @@ void map_parser(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
 	On error return 1;
 	Generic function to set an array symbol;
 */
+
 int map_set(map_t *map, char symbol, int y, int x)
 {
 	if (x == 0 || y == 0 || y == MAP_HEIGHT - 1 || x == MAP_WIDTH - 1)
@@ -167,7 +168,7 @@ int map_set(map_t *map, char symbol, int y, int x)
 	}
 	else
 	{
-		map->map_array[x][y] = symbol;
+		map->map_array[y][x] = symbol;
 		return 0;
 	}
 }

@@ -82,7 +82,7 @@ void init_game(account_t *account, int mode)
             update_objects(&map, mons_arr, chest_arr);
         }
 
-        map_set(&map, player.psymbol, player.x, player.y);
+        map_set(&map, player.psymbol,player.y,player.x);
     }
     else
     {
@@ -94,58 +94,76 @@ void init_game(account_t *account, int mode)
         chest_arr = (chest_t *)calloc(sizeof(chest_t), map.level);
         load_map(&map, mons_arr, chest_arr);
         add_stats(&player);
-        map_set(&map, player.psymbol, player.x, player.y);
+        map_set(&map, player.psymbol,player.y, player.x);
     }
-
     while (1)
     {
-        /**
+
+        //mons_arr = (monster_t *)calloc(sizeof(monster_t), map.level + 3);
+       // chest_arr = (chest_t *)calloc(sizeof(chest_t), map.level);
+       // load_map(&map, mons_arr, chest_arr);
+        // update_objects(&map, mons_arr, chest_arr);
+     //   player.x = 18;
+       // player.y = 48;
+        //map_set(&map, player.psymbol, player.x, player.y);
+
+        while (1)
+        {
+            /**
          * Movement keys
          */
-        key_press = key_input(key);
-        //key_press = '#';
-        if (key_press == LEFT_C ||
-            key_press == LEFT_S ||
-            key_press == RIGHT_C ||
-            key_press == RIGHT_S ||
-            key_press == UP_C ||
-            key_press == UP_S ||
-            key_press == DOWN_C ||
-            key_press == DOWN_S)
-        {
-            player.prev_direction = player.direction;
-            player.direction = key_press;
-            move(&map, &player);
-        }
-        /**
+            key_press = key_input(key);
+            //key_press = '#';
+            if (key_press == LEFT_C ||
+                key_press == LEFT_S ||
+                key_press == RIGHT_C ||
+                key_press == RIGHT_S ||
+                key_press == UP_C ||
+                key_press == UP_S ||
+                key_press == DOWN_C ||
+                key_press == DOWN_S)
+            {
+                player.prev_direction = player.direction;
+                player.direction = key_press;
+                move(&map, &player);
+            }
+            /**
          * To save the game press #
          */
-        else if (key_press == '#')
-        {
-            if (!save_game(&map, account, &player, mons_arr, chest_arr))
+            else if (key_press == '#')
             {
-                redprint("CRASH ERROR!");
-                exit(EXIT_FAILURE);
+                if (!save_game(&map, account, &player, mons_arr, chest_arr))
+                {
+                    redprint("CRASH ERROR!");
+                    exit(EXIT_FAILURE);
+                }
+                else
+                {
+                    exit(EXIT_SUCCESS);
+                }
             }
-            else
-            {
-                exit(EXIT_SUCCESS);
+            else if(key_press == 'L'){
+                kill_all(mons_arr,&map);
+                level_up(&player,mons_arr,&map);
             }
-        }
-        system("clear");
-        /**
+            system("clear");
+            /**
          * Here put code that determines open open chests and dead monsters
          */
-        update_objects(&map, mons_arr, chest_arr);
-        object_found(&map,&player,mons_arr,chest_arr);
-        to_print(&map, &player, mons_arr, chest_arr);
-        usleep(500000);
-    }
+            update_objects(&map, mons_arr, chest_arr);
+            object_found(&map, &player, mons_arr, chest_arr);
+            to_print(&map, &player, mons_arr, chest_arr);
+            usleep(500000);
+            fflush(stderr);
+            fflush(stdin);
+            fflush(stdout);
+        }
 
-    free(mons_arr);
-    mons_arr = NULL;
-    free(chest_arr);
-    chest_arr = NULL;
+        free(mons_arr);
+        mons_arr = NULL;
+        free(chest_arr);
+        chest_arr = NULL;
+    }
 }
 
 void to_print(map_t *map, player_t *player, monster_t monsters[], chest_t chests[])
@@ -439,12 +457,10 @@ void pass_object_values(monster_t mons_arr[], chest_t chest_arr[], int mons_buff
             // printf("%d:%d\n", chest_arr[j].chest_id, chest_buffer[i]);
             if (chest_arr[j].chest_id == chest_buffer[i])
             {
-                printf("PASS!!\n");
                 chest_arr[j].isOpen = FALSE;
             }
         }
     }
-
 }
 /**
  * Updates objects depending if they are alive or dead for monsters
@@ -491,15 +507,10 @@ void level_up(player_t *player, monster_t monsters[], map_t *map)
     //go through all monsters find boss and check if it boos is dead
     for (i = 0; i < map->monsters_num; i++)
     {
-        if ((monsters[i].is_boss == 1) && (monsters[i].isDead == 1))
+        if (monsters[i].isDead == FALSE)
         {
-            map->level++;
-            if (map->level == 11) win(player);
-            player->wins++;
-            player->level++;
-            map->level++;
-            printf("\nCongrats! Level %d is next. Get ready! \n\n", map->level);
-            sleep(2);
+
+            return;
             /*TODO:
                 Place the save function here which will save the player stats
                 and reload them at the next level. Ex. player hp=20 at=70 ar=65 ac=55
@@ -508,7 +519,13 @@ void level_up(player_t *player, monster_t monsters[], map_t *map)
             */
         }
     }
-    return;
+    map->level++;
+    if (map->level == 11)
+        win(player);
+    player->wins++;
+    player->level++;
+    printf("\nCongrats! Level %d is next. Get ready! \n\n", map->level);
+    sleep(2);
 }
 
 void win(player_t *player)
@@ -527,7 +544,7 @@ void win(player_t *player)
     printf("\033[0;0m\n\n"); // color reset
 
     printf("\033[1;33m");
-    printf("The game was created by:\n[1] %s\n[2] %s\n[3]%s\n", "Angelos Kalaitzidis", "Theodore Zisimopoulos", "Stelios Restemis");
+    printf("The game was created by:\n[1] %s\n[2] %s\n[3] %s\n", "Angelos Kalaitzidis", "Theodore Zisimopoulos", "Stelios Restemis");
     printf("\033[0;0m\n");
     printf("Thanks for playing. The game will exit in 5 seconds. See you soon...maybe\n");
 
@@ -543,5 +560,16 @@ void game_over(player_t *player)
         Each time player dies stats shoud be autoloaded from
         the .rpg file. The map level should be the same as last game.
         */
+    }
+}
+
+
+void kill_all(monster_t mons_arr[], map_t *map)
+{
+
+    int i;
+    for (i = 0; i < map->monsters_num; i++)
+    {
+        mons_arr[i].isDead = TRUE;
     }
 }

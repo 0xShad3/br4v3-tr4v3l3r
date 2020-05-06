@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "map.h"
 #include "monster.h"
 
-void init_monster(monster_t *monster,int id, int x1, int y1)
+void init_monster(monster_t *monster, int id, int x1, int y1)
 {
     monster->is_boss = 0;
     monster->attack = 10;
@@ -18,18 +19,19 @@ void init_monster(monster_t *monster,int id, int x1, int y1)
     monster->monster_id = id;
 }
 
-void monster_die(monster_t monster){
-    monster.isDead=1;
+void monster_die(monster_t monster)
+{
+    monster.isDead = 1;
 }
 
-
-void monster_boss_parser(int save_bosses[TOTAL_LVLS][2]){
-    int i,j;
-    j=0;
-    i=0;
+void monster_boss_parser(int save_bosses[TOTAL_LVLS][2])
+{
+    int i, j;
+    j = 0;
+    i = 0;
     char *temp_map_level;
     char *temp_monster_id;
-    int id,map_level;
+    int id, map_level;
     FILE *fp;
     char *line = NULL;
     size_t len = 0;
@@ -40,10 +42,10 @@ void monster_boss_parser(int save_bosses[TOTAL_LVLS][2]){
         printf("Boss parser error!");
         exit(EXIT_FAILURE);
     }
-  
+
     while (getline(&line, &len, fp) != -1)
     {
-        j=0;
+        j = 0;
         temp_map_level = strtok(line, ",");
         temp_monster_id = strtok(NULL, "\n");
 
