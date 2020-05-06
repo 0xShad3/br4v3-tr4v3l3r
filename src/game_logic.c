@@ -537,11 +537,7 @@ void level_up(player_t *player, monster_t monsters[], map_t *map)
     player->accuracy +=5;
     player->health += 20;
     player->attack += 5;
-    //debug for max health attack ++others
-    if(player->armor > 100) player->armor = 100;
-    if(player->accuracy > 100) player->accuracy = 100;
-    if(player-> health > 100 ) player->health = 100;
-    if(player->attack > 100) player->attack = 100;
+    player_check_max_stats(player);
     printf("\nCongrats! Level %d is next. Get ready! \n\n", map->level);
     sleep(2);
 }
