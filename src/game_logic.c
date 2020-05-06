@@ -137,6 +137,7 @@ void init_game(account_t *account, int mode)
          * Here put code that determines open open chests and dead monsters
          */
         update_objects(&map, mons_arr, chest_arr);
+        object_found(&map,&player,mons_arr,chest_arr);
         to_print(&map, &player, mons_arr, chest_arr);
         usleep(500000);
     }

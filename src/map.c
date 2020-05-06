@@ -133,8 +133,8 @@ void map_parser(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
 				chest_arr[chest_counter].isOpen = FALSE;
 				chest_id = map->chests_num - (map->chests_num - chest_counter);
 				chest_arr[chest_counter].chest_id = chest_id;
-				chest_arr[chest_counter].x = i;
-				chest_arr[chest_counter].y = j;
+				chest_arr[chest_counter].x = j;
+				chest_arr[chest_counter].y = i;
 				chest_counter++;
 			}
 			else if (hold_buffer[j * 2] == '3')
@@ -143,8 +143,8 @@ void map_parser(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
 				mons_arr[monster_counter].isDead = FALSE;
 				mons_id = map->monsters_num - (map->monsters_num - monster_counter);
 				mons_arr[monster_counter].monster_id = mons_id;
-				mons_arr[monster_counter].x = i;
-				mons_arr[monster_counter].y = j;
+				mons_arr[monster_counter].x = j;
+				mons_arr[monster_counter].y = i;
 				mons_arr[monster_counter].health = 10;
 				monster_counter++;
 			}

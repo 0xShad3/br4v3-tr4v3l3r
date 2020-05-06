@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "player.h"
 #include "map.h"
 #include "monster.h"
@@ -201,7 +202,9 @@ void object_found(map_t *map,player_t *player, monster_t mons_arr[], chest_t che
             {
                 //attack_val=((player->attack)-(mons_arr[i].armor))/10;
                 mons_arr[i].health -= attack(player->accuracy,player->attack,mons_arr[i].armor);
-                
+                printf("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                sleep(10);
+  
                 if(mons_arr[i].health<=0){
                     monster_die(mons_arr[i]);
                 }
