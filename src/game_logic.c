@@ -146,7 +146,7 @@ void init_game(account_t *account, int mode)
             object_found(&map, &player, mons_arr, chest_arr);
             to_print(&map, &player, mons_arr, chest_arr);
 
-            usleep(500000);
+            usleep(100000);
             fflush(stderr);
             fflush(stdin);
             fflush(stdout);
@@ -532,6 +532,16 @@ void level_up(player_t *player, monster_t monsters[], map_t *map)
     }
     player->wins++;
     player->level++;
+
+    player->armor += 3;
+    player->accuracy +=5;
+    player->health += 20;
+    player->attack += 5;
+    //debug for max health attack ++others
+    if(player->armor > 100) player->armor = 100;
+    if(player->accuracy > 100) player->accuracy = 100;
+    if(player-> health > 100 ) player->health = 100;
+    if(player->attack > 100) player->attack = 100;
     printf("\nCongrats! Level %d is next. Get ready! \n\n", map->level);
     sleep(2);
 }
