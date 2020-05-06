@@ -247,3 +247,16 @@ void object_found(map_t *map, player_t *player, monster_t mons_arr[], chest_t ch
         }
     }
 }
+
+int check_level_up(monster_t mons_arr[], map_t *map)
+{
+    int i;
+    for (i = 0; i < map->monsters_num; i++)
+    {
+        if (!mons_arr[i].isDead)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}

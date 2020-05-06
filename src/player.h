@@ -56,6 +56,8 @@ void die(player_t *player);
 void get_stats(player_t *player, monster_t monsters[],map_t *map);
 int attack(int accuracy,int damage,int armor);
 void open_chest(chest_t chest,player_t *player);
+int check_level_up(monster_t mons_arr[], map_t *map);
+
 
 
 #endif

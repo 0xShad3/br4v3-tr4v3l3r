@@ -12,25 +12,14 @@
 #include "chest.h"
 #include "monster.h"
 #include "custom_effects.h"
-/*
-    #SINGLE_PLAYER
-    TODO:
-        -game over
-        -level up
-             before you level up you have to free or realloc
-             both arrays of structs monsters/chests to give them values again
-        - battle system
-    #MULTIPLAYER
-    TODO:
-        -everything
-*/
 
 char *win_msg = "Congratulations! You are a br4v3 tr4v3l3r!";
 
-/*
-    Connector library
-    @purpose init and run the game
-*/
+/**
+ * Main game function
+ * its responsible for running the game for both single and 
+ * multiplayer mode
+ */
 
 void init_game(account_t *account, int mode)
 {
@@ -82,7 +71,7 @@ void init_game(account_t *account, int mode)
             update_objects(&map, mons_arr, chest_arr);
         }
 
-        map_set(&map, player.psymbol,player.y,player.x);
+        map_set(&map, player.psymbol, player.y, player.x);
     }
     else
     {
@@ -94,26 +83,22 @@ void init_game(account_t *account, int mode)
         chest_arr = (chest_t *)calloc(sizeof(chest_t), map.level);
         load_map(&map, mons_arr, chest_arr);
         add_stats(&player);
-        map_set(&map, player.psymbol,player.y, player.x);
+        map_set(&map, player.psymbol, player.y, player.x);
     }
+    /**
+     * Level change loop
+     */
     while (1)
     {
-
-        //mons_arr = (monster_t *)calloc(sizeof(monster_t), map.level + 3);
-       // chest_arr = (chest_t *)calloc(sizeof(chest_t), map.level);
-       // load_map(&map, mons_arr, chest_arr);
-        // update_objects(&map, mons_arr, chest_arr);
-     //   player.x = 18;
-       // player.y = 48;
-        //map_set(&map, player.psymbol, player.x, player.y);
-
+        /**
+         * Main game loop
+         */
         while (1)
         {
             /**
-         * Movement keys
-         */
+            * Movement keys
+            */
             key_press = key_input(key);
-            //key_press = '#';
             if (key_press == LEFT_C ||
                 key_press == LEFT_S ||
                 key_press == RIGHT_C ||
@@ -128,8 +113,8 @@ void init_game(account_t *account, int mode)
                 move(&map, &player);
             }
             /**
-         * To save the game press #
-         */
+            * To save the game press #
+            */
             else if (key_press == '#')
             {
                 if (!save_game(&map, account, &player, mons_arr, chest_arr))
@@ -142,36 +127,57 @@ void init_game(account_t *account, int mode)
                     exit(EXIT_SUCCESS);
                 }
             }
-            else if(key_press == 'L'){
-                kill_all(mons_arr,&map);
-                level_up(&player,mons_arr,&map);
+            /**
+             * Check if the conditions match to level up
+             */
+            if (!check_level_up(mons_arr, &map))
+            {
+                system("clear");
+                kill_all(mons_arr, &map);
+                level_up(&player, mons_arr, &map);
+                break;
             }
+
             system("clear");
             /**
-         * Here put code that determines open open chests and dead monsters
-         */
+            * When no direction key is pressed
+            */
             update_objects(&map, mons_arr, chest_arr);
             object_found(&map, &player, mons_arr, chest_arr);
             to_print(&map, &player, mons_arr, chest_arr);
+
             usleep(500000);
             fflush(stderr);
             fflush(stdin);
             fflush(stdout);
         }
-
+        /**
+         * In case were break is called the 2 arrays are getting freed and reallocated 
+         * next level.
+         * Also the map gets loaded and the point values are getting passed to the 2 arrays
+         * 
+         */
         free(mons_arr);
         mons_arr = NULL;
         free(chest_arr);
         chest_arr = NULL;
+        mons_arr = (monster_t *)calloc(sizeof(monster_t), map.level + 3);
+        chest_arr = (chest_t *)calloc(sizeof(chest_t), map.level);
+        load_map(&map, mons_arr, chest_arr);
+        update_objects(&map, mons_arr, chest_arr);
+        player.x = 18;
+        player.y = 48;
     }
 }
-
 void to_print(map_t *map, player_t *player, monster_t monsters[], chest_t chests[])
 {
     print_map(map);
     get_stats(player, monsters, map);
 }
-
+/**
+ * Modifies the initial values of player stats giving him a buff of 50 points
+ * to share between his stats. 
+ */
 void add_stats(player_t *player)
 {
     char *saving = "Please wait while we save your changes...";
@@ -521,7 +527,9 @@ void level_up(player_t *player, monster_t monsters[], map_t *map)
     }
     map->level++;
     if (map->level == 11)
+    {
         win(player);
+    }
     player->wins++;
     player->level++;
     printf("\nCongrats! Level %d is next. Get ready! \n\n", map->level);
@@ -562,7 +570,6 @@ void game_over(player_t *player)
         */
     }
 }
-
 
 void kill_all(monster_t mons_arr[], map_t *map)
 {

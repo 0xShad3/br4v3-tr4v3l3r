@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "map.h"
-#include "monster.h"
 
 void init_monster(monster_t *monster, int id, int x1, int y1)
 {
@@ -23,6 +22,7 @@ void monster_die(monster_t monster)
 {
     monster.isDead = 1;
 }
+
 
 void monster_boss_parser(int save_bosses[TOTAL_LVLS][2])
 {
