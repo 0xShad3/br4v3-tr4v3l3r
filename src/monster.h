@@ -4,6 +4,7 @@
 #define MSYMBOL '@'
 #define FALSE 0
 #define TRUE 1
+#define TOTAL_LVLS 10
 
 typedef struct monster_t{
     int x;
@@ -21,5 +22,6 @@ typedef struct monster_t{
 
 void init_monster(monster_t *monster,int id,int x1,int y1);
 void monster_die(monster_t monster);
+void monster_boss_parser(int save_bosses[TOTAL_LVLS][2]);
 //void attack(monster_t *monster,player_t *player);
 #endif
