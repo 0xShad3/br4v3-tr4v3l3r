@@ -1,6 +1,12 @@
 # Collect the binaries
-CSRC = $(wildcard src/*.c)
+CGSRC = $(wildcard src/*.c)
+CSSRC = $(wildcard server/*.c)
+
 CC = gcc
 
-game.bin: $(CSRC)
-	$(CC) -o game.bin $(CSRC)
+
+game.bin: $(CGSRC)
+	$(CC) -g -Wall -o bin/game.bin $(CGSRC)
+
+server.bin: $(CSSRC)
+	$(CC) -g  -Wall -o bin/server.bin $(CSSRC)

@@ -2,6 +2,7 @@ import socket
 import os
 from threading import Thread
 import parser as parser
+import codecs
 from importlib import reload
 
 class Proxy2Server(Thread):
@@ -67,7 +68,7 @@ class Proxy(Thread):
             print ("[proxy({})] setting up".format(self.port))
             # waiting for a client
             self.g2p = Game2Proxy(self.from_host, self.port)
-            self.p2s = Proxy2Server(self.to_host, self.port)
+            self.p2s = Proxy2Server(self.to_host, 3333)
             print ("[proxy({})] connection established".format(self.port))
             self.g2p.server = self.p2s.server
             self.p2s.game = self.g2p.game
@@ -77,7 +78,7 @@ class Proxy(Thread):
             
 game_servers = []
 for port in range(8000, 8003):
-    _game_server = Proxy('0.0.0.0', 'game_Server_ip', port)
+    _game_server = Proxy('0.0.0.0', '192.168.2.5', port)
     _game_server.start()
     game_servers.append(_game_server)
 

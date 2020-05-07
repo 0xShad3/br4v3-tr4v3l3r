@@ -23,7 +23,6 @@ char *win_msg = "Congratulations! You are a br4v3 tr4v3l3r!";
 
 void init_game(account_t *account, int mode)
 {
-    int i;
     char key_press = ' ';
     char key[2];
     map_t map;
@@ -475,16 +474,16 @@ void pass_object_values(monster_t mons_arr[], chest_t chest_arr[], int mons_buff
  */
 void update_objects(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
 {
-    int i, j;
-    for (j = 0; j < map->monsters_num; j++)
+    int i;
+    for (i = 0; i < map->monsters_num; i++)
     {
-        if (mons_arr[j].isDead == TRUE)
-            map_set(map, MAP_P_SYMBOL, mons_arr[j].y, mons_arr[j].x);
+        if (mons_arr[i].isDead == TRUE)
+            map_set(map, MAP_P_SYMBOL, mons_arr[i].y, mons_arr[i].x);
     }
-    for (j = 0; j < map->chests_num; j++)
+    for (i = 0; i < map->chests_num; i++)
     {
-        if (chest_arr[j].isOpen == TRUE)
-            map_set(map, MAP_P_SYMBOL, chest_arr[j].y, chest_arr[j].x);
+        if (chest_arr[i].isOpen == TRUE)
+            map_set(map, MAP_P_SYMBOL, chest_arr[i].y, chest_arr[i].x);
     }
 }
 
