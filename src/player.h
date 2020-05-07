@@ -49,12 +49,11 @@ typedef struct player_t
 
 void init_player(player_t *player,int account_id);
 void move(map_t* map,player_t *player);
-//void attack_player(map_t *map, player_t *player,monster_t *monster);
-void object_found(map_t *map,player_t *player, monster_t mons_arr[], chest_t chest_arr[]);
+void object_found(map_t *map,player_t *player,char key_press, monster_t mons_arr[], chest_t chest_arr[]);
 int *check_obj(map_t *map,player_t *player,int obj_array[2]);
-void die(player_t *player);
+void player_die(player_t *player);
 void get_stats(player_t *player, monster_t monsters[],map_t *map);
-int attack(int accuracy,int damage,int armor);
+int attack(float accuracy,float damage,float armor);
 void open_chest(chest_t chest,player_t *player);
 int check_level_up(monster_t mons_arr[], map_t *map);
 

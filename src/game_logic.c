@@ -110,6 +110,7 @@ void init_game(account_t *account, int mode)
             {
                 player.prev_direction = player.direction;
                 player.direction = key_press;
+                object_found(&map, &player,key_press, mons_arr, chest_arr);
                 move(&map, &player);
             }
             /**
@@ -142,11 +143,10 @@ void init_game(account_t *account, int mode)
             /**
             * When no direction key is pressed
             */
-            update_objects(&map, mons_arr, chest_arr);
-            object_found(&map, &player, mons_arr, chest_arr);
+            update_objects(&map, mons_arr, chest_arr);       
             to_print(&map, &player, mons_arr, chest_arr);
 
-            usleep(500000);
+            usleep(100000);
             fflush(stderr);
             fflush(stdin);
             fflush(stdout);
