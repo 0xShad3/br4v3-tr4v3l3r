@@ -532,6 +532,12 @@ void level_up(player_t *player, monster_t monsters[], map_t *map)
     }
     player->wins++;
     player->level++;
+
+    player->armor += 3;
+    player->accuracy +=5;
+    player->health += 20;
+    player->attack += 5;
+    player_check_max_stats(player);
     printf("\nCongrats! Level %d is next. Get ready! \n\n", map->level);
     sleep(2);
 }

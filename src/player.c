@@ -281,3 +281,10 @@ int check_level_up(monster_t mons_arr[], map_t *map)
     }
     return 0;
 }
+
+void player_check_max_stats(player_t *player){
+    if(player->armor > 100 ) player->armor = 100;
+    if(player->accuracy > 100) player->accuracy = 100;
+    if(player->attack > 100) player->attack = 100;
+    if(player->health > 100) player->health = 100;
+}
