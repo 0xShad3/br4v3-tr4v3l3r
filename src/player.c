@@ -62,77 +62,7 @@ void move(map_t *map, player_t *player)
     map_set(map, MAP_P_SYMBOL,temp_y, temp_x);
     map_set(map, PSYMBOL,player->y ,player->x );
 }
-/*
-void attack_player(map_t *map, player_t *player,monster_t *monster)w
-{
-    if(map->map_array[player->y+1][player->x]=='@' || map->map_array[player->y+1][player->x]=='@' || map->map_array[player->y+1][player->x]=='@' || map->map_array[player->y+1][player->x]=='@'){
-        monster->health-=((player->accuracy*player->attack)/100-(monster->armor)/10);
-    }
-}*/
 
-int *check_obj(map_t *map, player_t *player, int obj_array[2])
-{
-    if (map->map_array[player->y + 1][player->x] != ' ' || map->map_array[player->y + 1][player->x] != '*')
-    {
-        if (map->map_array[player->y + 1][player->x] == '@')
-        {
-            obj_array[0] = DOWN_OBJ;
-            obj_array[1] = MONSTER;
-            return obj_array;
-        }
-        else if (map->map_array[player->y + 1][player->x] == '$')
-        {
-            obj_array[0] = DOWN_OBJ;
-            obj_array[1] = CHEST;
-            return obj_array;
-        }
-    }
-    else if (map->map_array[player->y - 1][player->x] != ' ' || map->map_array[player->y - 1][player->x] != '*')
-    {
-        if (map->map_array[player->y - 1][player->x] == '@')
-        {
-            obj_array[0] = UP_OBJ;
-            obj_array[1] = MONSTER;
-            return obj_array;
-        }
-        else if (map->map_array[player->y - 1][player->x] == '$')
-        {
-            obj_array[0] = UP_OBJ;
-            obj_array[1] = CHEST;
-            return obj_array;
-        }
-    }
-    else if (map->map_array[player->y][player->x - 1] != ' ' || map->map_array[player->y][player->x - 1] != '*')
-    {
-        if (map->map_array[player->y][player->x - 1] == '@')
-        {
-            obj_array[0] = LEFT_OBJ;
-            obj_array[1] = MONSTER;
-            return obj_array;
-        }
-        else if (map->map_array[player->y][player->x - 1] == '$')
-        {
-            obj_array[0] = LEFT_OBJ;
-            obj_array[1] = CHEST;
-            return obj_array;
-        }
-    }
-    else if (map->map_array[player->y][player->x + 1] != ' ' || map->map_array[player->y][player->x + 1] != '*')
-    {
-        if (map->map_array[player->y][player->x + 1] == '@')
-        {
-            obj_array[0] = RIGHT_OBJ;
-            obj_array[1] = MONSTER;
-            return obj_array;
-        }
-        else if (map->map_array[player->y][player->x + 1] == '$')
-        {
-            obj_array[0] = RIGHT_OBJ;
-            obj_array[1] = CHEST;
-            return obj_array;
-        }
-    }
-}
 void player_die(player_t *player)
 {
     player->isDead = 1;
@@ -234,24 +164,26 @@ void object_found(map_t *map,player_t *player, char key_press, monster_t mons_ar
             (mons_arr[i].y==player->y   && mons_arr[i].x==player->x+1 && (key_press == RIGHT_C || key_press == RIGHT_S)) ||
             (mons_arr[i].y==player->y   && mons_arr[i].x==player->x-1 && (key_press == LEFT_C  || key_press == LEFT_S))  )
             {
-                if(player->health>0)
-                {
-                    player_attack=attack((float)mons_arr[i].accuracy,(float)mons_arr[i].attack,(float)player->armor);   
-                    player->health -= player_attack;
-                    if(player->health < 0) player_die(player); //second check for life after health so the player can t have negative hp
-                }
-                else
-                {
-                    player_die(player);
-                }
-                if(mons_arr[i].health>0)
-                {
-                    mons_attack=attack((float)player->accuracy,(float)player->attack,(float)mons_arr[i].armor);
-                    mons_arr[i].health -= mons_attack;
-                }
-                else
-                {
-                    mons_arr[i].isDead=TRUE;
+                if(mons_arr[i].isDead!=TRUE){
+                    if(player->health>0)
+                    {
+                        player_attack=attack((float)mons_arr[i].accuracy,(float)mons_arr[i].attack,(float)player->armor);   
+                        player->health -= player_attack;
+                        if(player->health <= 0) player_die(player); //second check for life after health so the player can t have negative hp
+                    }
+                    else
+                    {
+                        player_die(player);
+                    }
+                    if(mons_arr[i].health>0)
+                    {
+                        mons_attack=attack((float)player->accuracy,(float)player->attack,(float)mons_arr[i].armor);
+                        mons_arr[i].health -= mons_attack;
+                    }
+                    else
+                    {
+                        mons_arr[i].isDead=TRUE;
+                    }
                 }
             }    
     }

@@ -573,7 +573,11 @@ void check_game_over(player_t *player,account_t *account,int mode)
 {
     if (player->isDead == TRUE)
     {   
-
+        //pid_t pid;
+        //pid = fork();
+        //if(pid==0){
+          //  system("mpg123 -q 'Vicetone & Tony Igy - Astronomia.mp3'");
+        //}else{
         printf(
             "┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
             "┼┼┼┼███▀▀▀██┼███▀▀▀███┼███▀█▄█▀███┼██▀▀▀┼┼┼┼\n"
@@ -602,7 +606,11 @@ void check_game_over(player_t *player,account_t *account,int mode)
             "┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n\n"
         );
         redprint_slow("\tWars aren`t meant to be won\n");
+        sleep(5);
+        //player->loses++;
+        //system("pkill mpg123");
         greenprint_slow("\t\tRestarting...\n");
+        //}
         sleep(2);
         init_game(account,mode);
         
