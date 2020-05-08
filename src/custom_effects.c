@@ -54,3 +54,18 @@ void redprint_slow(char *message_to_print){
     // free(message_to_print);
 }
 
+void greenprint_slow(char *message_to_print){
+    int i=0;
+    printf("\033[0;32m"); //set color to red
+    while (message_to_print[i] != '\0')
+    {
+
+        printf("%c", message_to_print[i]);
+        fflush(stdout);
+        usleep(80000);
+        i++;
+    }
+    printf("\033[0;0m"); // color reset
+    // free(message_to_print);
+}
+

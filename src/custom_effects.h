@@ -9,5 +9,6 @@ void redprint_char(char randomchar);
 void yellowprint_char(char randomchar);
 void greenprint_char(char randomchar);
 void redprint_slow(char *message_to_print);
+void greenprint_slow(char *message_to_print);
 
 #endif

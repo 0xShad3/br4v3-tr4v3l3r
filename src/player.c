@@ -11,9 +11,9 @@ void init_player(player_t *player, int account_id)
     player->x = 18; //gia na ksekinaei apo katw aristera
     player->y = 48;
     player->health = 50;
-    player->armor = 50;
-    player->attack = 50;
-    player->accuracy = 50;
+    player->armor = 20;
+    player->attack = 20;
+    player->accuracy = 20;
     player->direction = UP_C;
     player->prev_direction = DOWN_C;
     player->level = 0;
@@ -212,10 +212,10 @@ int attack(float accuracy, float damage, float armor)
  * */
 void open_chest(chest_t chest, player_t *player)
 {
-    player->health += (chest.level) * 10;
-    player->armor += (chest.level) * 10;
-    player->attack += (chest.level) * 10;
-    player->accuracy += (chest.level) * 10;
+    player->health += (chest.level) * 5;
+    player->armor += (chest.level) * 2;
+    player->attack += (chest.level) * 2;
+    player->accuracy += (chest.level) * 2;
 }
 
 /**
@@ -238,6 +238,7 @@ void object_found(map_t *map,player_t *player, char key_press, monster_t mons_ar
                 {
                     player_attack=attack((float)mons_arr[i].accuracy,(float)mons_arr[i].attack,(float)player->armor);   
                     player->health -= player_attack;
+                    if(player->health < 0) player_die(player); //second check for life after health so the player can t have negative hp
                 }
                 else
                 {

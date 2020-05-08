@@ -23,6 +23,7 @@ char *win_msg = "Congratulations! You are a br4v3 tr4v3l3r!";
 
 void init_game(account_t *account, int mode)
 {
+    int i;
     char key_press = ' ';
     char key[2];
     map_t map;
@@ -124,6 +125,8 @@ void init_game(account_t *account, int mode)
                 }
                 else
                 {
+                    system("clear");
+                    redprint_slow("Your game has been saved successfully!\nC0ntr0l 1s 4n 1llus10n!\n");
                     exit(EXIT_SUCCESS);
                 }
             }
@@ -142,9 +145,10 @@ void init_game(account_t *account, int mode)
             /**
             * When no direction key is pressed
             */
-            update_objects(&map, mons_arr, chest_arr);       
+            update_objects(&map, mons_arr, chest_arr);
+            check_game_over(&player,account,mode);
+            player_check_max_stats(&player);
             to_print(&map, &player, mons_arr, chest_arr);
-
             usleep(100000);
             fflush(stderr);
             fflush(stdin);
@@ -166,6 +170,7 @@ void init_game(account_t *account, int mode)
         update_objects(&map, mons_arr, chest_arr);
         player.x = 18;
         player.y = 48;
+        save_game(&map,account,&player,mons_arr,chest_arr);
     }
 }
 void to_print(map_t *map, player_t *player, monster_t monsters[], chest_t chests[])
@@ -387,8 +392,8 @@ int save_game(map_t *map, account_t *account, player_t *player, monster_t mons_a
     }
     fprintf(fd, "%d\n", counter);
     fprintf(fd, "%s", buffer);
-    system("clear");
-    redprint_slow("Your game has been saved successfully!\nC0ntr0l 1s 4n 1llus10n!\n");
+    
+    
     fclose(fd);
     return 1;
 }
@@ -531,11 +536,10 @@ void level_up(player_t *player, monster_t monsters[], map_t *map)
     }
     player->wins++;
     player->level++;
-
-    player->armor += 3;
-    player->accuracy +=5;
+    player->armor += 2;
+    player->accuracy +=2;
     player->health += 20;
-    player->attack += 5;
+    player->attack += 2;
     player_check_max_stats(player);
     printf("\nCongrats! Level %d is next. Get ready! \n\n", map->level);
     sleep(2);
@@ -565,10 +569,44 @@ void win(player_t *player)
     exit(EXIT_SUCCESS);
 }
 
-void game_over(player_t *player)
+void check_game_over(player_t *player,account_t *account,int mode)
 {
     if (player->isDead == TRUE)
-    {
+    {   
+
+        printf(
+            "┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
+            "┼┼┼┼███▀▀▀██┼███▀▀▀███┼███▀█▄█▀███┼██▀▀▀┼┼┼┼\n"
+            "┼┼┼┼██┼┼┼┼██┼██┼┼┼┼┼██┼██┼┼┼█┼┼┼██┼██┼┼┼┼┼┼┼\n"
+            "┼┼┼┼██┼┼┼▄▄▄┼██▄▄▄▄▄██┼██┼┼┼▀┼┼┼██┼██▀▀▀┼┼┼┼\n"
+            "┼┼┼┼██┼┼┼┼██┼██┼┼┼┼┼██┼██┼┼┼┼┼┼┼██┼██┼┼┼┼┼┼┼\n"
+            "┼┼┼┼███▄▄▄██┼██┼┼┼┼┼██┼██┼┼┼┼┼┼┼██┼██▄▄▄┼┼┼┼\n"
+            "┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
+            "┼┼┼┼███▀▀▀███┼▀███┼┼██▀┼██▀▀▀┼██▀▀▀▀██▄┼┼┼┼┼\n"
+            "┼┼┼┼██┼┼┼┼┼██┼┼┼██┼┼██┼┼██┼┼┼┼██┼┼┼┼┼██┼┼┼┼┼\n"
+            "┼┼┼┼██┼┼┼┼┼██┼┼┼██┼┼██┼┼██▀▀▀┼██▄▄▄▄▄▀▀┼┼┼┼┼\n"
+            "┼┼┼┼██┼┼┼┼┼██┼┼┼██┼┼█▀┼┼██┼┼┼┼██┼┼┼┼┼██┼┼┼┼┼\n"
+            "┼┼┼┼███▄▄▄███┼┼┼─▀█▀┼┼─┼██▄▄▄┼██┼┼┼┼┼██▄┼┼┼┼\n"
+            "┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
+            "┼┼┼┼┼┼┼┼┼┼┼┼\033[0;31m██\033[0;0m┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\033[0;31m██\033[0;0m┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
+            "┼┼┼┼┼┼┼┼┼┼\033[0;31m████▄\033[0;0m┼┼┼\033[0;31m▄▄▄▄▄▄▄\033[0;0m┼┼┼\033[0;31m▄████\033[0;0m┼┼┼┼┼┼┼┼┼┼┼\n"
+            "┼┼┼┼┼┼┼┼┼┼┼┼┼\033[0;31m▀▀█▄█████████▄█▀▀\033[0;0m┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
+            "┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\033[0;31m█████████████\033[0;0m┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
+            "┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\033[0;31m██▀▀▀███▀▀▀██\033[0;0m┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
+            "┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\033[0;31m██\033[0;0m┼┼┼\033[0;31m███\033[0;0m┼┼┼\033[0;31m██\033[0;0m┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
+            "┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\033[0;31m█████▀▄▀█████\033[0;0m┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
+            "┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\033[0;31m███████████\033[0;0m┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
+            "┼┼┼┼┼┼┼┼┼┼┼┼\033[0;31m▄▄▄██┼┼\033[0;31m█▀█▀█┼┼\033[0;31m██▄▄▄\033[0;0m┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
+            "┼┼┼┼┼┼┼┼┼┼┼┼\033[0;31m▀▀██\033[0;0m┼┼┼┼┼┼┼┼┼┼┼\033[0;31m██▀▀\033[0;0m┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
+            "┼┼┼┼┼┼┼┼┼┼┼┼┼┼\033[0;31m▀▀\033[0;0m┼┼┼┼┼┼┼┼┼┼┼\033[0;31m▀▀\033[0;0m┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
+            "┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n\n"
+        );
+        redprint_slow("\tWars aren`t meant to be won\n");
+        greenprint_slow("\t\tRestarting...\n");
+        sleep(2);
+        init_game(account,mode);
+        
+
         /*load the player stats with the load function
         Each time player dies stats shoud be autoloaded from
         the .rpg file. The map level should be the same as last game.

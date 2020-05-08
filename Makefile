@@ -6,7 +6,7 @@ CC = gcc
 
 
 game.bin: $(CGSRC)
-	$(CC) -g -Wall -o bin/game.bin $(CGSRC)
+	$(CC) -g -Wall -o game.bin $(CGSRC)
 
 server.bin: $(CSSRC)
-	$(CC) -g  -Wall -o bin/server.bin $(CSSRC)
+	$(CC) -g  -Wall -o server.bin $(CSSRC)
