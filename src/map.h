@@ -35,11 +35,13 @@ typedef struct map_t
 }map_t;
 
 
-void load_map(map_t *map,monster_t mons_array[],chest_t chest_arr[]);
-void print_map(map_t *map);
+void load_map(map_t *map,monster_t mons_array[],chest_t chest_arr[], int boss_arr[TOTAL_LVLS][2]);
+void print_map(map_t *map,monster_t mons_array[]);
 void map_parser(map_t* map,monster_t mons_array[],chest_t chest_arr[]);
 void map_constr_fn(map_t *map);
 int map_set(map_t *map, char symbol, int y, int x);
+void set_boss(map_t *map, monster_t mons_arr[], int boss_array[TOTAL_LVLS][2]);
+
 
 
 #endif // MAP_H_

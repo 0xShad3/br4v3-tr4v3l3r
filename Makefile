@@ -2,7 +2,7 @@
 CGSRC = $(wildcard src/*.c)
 CSSRC = $(wildcard server/*.c)
 
-cc = gcc
+CC = gcc
 
 game.bin: $(CGSRC)
 	$(CC) -g -Wall -o game.bin $(CGSRC)

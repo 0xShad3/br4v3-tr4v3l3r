@@ -12,12 +12,13 @@
 /*
 	initialises the map
 */
-void load_map(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
+void load_map(map_t *map, monster_t mons_arr[], chest_t chest_arr[], int boss_array[TOTAL_LVLS][2])
 {
 	map->monsters_num = map->level + 3;
 	map->chests_num = map->level;
 	map_constr_fn(map);
 	map_parser(map, mons_arr, chest_arr);
+	set_boss(map, mons_arr, boss_array);
 }
 
 /* 
@@ -39,28 +40,41 @@ void map_constr_fn(map_t *map)
 	prints the map
 */
 
-void print_map(map_t *map)
+void print_map(map_t *map, monster_t mons_arr[])
 {
 	int i;
 	int j;
-
+	int k;
+	int boss_counter = 0;
 	for (i = 0; i < MAP_HEIGHT; i++)
 	{
 		for (j = 0; j < MAP_WIDTH - 1; j++)
 		{
-			if (map->map_array[i][j] == '@')
-			{
-				redprint_char(map->map_array[i][j]);
-			}
 
+			if (map->map_array[i][j] == 'Y')
+			{
+				greenprint_char(map->map_array[i][j]);
+			}
 			else if (map->map_array[i][j] == '$')
 			{
 				yellowprint_char(map->map_array[i][j]);
 			}
-
-			else if (map->map_array[i][j] == 'Y')
+			else if (map->map_array[i][j] == '@')
 			{
-				greenprint_char(map->map_array[i][j]);
+				
+				for (k = 0; k < map->monsters_num; k++)
+				{
+					if (mons_arr[k].is_boss && mons_arr[k].x == j && mons_arr[k].y == i)
+					{
+
+						greenprint_char(map->map_array[i][j]);
+					}
+					if (!mons_arr[k].is_boss && mons_arr[k].x == j && mons_arr[k].y == i)
+					{
+
+						redprint_char(map->map_array[i][j]);
+					}
+				}
 			}
 
 			else
@@ -132,7 +146,7 @@ void map_parser(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
 				map->map_array[i][j] = CSYMBOL;
 				chest_arr[chest_counter].isOpen = FALSE;
 				chest_id = map->chests_num - (map->chests_num - chest_counter);
-				init_chest(&chest_arr[chest_counter],chest_id,j,i);
+				init_chest(&chest_arr[chest_counter], chest_id, j, i);
 				chest_counter++;
 			}
 			else if (hold_buffer[j * 2] == '3')
@@ -140,13 +154,14 @@ void map_parser(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
 				map->map_array[i][j] = MSYMBOL;
 				mons_arr[monster_counter].isDead = FALSE;
 				mons_id = map->monsters_num - (map->monsters_num - monster_counter);
-				init_monster(&mons_arr[monster_counter],mons_id,j,i);
+				init_monster(&mons_arr[monster_counter], mons_id, j, i);
 				monster_counter++;
 			}
 		}
 
 		map->map_array[i][MAP_WIDTH - 1] = '\0';
 	}
+
 	fclose(fd);
 }
 
@@ -165,5 +180,22 @@ int map_set(map_t *map, char symbol, int y, int x)
 	{
 		map->map_array[y][x] = symbol;
 		return 0;
+	}
+}
+
+void set_boss(map_t *map, monster_t mons_arr[], int boss_array[TOTAL_LVLS][2])
+{
+	int i;
+	for (i = 0; i < map->monsters_num; i++)
+	{
+		if (mons_arr[i].monster_id == boss_array[map->level - 1][1])
+		{
+			mons_arr[i].is_boss = TRUE;
+			mons_arr[i].attack = 30;
+			mons_arr[i].health = 40;
+			mons_arr[i].armor = 15;
+			mons_arr[i].accuracy = 40;
+			break;
+		}
 	}
 }

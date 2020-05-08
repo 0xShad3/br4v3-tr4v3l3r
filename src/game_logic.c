@@ -14,7 +14,6 @@
 #include "custom_effects.h"
 
 char *win_msg = "Congratulations! You are a br4v3 tr4v3l3r!";
-
 /**
  * Main game function
  * its responsible for running the game for both single and 
@@ -30,6 +29,8 @@ void init_game(account_t *account, int mode)
     player_t player;
     monster_t *mons_arr;
     chest_t *chest_arr;
+    int health_holder = 0;
+    int boss_arr[TOTAL_LVLS][2];
 
     /**
      * To pass the values from the loaded save file to current game
@@ -38,6 +39,10 @@ void init_game(account_t *account, int mode)
     int mons_buffer[MAX_MONSTERS][MONS_ELMNTS];
     int chest_buffer[MAX_CHESTS];
 
+    /**
+     * Parse boss monsters
+     */
+    monster_boss_parser(boss_arr);
     init_player(&player, account->id);
     /**
      *  When a save game is found load the values from that file and start
@@ -66,7 +71,7 @@ void init_game(account_t *account, int mode)
              */
             mons_arr = (monster_t *)calloc(sizeof(monster_t), map.level + 3);
             chest_arr = (chest_t *)calloc(sizeof(chest_t), map.level);
-            load_map(&map, mons_arr, chest_arr);
+            load_map(&map, mons_arr, chest_arr,boss_arr);
             pass_object_values(mons_arr, chest_arr, mons_buffer, chest_buffer, &map);
             update_objects(&map, mons_arr, chest_arr);
         }
@@ -81,14 +86,20 @@ void init_game(account_t *account, int mode)
         map.level = 1;
         mons_arr = (monster_t *)calloc(sizeof(monster_t), map.level + 3);
         chest_arr = (chest_t *)calloc(sizeof(chest_t), map.level);
-        load_map(&map, mons_arr, chest_arr);
+        load_map(&map, mons_arr, chest_arr,boss_arr);
         add_stats(&player);
         map_set(&map, player.psymbol, player.y, player.x);
     }
     /**
+     * Fetch health to the holder var
+     */
+    health_holder = player.health;
+    /**
      * Level change loop
      */
-    if(map.level == 1) save_game(&map,account,&player,mons_arr,chest_arr);
+    if (map.level == 1)
+        save_game(&map, account, &player, mons_arr, chest_arr);
+
     while (1)
     {
         /**
@@ -96,6 +107,7 @@ void init_game(account_t *account, int mode)
          */
         while (1)
         {
+            
             /**
             * Movement keys
             */
@@ -111,7 +123,7 @@ void init_game(account_t *account, int mode)
             {
                 player.prev_direction = player.direction;
                 player.direction = key_press;
-                object_found(&map, &player,key_press, mons_arr, chest_arr);
+                object_found(&map, &player, key_press, mons_arr, chest_arr);
                 move(&map, &player);
             }
             /**
@@ -142,14 +154,22 @@ void init_game(account_t *account, int mode)
                 break;
             }
 
-            system("clear");
+            if (!check_game_over(&player, account, mode))
+            {
+                ///system("clear");
+                player.health = health_holder;
+                player.isDead = FALSE;
+                break;
+            }
+
             /**
             * When no direction key is pressed
             */
-            update_objects(&map, mons_arr, chest_arr);
-            check_game_over(&player,account,mode);
+            
+            system("clear");
             player_check_max_stats(&player);
             to_print(&map, &player, mons_arr, chest_arr);
+            update_objects(&map, mons_arr, chest_arr);
             usleep(100000);
             fflush(stderr);
             fflush(stdin);
@@ -167,16 +187,16 @@ void init_game(account_t *account, int mode)
         chest_arr = NULL;
         mons_arr = (monster_t *)calloc(sizeof(monster_t), map.level + 3);
         chest_arr = (chest_t *)calloc(sizeof(chest_t), map.level);
-        load_map(&map, mons_arr, chest_arr);
+        load_map(&map, mons_arr, chest_arr,boss_arr);
         update_objects(&map, mons_arr, chest_arr);
         player.x = 18;
         player.y = 48;
-        save_game(&map,account,&player,mons_arr,chest_arr); //this is the autosave feature for every level
+        save_game(&map, account, &player, mons_arr, chest_arr); //this is the autosave feature for every level
     }
 }
 void to_print(map_t *map, player_t *player, monster_t monsters[], chest_t chests[])
 {
-    print_map(map);
+    print_map(map,monsters);
     get_stats(player, monsters, map);
 }
 /**
@@ -393,8 +413,7 @@ int save_game(map_t *map, account_t *account, player_t *player, monster_t mons_a
     }
     fprintf(fd, "%d\n", counter);
     fprintf(fd, "%s", buffer);
-    
-    
+
     fclose(fd);
     return 1;
 }
@@ -483,12 +502,12 @@ void update_objects(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
     int i;
     for (i = 0; i < map->monsters_num; i++)
     {
-        if (mons_arr[i].isDead == TRUE)
+        if (mons_arr[i].isDead == TRUE && map->map_array[mons_arr[i].y][mons_arr[i].x] == MSYMBOL)
             map_set(map, MAP_P_SYMBOL, mons_arr[i].y, mons_arr[i].x);
     }
     for (i = 0; i < map->chests_num; i++)
     {
-        if (chest_arr[i].isOpen == TRUE)
+        if (chest_arr[i].isOpen == TRUE && map->map_array[chest_arr[i].y][chest_arr[i].x] == CSYMBOL)
             map_set(map, MAP_P_SYMBOL, chest_arr[i].y, chest_arr[i].x);
     }
 }
@@ -538,7 +557,7 @@ void level_up(player_t *player, monster_t monsters[], map_t *map)
     player->wins++;
     player->level++;
     player->armor += 2;
-    player->accuracy +=2;
+    player->accuracy += 2;
     player->health += 20;
     player->attack += 2;
     player_check_max_stats(player);
@@ -570,15 +589,12 @@ void win(player_t *player)
     exit(EXIT_SUCCESS);
 }
 
-void check_game_over(player_t *player,account_t *account,int mode)
+int check_game_over(player_t *player, account_t *account, int mode)
 {
     if (player->isDead == TRUE)
-    {   
-        //pid_t pid;
-        //pid = fork();
-        //if(pid==0){
-          //  system("mpg123 -q 'Vicetone & Tony Igy - Astronomia.mp3'");
-        //}else{
+    {
+        system("clear");
+
         printf(
             "┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
             "┼┼┼┼███▀▀▀██┼███▀▀▀███┼███▀█▄█▀███┼██▀▀▀┼┼┼┼\n"
@@ -604,23 +620,19 @@ void check_game_over(player_t *player,account_t *account,int mode)
             "┼┼┼┼┼┼┼┼┼┼┼┼\033[0;31m▄▄▄██┼┼\033[0;31m█▀█▀█┼┼\033[0;31m██▄▄▄\033[0;0m┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
             "┼┼┼┼┼┼┼┼┼┼┼┼\033[0;31m▀▀██\033[0;0m┼┼┼┼┼┼┼┼┼┼┼\033[0;31m██▀▀\033[0;0m┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
             "┼┼┼┼┼┼┼┼┼┼┼┼┼┼\033[0;31m▀▀\033[0;0m┼┼┼┼┼┼┼┼┼┼┼\033[0;31m▀▀\033[0;0m┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n"
-            "┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n\n"
-        );
+            "┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼\n\n");
         redprint_slow("\tWars aren`t meant to be won\n");
-        sleep(5);
-        //player->loses++;
-        //system("pkill mpg123");
         greenprint_slow("\t\tRestarting...\n");
-        //}
         sleep(2);
-        init_game(account,mode);
-        
+        player->loses++;
+        return 0;
 
         /*load the player stats with the load function
         Each time player dies stats shoud be autoloaded from
         the .rpg file. The map level should be the same as last game.
         */
     }
+    return 1;
 }
 
 void kill_all(monster_t mons_arr[], map_t *map)

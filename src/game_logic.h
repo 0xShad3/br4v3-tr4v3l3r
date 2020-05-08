@@ -10,7 +10,7 @@
 #define MAX_TOKENS 15
 
 
-void check_game_over(player_t *player,account_t *account,int mode);
+int check_game_over(player_t *player,account_t *account,int mode);
 void init_game(account_t* account,int mode);
 void add_stats(player_t  *player);
 char key_input(char* key);

@@ -23,7 +23,6 @@ void monster_die(monster_t monster)
     monster.isDead = 1;
 }
 
-
 void monster_boss_parser(int save_bosses[TOTAL_LVLS][2])
 {
     int i, j;
