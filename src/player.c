@@ -238,7 +238,7 @@ void object_found(map_t *map,player_t *player, char key_press, monster_t mons_ar
                 {
                     player_attack=attack((float)mons_arr[i].accuracy,(float)mons_arr[i].attack,(float)player->armor);   
                     player->health -= player_attack;
-                    if(player->health < 0) player_die(player); //second check for life after health so the player can t have negative hp
+                    if(player->health <= 0) player_die(player); //second check for life after health so the player can t have negative hp
                 }
                 else
                 {
