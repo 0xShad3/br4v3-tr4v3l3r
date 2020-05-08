@@ -88,6 +88,7 @@ void init_game(account_t *account, int mode)
     /**
      * Level change loop
      */
+    if(map.level == 1) save_game(&map,account,&player,mons_arr,chest_arr);
     while (1)
     {
         /**
@@ -170,7 +171,7 @@ void init_game(account_t *account, int mode)
         update_objects(&map, mons_arr, chest_arr);
         player.x = 18;
         player.y = 48;
-        save_game(&map,account,&player,mons_arr,chest_arr);
+        save_game(&map,account,&player,mons_arr,chest_arr); //this is the autosave feature for every level
     }
 }
 void to_print(map_t *map, player_t *player, monster_t monsters[], chest_t chests[])
