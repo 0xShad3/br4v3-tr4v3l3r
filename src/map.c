@@ -45,7 +45,6 @@ void print_map(map_t *map, monster_t mons_arr[])
 	int i;
 	int j;
 	int k;
-	int boss_counter = 0;
 	for (i = 0; i < MAP_HEIGHT; i++)
 	{
 		for (j = 0; j < MAP_WIDTH - 1; j++)

@@ -5,8 +5,7 @@
 #include <time.h>
 #include "login.h"
 #include "custom_effects.h"
-#include "game_logic.h"
-#include "player.h"
+#include "mode_handle.h"
 
 #define SINGLE_PLR 0
 #define MULTI_PLR 1
@@ -102,7 +101,7 @@ int main(int argc, char *argv[])
             // Construct the file path
             save_constr_fn(&account);
             // Starting game on single player mode
-            init_game(&account, SINGLE_PLR);
+            init_game_single(&account);
         }
 
         if (selection == 2)
@@ -132,7 +131,7 @@ int main(int argc, char *argv[])
                 // Construct the file path
                 save_constr_fn(&account);
                 // Starting game on single player mode
-                init_game(&account, SINGLE_PLR);
+                init_game_single(&account);
             }
         }
     }
