@@ -5,68 +5,37 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <pthread.h>
-#include "conn_handle.h"
 
+#include "../src/net_protocol.h"
+#include "../src/util.h"
 #define SOCK_BUFFER_SIZE 1024
 #define DEFAULT_PORT 8888
 
 int main(int argc, char **argv)
 {
-    char msg[SOCK_BUFFER_SIZE];
-    int srv_sockfd, cli_sockfd;
-    int socket_operation = 1;
+    gsock_t *gamesocket;
+    struct sockaddr_in client_addr;
 
-    struct sockaddr_in addr, cli;
-    socklen_t cli_len;
-    srv_sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (srv_sockfd == -1)
+    if (argc != 2)
     {
-        printf("[ERROR] Server socket couldnt be created. Exiting");
+        fprintf(stderr, "[ERROR] Usage : %s [port number]\n or to run on default port: %s -d", argv[0], argv[0]);
         exit(EXIT_FAILURE);
     }
 
-    if (setsockopt(srv_sockfd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &socket_operation, sizeof(socket_operation)))
+    if (!strcmp(argv[1], "-d" || !strcmp(argv[1], "-D")))
     {
-        perror("setsockopt");
-        exit(EXIT_FAILURE);
-    }
-    /**
-     * Clear out the area of memory where the addr is allocated
-     */
-    bzero(&addr, sizeof(addr));
-
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    addr.sin_port = htons(DEFAULT_PORT);
-    /**
-     * Set padding bits in heap struct area to 0
-     */
-    memset(addr.sin_zero, '\0', sizeof addr.sin_zero);
-
-    if (bind(srv_sockfd, (struct sockaddr *)&addr, sizeof(addr)) != 0)
-    {
-        printf("[ERROR] Socket couldn't bind to the specified port");
-        exit(EXIT_SUCCESS);
-    }
-
-    if (!listen(srv_sockfd, 3))
-    {
-        printf("[info] Server is listening for new connections on port %d", DEFAULT_PORT);
+        set_server_socket(&gamesocket, DEFAULT_PORT);
     }
     else
     {
-        printf("[ERROR] Server couldnt start listening!");
+        set_server_socket(&gamesocket, atoi(argv[1]));
     }
 
-    cli_len = sizeof cli;
-    cli_sockfd = accept(srv_sockfd, (struct sockaddr *)&cli, &cli_len);
-    
-    func(cli_sockfd);
-    /**
-     * Threading has to go here
-     */
+    /*ready to accept connections*/
+    while (1)
+    {
+        socklen_t client_len = sizeof(client_addr);
+        /*continue threadding here*/
 
-
-    
-
+    }
 }
