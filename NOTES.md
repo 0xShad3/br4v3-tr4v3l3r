@@ -69,3 +69,40 @@ SERVER
 CLIENT NEEDS TO BE MULTITHREADED
 - RECEIVER ---> Handles incoming messages
 - Main thread ---> continues playing the game and sends messages to the socket
+
+
+## Final Encoding:
+### Player:
+- P01: move()
+- P02: die()
+- P03: getstats()
+- P04: openchest()
+- P05: attack()
+- P06: object_found()
+- P07: init_player()
+
+### Monster:
+- M01: init_monster()
+- M02: monster_die()
+
+### Chest:
+- C01: init_chest()
+
+### Game:
+- G01: load_game()
+- G02: save_game()
+- G03: check_game_over()
+- G04: add_stats()
+- G05: key_input()
+- G06: to_print()
+- G07: memset_arrays()
+- G08: pass_object_values()
+- G09: update_objects()
+- G10: level_up()
+- G11: win()
+- G12: game_over()
+
+### Functionality
+- FO1: login()
+- FO2: register()
+- FO3: exit()
