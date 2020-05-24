@@ -15,10 +15,9 @@
 
 char *win_msg = "Congratulations! You are a br4v3 tr4v3l3r!";
 
-
 void to_print(map_t *map, player_t *player, monster_t monsters[], chest_t chests[])
 {
-    print_map(map,monsters);
+    print_map(map, monsters);
     get_stats(player, monsters, map);
 }
 /**
@@ -345,6 +344,7 @@ char key_input(char *key)
     read(STDIN_FILENO, key, 2);
     // Reset the "system ("/bin/stty raw")" to display correctly the output
     system("/bin/stty cooked");
+    fcntl(STDIN_FILENO, F_SETFL, flags);
 
     return key[0];
 }

@@ -17,4 +17,5 @@ int get_lastid();
 void exit_choice();
 void exists_error();
 void save_constr_fn(account_t* account);
+//int login_check_multi();
 #endif

@@ -194,6 +194,7 @@ void init_game_single(account_t *account, int mode)
 
 void init_game_multi(account_t *account)
 {
+    /*
     char key_press = ' ';
     char key[2];
     map_t map;
@@ -209,6 +210,6 @@ void init_game_multi(account_t *account)
     load_map(&map, mons_arr, chest_arr, boss_arr);
     add_stats(&player);
     map_set(&map, player.psymbol, player.y, player.x);
-
+*/
     
 }

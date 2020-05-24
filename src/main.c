@@ -7,6 +7,9 @@
 #include "custom_effects.h"
 #include "mode_handle.h"
 
+#include "net_protocol.h"
+#include "client.h"
+
 #define SINGLE_PLR 0
 #define MULTI_PLR 1
 
@@ -20,6 +23,7 @@ int main(int argc, char *argv[])
     int i = 0;
     int selection = 0;
     account_t account;
+    client_t client;
     //used for all main menu selections
     if (argc != 1)
     {
@@ -137,12 +141,105 @@ int main(int argc, char *argv[])
     }
     if (selection == 2)
     {
-        //TODO add multiplayer code
-    }
+        selection = 0;
+        printf("Multiplayer mode!\n[1] Login\n[2] Register and play\n[3] Exit\n");
+        scanf("%d", &selection);
+        while (selection != 2 && selection != 1 && selection != 3)
+        {
+            printf("\033[0;31m");
+            printf("[-] Try again..\n");
+            printf("\033[0;0m");
+            printf("Multiplayer mode!\n[1] Login\n[2] Register and play\n");
+            scanf("%d", &selection);
+        }
+        //login action check
+        if (selection == 1)
+        {
+            /**
+             **Connection to server starts
+             */
+            if (!connect_server(&client))
+            {
+                return EXIT_SUCCESS;
+            }
+            greenprint("[+]Enter your username and password:\nUsername: ");
+            scanf("%s", account.username);
 
-    if (selection == 3)
-    {
-        exit_choice();
+            greenprint("Password: ");
+            scanf("%s", account.password);
+
+            if (login_check_multi(&account, &client) != 0)
+            {
+                i = 0;
+                printf("\033[0;31m"); //set color to red
+                while (wrong_creds[i] != '\0')
+                {
+                    printf("%c", wrong_creds[i]);
+                    fflush(stdout);
+                    usleep(70000);
+                    i++;
+                }
+                printf("\033[0;0m\n"); // color reset
+                return 0;
+            }
+            printf("Hello %s. \n", account.username);
+            int i = 0;
+            while (waiting_game[i] != '\0')
+            {
+                printf("%c", waiting_game[i]);
+                fflush(stdout);
+                usleep(70000);
+                i++;
+            }
+            printf("\n");
+
+            // Construct the file path
+            save_constr_fn(&account);
+            // Starting game on single player mode
+            init_game_single(&account);
+        }
+
+        if (selection == 2)
+        {
+            if (!connect_server(&client))
+            {
+                return EXIT_SUCCESS;
+            }
+            orangeprint("[+]Enter your player`s username and password:\n");
+            greenprint("Username: ");
+            scanf("%s", account.username);
+            greenprint("Password: ");
+            scanf("%s", account.password);
+            if (!strlen(account.username) || !strlen(account.password))
+            {
+                redprint("What are you trying to do...");
+            }
+            else
+            {
+                if (!register_multi(&account, &client))
+                {
+                    printf("Hello %s. \n", account.username);
+                    i = 0;
+                    while (waiting_game[i] != '\0')
+                    {
+                        printf("%c", waiting_game[i]);
+                        fflush(stdout);
+                        usleep(70000);
+                        i++;
+                    }
+
+                    // Construct the file path
+                    save_constr_fn(&account);
+                    // Starting game on single player mode
+                    // init_game_single(&account);
+                }
+            }
+        }
+
+        if (selection == 3)
+        {
+            exit_choice();
+        }
+        return EXIT_SUCCESS;
     }
-    return EXIT_SUCCESS;
 }
