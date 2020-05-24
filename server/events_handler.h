@@ -1,3 +1,6 @@
+#ifndef EVENT_HANDLER_H_
+#define EVENT_HANDLER_H_
+
 #include <netdb.h> 
 #include <stdio.h> 
 #include <stdlib.h> 
@@ -17,3 +20,4 @@ char *on_chest_open(chest_t *chest);
 char *on_player_death(player_t *player);
 char *on_player_move(player_t *player);
 char *on_player_update_stats(player_t *player);
+#endif
