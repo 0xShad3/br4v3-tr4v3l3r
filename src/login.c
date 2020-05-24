@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include "client.h"
 #include "util.h"
 #include "player.h"
 #include "login.h"
@@ -48,12 +49,15 @@ int login_check(account_t *account)
             return 0;
         }
     }
+    fclose(fp);
     return -1;
 }
 
-int do_register(account_t* login)
+
+
+int do_register(account_t *login)
 {
-    login->id = get_lastid() + 1 ;
+    login->id = get_lastid() + 1;
     if (account_exists(login->username, login->password) == 1)
     {
         exists_error();

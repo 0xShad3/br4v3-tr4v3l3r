@@ -1,5 +1,9 @@
-#include "util.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <openssl/md5.h>
 
+#include "util.h"
 
 void reverse(char str[], int length)
 {
@@ -37,8 +41,8 @@ char *itoa(int num, char *str, int base)
 		isNegative = 1;
 		num = -num;
 	}
-
 	// Process individual digits
+
 	while (num != 0)
 	{
 		int rem = num % base;
@@ -56,4 +60,19 @@ char *itoa(int num, char *str, int base)
 	reverse(str, i);
 
 	return str;
+}
+
+char* strmd5(char *str, int len)
+{
+	unsigned char digest[16];
+	MD5_CTX context;
+	char* md5string = (char*)malloc(33);
+	MD5_Init(&context);
+	MD5_Update(&context, str, len);
+	MD5_Final(digest, &context);
+	
+	for (int i = 0; i < 16; ++i){
+		sprintf(&md5string[i * 2], "%02x", (unsigned int)digest[i]);
+	}
+	return md5string;
 }
