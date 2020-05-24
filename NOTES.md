@@ -1,4 +1,3 @@
-
 Game Protocol
 
 Packet Max size: 53 bytes
@@ -15,9 +14,9 @@ The server broadcasts that buffer acting as an echo
 ```
 Buffer Structure:
 
-``[P01]:[Player ID]:[Player X]:[Player Y]``
+``[101]:[Player ID]:[Player X]:[Player Y]``
 
-###onPlayerUpdateStats()
+### onPlayerUpdateStats()
 
 ```
 When a player takes Damage from a monster or gets stats upgrades from a chest the client sends a message to the server
@@ -26,31 +25,34 @@ The server echoes this message to every client
 
 Buffer Structure:
 
-``[P02]:....:`` (Player struct)
-###onPlayerDeath()
+``[102]:[Player ID][Player X][Player Y][Player isDead][Player Loses][Player Wins][Player isOnline][Player Level][Player Accuracy][Player Armor][Player Attack][Player Health][Player Direction][Player Previous Direction]:`` (Player struct)
+
+### onPlayerDeath()
 
 ``When a player dies it sends a Message to the server which is getting broadcasted to all active connections``
 
 In that situation the player needs to still stay in the game and attend its process
 
 Buffer Structere:
-``[P03][Player ID][isDead == TRUE]``
+``[103][Player ID][isDead == TRUE]``
 
 
 ## Monster :
 
 onMonsterDeath()
-``When a player dies the client sends a Message to the server which is getting broadcasted to all connections``
+``When a monster dies the client sends a Message to the server which is getting broadcasted to all connections``
 
 Buffer Structure:
-``[M01][MONS ID][ISDEAD == TRUE]``
+``[201][MONS ID][ISDEAD == TRUE]``
 
 onMonsterUpdateStats()
-``[M02][MONSID]....[MONSTRUCT]``
+``[202][MON Accuracy][MON Armor][MON Attack][MON Health][MON isBoss][MON is_dead][MON monster_id][MON X][MON Y]``
+
 ## Chest :
 
 onChestOpen()
-``[C01][CHID][ISOPEN==TRUE]``
+``[301][CHID][ISOPEN==TRUE]``
+
 ## Game:
 ```
 I might need CFG FOR THAT
@@ -69,40 +71,3 @@ SERVER
 CLIENT NEEDS TO BE MULTITHREADED
 - RECEIVER ---> Handles incoming messages
 - Main thread ---> continues playing the game and sends messages to the socket
-
-
-## Final Encoding:
-### Player:
-- P01: move()
-- P02: die()
-- P03: getstats()
-- P04: openchest()
-- P05: attack()
-- P06: object_found()
-- P07: init_player()
-
-### Monster:
-- M01: init_monster()
-- M02: monster_die()
-
-### Chest:
-- C01: init_chest()
-
-### Game:
-- G01: load_game()
-- G02: save_game()
-- G03: check_game_over()
-- G04: add_stats()
-- G05: key_input()
-- G06: to_print()
-- G07: memset_arrays()
-- G08: pass_object_values()
-- G09: update_objects()
-- G10: level_up()
-- G11: win()
-- G12: game_over()
-
-### Functionality
-- FO1: login()
-- FO2: register()
-- FO3: exit()

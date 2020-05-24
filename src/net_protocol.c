@@ -32,7 +32,7 @@ void set_server_socket(gsock_t *gamesock, int port)
     gamesock->addrlen = sizeof(gamesock->addr);
 
     /* sock opt */
-    gamesock->sockopt_val = setsockopt(gamesock->sockfd, SOL_SOCKET, (SO_REUSEPORT | SO_REUSEADDR), (char *)&so_option, sizeof(so_option));
+    gamesock->sockopt_val = setsockopt(gamesock->sockfd, SOL_SOCKET, (SO_REUSEPORT | SO_REUSEADDR), (char *)&so_option, sizeof(so_option)); //SO_REUSEPORT is undefined! Check later.
      if (gamesock->bind_val == -1)
     {
         fprintf(stderr, "ERROR: %s\n", strerror(-1));

@@ -5,7 +5,6 @@
 #define PACK_SIZE 256
 #define SRV_BACKLOG 3
 #define CLNT_BACKLOG 1
-
 /**
  * Player
  */
