@@ -11,6 +11,7 @@
 #include "srv_interact.h"
 pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+
 int search_hash(char *client_hash)
 {
     char *line = NULL;
@@ -25,6 +26,7 @@ int search_hash(char *client_hash)
     {
         hash_buffer = line;
         hash_buffer[strlen(hash_buffer) - 1] = '\0';
+        printf("%s|\n",hash_buffer);
         if (!strcmp(hash_buffer, client_hash))
         {
             fclose(fd);
@@ -50,7 +52,9 @@ int register_hash(char *client_hash)
     }
     while (getline(&line, &len, fd) != -1)
     {
+        
         hash_buffer = line;
+        hash_buffer[strlen(hash_buffer) - 1] = '\0';
         if (!strcmp(hash_buffer, client_hash))
         {
             fclose(fd);
@@ -65,7 +69,7 @@ int register_hash(char *client_hash)
     {
         printf("Internal error hash file may be corrupted");
     }
-    fprintf(fd, "\n%s", client_hash); //create new line + add username/password
+    fprintf(fd, "%s\n", client_hash); //create new line + add username/password
     fclose(fd);
     return 0;
 }

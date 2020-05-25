@@ -11,12 +11,16 @@
 #include "mode_handle.h"
 #include "monster.h"
 
+#include "events_handler.h"
+
 char *on_monster_death(monster_t *monster){
-    char *starting_fn_msg = "201:";
+    char starting_fn_msg[4];
     char * help_sym = ":";
     char * update = malloc(sizeof(char)*3);
     char *buffer = malloc(sizeof(char)*16);
 
+    itoa(MNSTR_DEATH_ID_M,starting_fn_msg,10);
+    strcat(starting_fn_msg,":");
     strcat(buffer,starting_fn_msg);
     itoa(monster->monster_id,update,10);
     strcat(buffer,update);
@@ -31,12 +35,16 @@ char *on_monster_death(monster_t *monster){
 }
 
 char *on_moster_update_stats(monster_t *monster){
-    char *starting_fn_msg = "202:";
+    char starting_fn_msg[4];
     char *help_sym = ":";
     char *update = malloc(sizeof(char)*3);
     char *buffer = malloc(sizeof(char)*32);
+  
+    itoa(MNSTR_UPDATE_ID_M,starting_fn_msg,10);
+    strcat(starting_fn_msg,":");
+   
     strcat(buffer,starting_fn_msg);
-
+    
     itoa(monster->accuracy,update,10);
     strcat(buffer,update);
     strcat(buffer,help_sym);
@@ -75,10 +83,14 @@ char *on_moster_update_stats(monster_t *monster){
 }
 
 char *on_chest_open(chest_t *chest){
-    char *starting_fn_msg = "301:";
+    char starting_fn_msg[4];
     char *help_sym = ":";
     char *update = malloc(sizeof(char)*3);
     char *buffer = malloc(sizeof(char)*16);
+   
+    itoa(CHEST_OPEN_ID_C,starting_fn_msg,10);
+    strcat(starting_fn_msg,":");
+
     strcat(buffer,starting_fn_msg);
 
     itoa(chest->chest_id,update,10);
@@ -93,10 +105,14 @@ char *on_chest_open(chest_t *chest){
 }
 
 char *on_player_death(player_t *player){
-    char *starting_fn_msg = "103:";
+    char starting_fn_msg[4];
     char *help_sym = ":";
     char *update = malloc(sizeof(char)*3);
     char *buffer = malloc(sizeof(char)*16);
+    
+    itoa(PLR_DEATH_ID_P,starting_fn_msg,10);
+    strcat(starting_fn_msg,":");
+
     strcat(buffer,starting_fn_msg);
 
     itoa(player->id,update,10);
@@ -111,10 +127,14 @@ char *on_player_death(player_t *player){
 }
 
 char *on_player_move(player_t *player){
-    char *starting_fn_msg = "101:";
+    char starting_fn_msg[4];
     char * help_sym = ":";
     char * update = malloc(sizeof(char)*3);
     char *buffer = malloc(sizeof(char)*16);
+    
+    itoa(PLR_MOVE_ID_P,starting_fn_msg,10);
+    strcat(starting_fn_msg,":");
+ 
     strcat(buffer,starting_fn_msg);
 
     itoa(player->id,update,10);
@@ -132,10 +152,14 @@ char *on_player_move(player_t *player){
 }
 
 char *on_player_update_stats(player_t *player){
-    char *starting_fn_msg = "102:";
+    char starting_fn_msg[4];
     char *help_sym = ":";
     char *update = malloc(sizeof(char) * 3);
     char *buffer = malloc(sizeof(char)*32);
+    
+    itoa(PLR_UPDATE_ID_P,starting_fn_msg,10);
+    strcat(starting_fn_msg,":");
+
     strcat(buffer,starting_fn_msg);
 
 

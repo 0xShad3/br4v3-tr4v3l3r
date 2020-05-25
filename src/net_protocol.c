@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <signal.h>
 
+#include "custom_effects.h"
 #include "net_protocol.h"
 #include "player.h"
 #include "login.h"
@@ -34,15 +35,9 @@ int login_check_multi(account_t *account, client_t *client)
     free(account_md5);
     account_md5 = NULL;
 
-<<<<<<< HEAD
-    /* sock opt */
-    gamesock->sockopt_val = setsockopt(gamesock->sockfd, SOL_SOCKET, (SO_REUSEPORT | SO_REUSEADDR), (char *)&so_option, sizeof(so_option)); //SO_REUSEPORT is undefined! Check later.
-     if (gamesock->bind_val == -1)
-=======
     buff = (char *)malloc(sizeof(int));
     recv(client->sockfd, buff, sizeof(int), 0);
     if (atoi(buff) == 1)
->>>>>>> 5f21f50617ca8954fb090d670a0d865f82d16a3d
     {
         return 0;
     }
@@ -70,7 +65,23 @@ int register_multi(account_t *account, client_t *client)
     if (atoi(buff) == 1)
     {
         return 0;
-    } 
+    }
     exists_error();
+    return -1;
+}
+/**
+ * Wait team to connect
+ * On success @return 0
+ * else -1
+ */
+
+int wait_team(account_t *account, client_t *client)
+{
+    char buff[sizeof(int)];
+    recv(client->sockfd, buff, sizeof(char), 0);
+    if (atoi(buff) == 1)
+    {
+        return 0;
+    }
     return -1;
 }

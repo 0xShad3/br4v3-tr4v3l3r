@@ -6,5 +6,6 @@
 #include "login.h"
 #include "client.h"
 int login_check_multi(account_t *account, client_t *client);
-int register_multi(account_t *account, client_t *client_t);
+int register_multi(account_t *account, client_t *client);
+int wait_team(account_t *account,client_t * client);
 #endif

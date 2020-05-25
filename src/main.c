@@ -192,11 +192,15 @@ int main(int argc, char *argv[])
                 i++;
             }
             printf("\n");
+            greenprint("Waiting for all the players to join the game ...");
+            if(!wait_team(&account,&client)){
+                printf("GAME STARTING!!");
+            }
 
             // Construct the file path
-            save_constr_fn(&account);
+            //save_constr_fn(&account);
             // Starting game on single player mode
-            init_game_single(&account);
+            //init_game_single(&account);
         }
 
         if (selection == 2)
@@ -230,8 +234,11 @@ int main(int argc, char *argv[])
 
                     // Construct the file path
                     save_constr_fn(&account);
-                    // Starting game on single player mode
-                    // init_game_single(&account);
+                    greenprint("Waiting for all the players to join the game ...");
+                    if (!wait_team(&account,&client)){
+                        // init_game_single(&account);
+                    }
+                    
                 }
             }
         }

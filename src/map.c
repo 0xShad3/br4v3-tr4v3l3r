@@ -66,7 +66,7 @@ void print_map(map_t *map, monster_t mons_arr[])
 					if (mons_arr[k].is_boss && mons_arr[k].x == j && mons_arr[k].y == i)
 					{
 
-						greenprint_char(map->map_array[i][j]);
+						blueprint_char(map->map_array[i][j]);
 					}
 					if (!mons_arr[k].is_boss && mons_arr[k].x == j && mons_arr[k].y == i)
 					{

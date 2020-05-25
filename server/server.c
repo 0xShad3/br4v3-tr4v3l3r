@@ -18,6 +18,7 @@
 #define BUFFER_SZ 2048
 #define BACKLOG 4
 
+int connections_flag = 0;
 void *handle_client(void *arg);
 
 int main(int argc, char **argv)
@@ -143,6 +144,18 @@ void *handle_client(void *arg)
             bzero(buff_out, BUFFER_SZ);
             itoa(0, buff_out, 10);
             send(cli->sockfd, buff_out, sizeof(int), 0);
+        }
+    }
+    connections_flag++;
+    while (1)
+    {
+        // wait for the clients to connect
+        if (connections_flag == 4)
+        {
+            bzero(buff_out,BUFFER_SZ);
+            itoa(0, buff_out, 10);
+            send(cli->sockfd, buff_out, sizeof(int), 0);
+            break;
         }
     }
 
