@@ -27,6 +27,7 @@ int search_hash(char *client_hash)
         hash_buffer = line;
         hash_buffer[strlen(hash_buffer) - 1] = '\0';
         printf("%s|\n",hash_buffer);
+        printf("ch:%s|\n",client_hash);
         if (!strcmp(hash_buffer, client_hash))
         {
             fclose(fd);
