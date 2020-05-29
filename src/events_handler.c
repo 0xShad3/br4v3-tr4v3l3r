@@ -333,3 +333,17 @@ void decode_on_chest_open(chest_t *chest,char *buffer_to_decode){
     //get the second number which is 1 -> force chest to open
     chest->isOpen = atoi(token); //open chest
 }
+
+void decode_on_player_move(player_t *player,char *buffer_to_decode){
+    char *token;
+    strtok(buffer_to_decode,DELIM);
+
+    token = strtok(NULL,DELIM);
+    player->id = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    player->x = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    player->y = atoi(token);
+}
