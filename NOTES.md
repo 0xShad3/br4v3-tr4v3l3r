@@ -25,7 +25,7 @@ The server echoes this message to every client
 
 Buffer Structure:
 
-``[102]:[Player ID][Player X][Player Y][Player isDead][Player Loses][Player Wins][Player isOnline][Player Level][Player Accuracy][Player Armor][Player Attack][Player Health][Player Direction][Player Previous Direction]:`` (Player struct)
+``[102]:[Player ID][Player X][Player Y][Player isDead][Player Loses][Player Wins][Player isOnline][Player Level][Player Accuracy][Player Armor][Player Attack][Player Health][Player Direction][Player Previous Direction]`` (Player struct)
 
 ### onPlayerDeath()
 

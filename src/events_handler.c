@@ -10,8 +10,10 @@
 #include "map.h"
 #include "mode_handle.h"
 #include "monster.h"
-
 #include "events_handler.h"
+
+char *DELIM = ":"; //should be string to use strtok don t change it!
+
 
 char *on_monster_death(monster_t *monster){
     char starting_fn_msg[4];
@@ -221,4 +223,111 @@ char *on_player_update_stats(player_t *player){
     strcat(buffer,update);
     printf("%s\n",buffer);
     return buffer;
+}
+
+void decode_on_monster_death(monster_t *monster,char *buffer_to_decode){
+    char *token;
+    strtok(buffer_to_decode,DELIM);
+    token = strtok(NULL,DELIM); //monster id
+    token = strtok(NULL,DELIM);
+    //get the second number which is 1 -> force monster to die
+    monster->isDead = atoi(token); //kill monster
+}
+
+void decode_on_moster_update_stats(monster_t *monster,char *buffer_to_decode){
+    //[202][MON Accuracy][MON Armor][MON Attack][MON Health][MON isBoss][MON is_dead][MON monster_id][MON X][MON Y]
+    char *token;
+    strtok(buffer_to_decode,DELIM);
+
+    token = strtok(NULL,DELIM);
+    monster->accuracy = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    monster->armor = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    monster->attack = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    monster->health = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    monster->is_boss = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    monster->isDead = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    monster->monster_id = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    monster->x = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    monster->y = atoi(token);
+}
+
+void decode_on_player_update_stats(player_t *player,char *buffer_to_decode){
+    char *token;
+    strtok(buffer_to_decode,DELIM);
+
+    token = strtok(NULL,DELIM);
+    player->id = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    player->x = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    player->y = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    player->isDead = atoi(token);
+    
+    token = strtok(NULL,DELIM);
+    player->loses = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    player->wins = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    player->isOnline = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    player->level = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    player->accuracy = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    player->armor = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    player->attack = atoi(token);
+
+    token = strtok(NULL,DELIM);
+    player->health = atoi(token);
+
+    // token = strtok(NULL,DELIM);
+    // player->direction = token;
+
+    // token = strtok(NULL,DELIM);
+    // player->prev_direction = token;
+}
+
+void decode_on_player_death(player_t *player,char *buffer_to_decode){
+    char *token;
+    strtok(buffer_to_decode,DELIM);
+    token = strtok(NULL,DELIM); //player id
+    token = strtok(NULL,DELIM);
+    //get the second number which is 1 -> force player to die
+    player->isDead = atoi(token); //kill player
+}
+
+void decode_on_chest_open(chest_t *chest,char *buffer_to_decode){
+    char *token;
+    strtok(buffer_to_decode,DELIM);
+    token = strtok(NULL,DELIM); //chest id
+    token = strtok(NULL,DELIM);
+    //get the second number which is 1 -> force chest to open
+    chest->isOpen = atoi(token); //open chest
 }

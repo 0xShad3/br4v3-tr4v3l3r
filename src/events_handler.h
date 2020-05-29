@@ -21,7 +21,6 @@
 #define MNSTR_UPDATE_ID_M 202
 #define CHEST_OPEN_ID_C 301
 
-
 char *on_monster_death(monster_t *monster);
 char *on_moster_update_stats(monster_t *monster);
 char *on_chest_open(chest_t *chest);
