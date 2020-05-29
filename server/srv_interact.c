@@ -11,7 +11,6 @@
 #include "srv_interact.h"
 pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-
 int search_hash(char *client_hash)
 {
     char *line = NULL;
@@ -26,7 +25,6 @@ int search_hash(char *client_hash)
     {
         hash_buffer = line;
         hash_buffer[strlen(hash_buffer) - 1] = '\0';
-        printf("%s|\n",hash_buffer);
         if (!strcmp(hash_buffer, client_hash))
         {
             fclose(fd);
@@ -52,7 +50,7 @@ int register_hash(char *client_hash)
     }
     while (getline(&line, &len, fd) != -1)
     {
-        
+
         hash_buffer = line;
         hash_buffer[strlen(hash_buffer) - 1] = '\0';
         if (!strcmp(hash_buffer, client_hash))
@@ -73,7 +71,6 @@ int register_hash(char *client_hash)
     fclose(fd);
     return 0;
 }
-
 
 void broadcast_packet(char *s, int uid)
 {
@@ -155,4 +152,26 @@ void queue_remove(int uid)
     pthread_mutex_unlock(&clients_mutex);
 }
 
+void queue_print()
+{
+    pthread_mutex_lock(&clients_mutex);
 
+    for (int i = 0; i < MAX_CLIENTS; i++)
+    {
+        if (clients[i])
+        {
+            printf("CLIENT: \n");
+            printf("uid -> %d\n",clients[i]->uid);
+            printf("sockfd -> %d\n",clients[i]->sockfd);
+            printf("connect_val -> %d\n",clients[i]->connect_val);
+            printf("addr -> ");
+            print_client_addr(clients[i]->addr);
+            printf("\n\n");
+        }
+    }
+    pthread_mutex_unlock(&clients_mutex);
+}
+void loginfo(int uid, char *buff)
+{
+    printf("[LOG] Uid:%d -> %s\n", uid, buff);
+}

@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
             // Construct the file path
             save_constr_fn(&account);
             // Starting game on single player mode
-            init_game_single(&account);
+            init_game_single(&account,1);
         }
 
         if (selection == 2)
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
                 // Construct the file path
                 save_constr_fn(&account);
                 // Starting game on single player mode
-                init_game_single(&account);
+                init_game_single(&account,1);
             }
         }
     }
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 
             greenprint("Password: ");
             scanf("%s", account.password);
-
+            printf("username: %s| pw : %s|\n", account.username, account.password);
             if (login_check_multi(&account, &client) != 0)
             {
                 i = 0;
@@ -183,24 +183,16 @@ int main(int argc, char *argv[])
                 return 0;
             }
             printf("Hello %s. \n", account.username);
-            int i = 0;
-            while (waiting_game[i] != '\0')
-            {
-                printf("%c", waiting_game[i]);
-                fflush(stdout);
-                usleep(70000);
-                i++;
-            }
-            printf("\n");
+
             greenprint("Waiting for all the players to join the game ...");
-            if(!wait_team(&account,&client)){
-                printf("GAME STARTING!!");
+            if (!wait_team(&account, &client))
+            {
+                init_game_multi(&account, &client);
             }
 
             // Construct the file path
             //save_constr_fn(&account);
             // Starting game on single player mode
-            //init_game_single(&account);
         }
 
         if (selection == 2)
@@ -223,22 +215,11 @@ int main(int argc, char *argv[])
                 if (!register_multi(&account, &client))
                 {
                     printf("Hello %s. \n", account.username);
-                    i = 0;
-                    while (waiting_game[i] != '\0')
-                    {
-                        printf("%c", waiting_game[i]);
-                        fflush(stdout);
-                        usleep(70000);
-                        i++;
-                    }
-
-                    // Construct the file path
-                    save_constr_fn(&account);
                     greenprint("Waiting for all the players to join the game ...");
-                    if (!wait_team(&account,&client)){
-                        // init_game_single(&account);
+                    if (!wait_team(&account, &client))
+                    {
+                        init_game_multi(&account, &client);
                     }
-                    
                 }
             }
         }

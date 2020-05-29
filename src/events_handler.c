@@ -132,7 +132,7 @@ char *on_player_move(player_t *player){
     char starting_fn_msg[4];
     char * help_sym = ":";
     char * update = malloc(sizeof(char)*3);
-    char *buffer = malloc(sizeof(char)*16);
+    char *buffer = malloc(sizeof(char)*SOCK_BUFF_SZ);
     
     itoa(PLR_MOVE_ID_P,starting_fn_msg,10);
     strcat(starting_fn_msg,":");
@@ -157,7 +157,7 @@ char *on_player_update_stats(player_t *player){
     char starting_fn_msg[4];
     char *help_sym = ":";
     char *update = malloc(sizeof(char) * 3);
-    char *buffer = malloc(sizeof(char)*32);
+    char *buffer = malloc(sizeof(char)*SOCK_BUFF_SZ);
     
     itoa(PLR_UPDATE_ID_P,starting_fn_msg,10);
     strcat(starting_fn_msg,":");
@@ -222,6 +222,8 @@ char *on_player_update_stats(player_t *player){
     strcat(buffer,help_sym);
     strcat(buffer,update);
     printf("%s\n",buffer);
+
+    buffer[strlen(buffer)] = '\0';
     return buffer;
 }
 

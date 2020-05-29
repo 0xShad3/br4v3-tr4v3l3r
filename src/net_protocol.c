@@ -50,7 +50,7 @@ int register_multi(account_t *account, client_t *client)
     int account_len = strlen(account->username) + strlen(account->password);
     char *buff = (char *)calloc(account_len, sizeof(char));
     strcpy(buff, account->username);
-    strcpy(buff, account->password);
+    strcat(buff, account->password);
     char *account_md5 = strmd5(buff, strlen(buff));
     itoa(REGISTER_ID_F, message_buffer, 10);
     strcat(message_buffer, ":");
@@ -78,10 +78,13 @@ int register_multi(account_t *account, client_t *client)
 int wait_team(account_t *account, client_t *client)
 {
     char buff[sizeof(int)];
-    recv(client->sockfd, buff, sizeof(char), 0);
+    recv(client->sockfd, buff, sizeof(int), 0);
+    printf("%s\n",buff);
+    
     if (atoi(buff) == 1)
     {
         return 0;
     }
     return -1;
 }
+

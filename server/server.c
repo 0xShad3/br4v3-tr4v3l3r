@@ -14,7 +14,7 @@
 
 #include "../src/util.h"
 #include "../src/net_protocol.h"
-
+#include "../src/events_handler.h"
 #define BUFFER_SZ 2048
 #define BACKLOG 4
 
@@ -73,7 +73,7 @@ int main(int argc, char **argv)
         socklen_t clilen = sizeof(cli_addr);
         connfd = accept(listenfd, (struct sockaddr *)&cli_addr, &clilen);
 
-        if ((cli_count + 1) == MAX_CLIENTS)
+        if (cli_count + 1== MAX_CLIENTS)
         {
             printf("Max clients reached. Rejected: ");
             print_client_addr(cli_addr);
@@ -114,7 +114,7 @@ void *handle_client(void *arg)
     check_flag = atoi(token);
     token = strtok(NULL, ":");
     strcpy(buff_out, token);
-    printf("%s|\n", buff_out);
+    loginfo(cli->uid, buff_out);
     if (check_flag == LOGIN_ID_F)
     {
         if (!search_hash(buff_out))
@@ -144,20 +144,43 @@ void *handle_client(void *arg)
             bzero(buff_out, BUFFER_SZ);
             itoa(0, buff_out, 10);
             send(cli->sockfd, buff_out, sizeof(int), 0);
+            close(cli->sockfd);
+            queue_remove(cli->uid);
+            free(cli);
+            cli_count--;
+            pthread_detach(pthread_self());
+            return NULL;
         }
     }
     connections_flag++;
     while (1)
     {
         // wait for the clients to connect
-        if (connections_flag == 4)
+        if (connections_flag == 3)
         {
-            bzero(buff_out,BUFFER_SZ);
-            itoa(0, buff_out, 10);
+            bzero(buff_out, BUFFER_SZ);
+            itoa(1, buff_out, 10);
             send(cli->sockfd, buff_out, sizeof(int), 0);
             break;
         }
     }
+
+    /**
+     * Send to each client his id
+     */
+    loginfo(cli->uid,"Receiving ID");
+    bzero(buff_out,BUFFER_SZ);
+    itoa(cli->uid,buff_out,10);
+    send(cli->sockfd,buff_out,sizeof(int),0);
+    
+
+
+    bzero(buff_out, BUFFER_SZ);
+    recv(cli->sockfd, buff_out, BUFFER_SZ, 0);
+    loginfo(cli->uid,buff_out);
+    
+    
+    broadcast_packet(buff_out, uid);
 
     close(cli->sockfd);
     queue_remove(cli->uid);
