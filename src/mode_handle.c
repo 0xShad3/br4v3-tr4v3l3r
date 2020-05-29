@@ -13,7 +13,8 @@
 #include "monster.h"
 #include "custom_effects.h"
 
-
+#include "client.h"
+#include "events_handler.h"
 /**
  * Main game function
  * its responsible for running the game for single player mode
@@ -192,8 +193,42 @@ void init_game_single(account_t *account, int mode)
     }
 }
 
-void init_game_multi(account_t *account)
+void init_game_multi(account_t *account, client_t *client)
 {
+    char key[2];
+    char key_press = ' ';
+    int boss_arr[TOTAL_LVLS][2];
+    map_t map;
+    player_t player[3];
+    monster_t *mons_arr;
+    chest_t *chest_arr;
+    int health_holder = 0;
+    char *net_buffer;
+    char net_pass_buffer[sizeof(int)];
+    /**
+     * Parse boss monsters
+     */
+    monster_boss_parser(boss_arr);
+
+    /**
+     * 
+     * receive global game id and initialize the player
+     * 
+     */
+    recv(client->sockfd,net_pass_buffer,sizeof(int),0);
+    init_player(player,atoi(net_pass_buffer));
+
+    
+    net_buffer = on_player_update_stats(player);
+    printf("%s\n",net_buffer);
+    // code to start new game
+
+    printf("HANGED!");
+    while(1){
+        
+    }
+    // code to load game
+
     /*
     char key_press = ' ';
     char key[2];
@@ -211,5 +246,4 @@ void init_game_multi(account_t *account)
     add_stats(&player);
     map_set(&map, player.psymbol, player.y, player.x);
 */
-    
 }
