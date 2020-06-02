@@ -235,6 +235,7 @@ void decode_on_monster_death(monster_t *monster, char *buffer_to_decode)
     token = strtok(NULL, NET_DELIM);
     //get the second number which is 1 -> force monster to die
     monster->isDead = atoi(token); //kill monster
+    return 0;
 }
 
 void decode_on_moster_update_stats(monster_t *monster, char *buffer_to_decode)
@@ -269,6 +270,7 @@ void decode_on_moster_update_stats(monster_t *monster, char *buffer_to_decode)
 
     token = strtok(NULL, NET_DELIM);
     monster->y = atoi(token);
+    return 0;
 }
 
 void decode_on_player_update_stats(player_t *player, char *buffer_to_decode)
@@ -317,6 +319,7 @@ void decode_on_player_update_stats(player_t *player, char *buffer_to_decode)
 
     // token = strtok(NULL,NET_DELIM);
     // player->prev_direction = token;
+    return 0;
 }
 
 void decode_on_player_death(player_t *player, char *buffer_to_decode)
@@ -327,6 +330,7 @@ void decode_on_player_death(player_t *player, char *buffer_to_decode)
     token = strtok(NULL, NET_DELIM);
     //get the second number which is 1 -> force player to die
     player->isDead = atoi(token); //kill player
+    return 0;
 }
 
 void decode_on_chest_open(chest_t *chest, char *buffer_to_decode)
@@ -337,6 +341,7 @@ void decode_on_chest_open(chest_t *chest, char *buffer_to_decode)
     token = strtok(NULL, NET_DELIM);
     //get the second number which is 1 -> force chest to open
     chest->isOpen = atoi(token); //open chest
+    return 0;
 }
 
 void decode_on_player_move(player_t *player, char *buffer_to_decode)
