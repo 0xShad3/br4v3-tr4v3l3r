@@ -8,6 +8,7 @@
 
 #include "../src/net_protocol.h"
 #include "../src/util.h"
+#include "../src/events_handler.h"
 #include "srv_interact.h"
 pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -161,9 +162,9 @@ void queue_print()
         if (clients[i])
         {
             printf("CLIENT: \n");
-            printf("uid -> %d\n",clients[i]->uid);
-            printf("sockfd -> %d\n",clients[i]->sockfd);
-            printf("connect_val -> %d\n",clients[i]->connect_val);
+            printf("uid -> %d\n", clients[i]->uid);
+            printf("sockfd -> %d\n", clients[i]->sockfd);
+            printf("connect_val -> %d\n", clients[i]->connect_val);
             printf("addr -> ");
             print_client_addr(clients[i]->addr);
             printf("\n\n");
@@ -174,4 +175,37 @@ void queue_print()
 void loginfo(int uid, char *buff)
 {
     printf("[LOG] Uid:%d -> %s\n", uid, buff);
+}
+char *on_load_map(int level)
+{
+    const char base[] = "./maps/map";
+    const char file_extension[] = ".csv\0";
+    char str[10];
+    char level_buffer[2];
+    char filename[40];
+    char *buffer = (char*) calloc(sizeof(char),SOCK_BUFF_SZ);
+    char content[5050];
+    strcpy(filename, base);
+    strcat(filename, itoa(level, str, 10));
+    strcat(filename, file_extension);
+    FILE *fd = fopen(filename, "r");
+    if (fd == NULL)
+    {
+        printf("[ERROR] Could not load map file !");
+    }
+    bzero(content,5050);
+    fread(content, sizeof(content), sizeof(char), fd);
+    char *content_md5 = strmd5(content, strlen(content));
+    itoa(MAP_OPEN_ID, buffer, 10);
+    strcat(buffer, NET_DELIM);
+    itoa(level, level_buffer, 10);
+    strcat(buffer, level_buffer);
+    strcat(buffer, NET_DELIM);
+    strcat(buffer, content_md5);
+
+    free(content_md5);
+    content_md5 = NULL;
+    fclose(fd);
+
+    return buffer;
 }

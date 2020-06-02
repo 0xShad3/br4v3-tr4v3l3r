@@ -18,6 +18,11 @@
 #define BUFFER_SZ 2048
 #define BACKLOG 4
 
+/**
+ * This has to be changed
+ */
+pthread_mutex_t clients_mutex1 = PTHREAD_MUTEX_INITIALIZER;
+
 int connections_flag = 0;
 void *handle_client(void *arg);
 
@@ -73,7 +78,7 @@ int main(int argc, char **argv)
         socklen_t clilen = sizeof(cli_addr);
         connfd = accept(listenfd, (struct sockaddr *)&cli_addr, &clilen);
 
-        if (cli_count + 1== MAX_CLIENTS)
+        if (cli_count + 1 == MAX_CLIENTS)
         {
             printf("Max clients reached. Rejected: ");
             print_client_addr(cli_addr);
@@ -168,18 +173,36 @@ void *handle_client(void *arg)
     /**
      * Send to each client his id
      */
-    loginfo(cli->uid,"Receiving ID");
-    bzero(buff_out,BUFFER_SZ);
-    itoa(cli->uid,buff_out,10);
-    send(cli->sockfd,buff_out,sizeof(int),0);
-    
+    loginfo(cli->uid, "Receiving ID");
+    bzero(buff_out, BUFFER_SZ);
+    itoa(cli->uid, buff_out, 10);
+    send(cli->sockfd, buff_out, sizeof(int), 0);
 
-
+    /**
+     * Player Init
+     * 
+     */
+    pthread_mutex_lock(&clients_mutex1);
     bzero(buff_out, BUFFER_SZ);
     recv(cli->sockfd, buff_out, BUFFER_SZ, 0);
-    loginfo(cli->uid,buff_out);
-    
-    
+    loginfo(cli->uid, buff_out);
+    pthread_mutex_unlock(&clients_mutex1);
+    // Search for save file
+
+    /**
+     * Load Map 
+     * 
+     */
+
+    pthread_mutex_lock(&clients_mutex1);
+    char *map_buffer = on_load_map(9);
+    bzero(buff_out, BUFFER_SZ);
+    strcpy(buff_out, map_buffer);
+    loginfo(cli->uid,"Receiving map's hash");
+    send(cli->sockfd, buff_out, strlen(buff_out), 0);
+    bzero(buff_out, BUFFER_SZ);
+    free(map_buffer);
+    pthread_mutex_unlock(&clients_mutex1);
     broadcast_packet(buff_out, uid);
 
     close(cli->sockfd);

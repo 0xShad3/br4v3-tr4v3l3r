@@ -20,7 +20,8 @@
 #define MNSTR_DEATH_ID_M 201
 #define MNSTR_UPDATE_ID_M 202
 #define CHEST_OPEN_ID_C 301
-
+#define MAP_OPEN_ID 401
+#define NET_DELIM ":" 
 //Encodeing Funcs
 char *on_monster_death(monster_t *monster);
 char *on_moster_update_stats(monster_t *monster);
@@ -36,4 +37,5 @@ void decode_on_player_update_stats(player_t *player,char *buffer_to_decode);
 void decode_on_moster_update_stats(monster_t *monster,char *buffer_to_decode);
 void decode_on_monster_death(monster_t *monster,char *buffer_to_decode);
 void decode_on_player_move(player_t *player,char *buffer_to_decode);
+int decode_on_map_receive(map_t* map,char* buffer_to_decode);
 #endif

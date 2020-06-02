@@ -6,9 +6,17 @@
 #include "monster.h"
 #include "custom_effects.h"
 
-void init_player(player_t *player, int account_id)
+void init_player(player_t *player, int account_id, int game_mode)
 {
-    player->x = 18; //gia na ksekinaei apo katw aristera
+    if (!game_mode)
+    {
+        player->x = 18; //gia na ksekinaei apo katw aristera
+    }
+    else
+    {
+        player->x = 18 + account_id;
+    }
+    
     player->y = 48;
     player->health = 50;
     player->armor = 20;
@@ -26,7 +34,6 @@ void init_player(player_t *player, int account_id)
     player->pcolor = PCOLOR;
     player->psymbol = PSYMBOL;
 }
-
 void move(map_t *map, player_t *player)
 {
     int temp_x = player->x;
@@ -59,8 +66,8 @@ void move(map_t *map, player_t *player)
             player->y++;
         }
     }
-    map_set(map, MAP_P_SYMBOL,temp_y, temp_x);
-    map_set(map, PSYMBOL,player->y ,player->x );
+    map_set(map, MAP_P_SYMBOL, temp_y, temp_x);
+    map_set(map, PSYMBOL, player->y, player->x);
 }
 
 void player_die(player_t *player)
@@ -152,54 +159,56 @@ void open_chest(chest_t chest, player_t *player)
  * checks if there is an object near the player
  * when found,if it is a monster executes attack or if it is a chest opens it
  * it doesn't consider the diagonal position
- **/ 
-void object_found(map_t *map,player_t *player, char key_press, monster_t mons_arr[], chest_t chest_arr[])
+ **/
+void object_found(map_t *map, player_t *player, char key_press, monster_t mons_arr[], chest_t chest_arr[])
 {
     int i;
-    int mons_attack,player_attack;
-    for(i = 0; i < map->monsters_num; i++)
-    { 
-        if( (mons_arr[i].y==player->y+1 && mons_arr[i].x==player->x   && (key_press == DOWN_C  || key_press == DOWN_S))  ||
-            (mons_arr[i].y==player->y-1 && mons_arr[i].x==player->x   && (key_press == UP_C    || key_press == UP_S))    ||
-            (mons_arr[i].y==player->y   && mons_arr[i].x==player->x+1 && (key_press == RIGHT_C || key_press == RIGHT_S)) ||
-            (mons_arr[i].y==player->y   && mons_arr[i].x==player->x-1 && (key_press == LEFT_C  || key_press == LEFT_S))  )
+    int mons_attack, player_attack;
+    for (i = 0; i < map->monsters_num; i++)
+    {
+        if ((mons_arr[i].y == player->y + 1 && mons_arr[i].x == player->x && (key_press == DOWN_C || key_press == DOWN_S)) ||
+            (mons_arr[i].y == player->y - 1 && mons_arr[i].x == player->x && (key_press == UP_C || key_press == UP_S)) ||
+            (mons_arr[i].y == player->y && mons_arr[i].x == player->x + 1 && (key_press == RIGHT_C || key_press == RIGHT_S)) ||
+            (mons_arr[i].y == player->y && mons_arr[i].x == player->x - 1 && (key_press == LEFT_C || key_press == LEFT_S)))
+        {
+            if (mons_arr[i].isDead != TRUE)
             {
-                if(mons_arr[i].isDead!=TRUE){
-                    if(player->health>0)
-                    {
-                        player_attack=attack((float)mons_arr[i].accuracy,(float)mons_arr[i].attack,(float)player->armor);   
-                        player->health -= player_attack;
-                        if(player->health <= 0) player_die(player); //second check for life after health so the player can t have negative hp
-                    }
-                    else
-                    {
-                        player_die(player);
-                    }
-                    if(mons_arr[i].health>0)
-                    {
-                        mons_attack=attack((float)player->accuracy,(float)player->attack,(float)mons_arr[i].armor);
-                        mons_arr[i].health -= mons_attack;
-                    }
-                    else
-                    {
-                        mons_arr[i].isDead=TRUE;
-                    }
+                if (player->health > 0)
+                {
+                    player_attack = attack((float)mons_arr[i].accuracy, (float)mons_arr[i].attack, (float)player->armor);
+                    player->health -= player_attack;
+                    if (player->health <= 0)
+                        player_die(player); //second check for life after health so the player can t have negative hp
                 }
-            }    
+                else
+                {
+                    player_die(player);
+                }
+                if (mons_arr[i].health > 0)
+                {
+                    mons_attack = attack((float)player->accuracy, (float)player->attack, (float)mons_arr[i].armor);
+                    mons_arr[i].health -= mons_attack;
+                }
+                else
+                {
+                    mons_arr[i].isDead = TRUE;
+                }
+            }
+        }
     }
     for (i = 0; i < map->chests_num; i++)
     {
-        if( (chest_arr[i].y==player->y+1 && chest_arr[i].x==player->x   && (key_press == DOWN_C  || key_press == DOWN_S))  ||
-            (chest_arr[i].y==player->y-1 && chest_arr[i].x==player->x   && (key_press == UP_C    || key_press == UP_S))    ||
-            (chest_arr[i].y==player->y   && chest_arr[i].x==player->x+1 && (key_press == RIGHT_C || key_press == RIGHT_S)) ||
-            (chest_arr[i].y==player->y   && chest_arr[i].x==player->x-1 && (key_press == LEFT_C  || key_press == LEFT_S))  )
+        if ((chest_arr[i].y == player->y + 1 && chest_arr[i].x == player->x && (key_press == DOWN_C || key_press == DOWN_S)) ||
+            (chest_arr[i].y == player->y - 1 && chest_arr[i].x == player->x && (key_press == UP_C || key_press == UP_S)) ||
+            (chest_arr[i].y == player->y && chest_arr[i].x == player->x + 1 && (key_press == RIGHT_C || key_press == RIGHT_S)) ||
+            (chest_arr[i].y == player->y && chest_arr[i].x == player->x - 1 && (key_press == LEFT_C || key_press == LEFT_S)))
+        {
+            if (chest_arr[i].isOpen != TRUE)
             {
-                if(chest_arr[i].isOpen!=TRUE)
-                {
-                    chest_arr[i].isOpen = TRUE;
-                    open_chest(chest_arr[i],player);
-                }
+                chest_arr[i].isOpen = TRUE;
+                open_chest(chest_arr[i], player);
             }
+        }
     }
 }
 int check_level_up(monster_t mons_arr[], map_t *map)
@@ -215,9 +224,14 @@ int check_level_up(monster_t mons_arr[], map_t *map)
     return 0;
 }
 
-void player_check_max_stats(player_t *player){
-    if(player->armor > 100 ) player->armor = 100;
-    if(player->accuracy > 100) player->accuracy = 100;
-    if(player->attack > 100) player->attack = 100;
-    if(player->health > 100) player->health = 100;
+void player_check_max_stats(player_t *player)
+{
+    if (player->armor > 100)
+        player->armor = 100;
+    if (player->accuracy > 100)
+        player->accuracy = 100;
+    if (player->attack > 100)
+        player->attack = 100;
+    if (player->health > 100)
+        player->health = 100;
 }

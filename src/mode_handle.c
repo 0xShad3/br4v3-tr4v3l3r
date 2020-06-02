@@ -41,7 +41,7 @@ void init_game_single(account_t *account, int mode)
      * Parse boss monsters
      */
     monster_boss_parser(boss_arr);
-    init_player(&player, account->id);
+    init_player(&player, account->id, SINGLE_MODE);
     /**
      *  When a save game is found load the values from that file and start
      *  the game. Else create a file for that player and start a game from level 0
@@ -215,18 +215,27 @@ void init_game_multi(account_t *account, client_t *client)
      * receive global game id and initialize the player
      * 
      */
-    recv(client->sockfd,net_pass_buffer,sizeof(int),0);
-    init_player(player,atoi(net_pass_buffer));
+    recv(client->sockfd, net_pass_buffer, sizeof(int), 0);
+    init_player(player, atoi(net_pass_buffer), MULTI_MODE);
 
-    
+
     net_buffer = on_player_update_stats(player);
-    printf("%s\n",net_buffer);
+    send(client->sockfd, net_buffer, strlen(net_buffer), 0);
+
+    /***
+     * Check the hash of the file to be read
+     */
+    recv(client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
+    
+    if (!decode_on_map_receive(&map, net_buffer))
+    {
+        redprint("[ERROR] The map file may be corrupted or modified!");
+        exit(EXIT_FAILURE);
+    }
+    
     // code to start new game
 
-    printf("HANGED!");
-    while(1){
-        
-    }
+    
     // code to load game
 
     /*

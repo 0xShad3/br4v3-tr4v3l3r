@@ -18,7 +18,7 @@
 #define RIGHT_C 'D'
 #define RIGHT_S 'd'
 
-#define MONSTER 1  //gia thn check_obj
+#define MONSTER 1 //gia thn check_obj
 #define CHEST 2
 #define UP_OBJ 1
 #define DOWN_OBJ 2
@@ -47,16 +47,15 @@ typedef struct player_t
 
 } player_t;
 
-void init_player(player_t *player,int account_id);
-void move(map_t* map,player_t *player);
-void object_found(map_t *map,player_t *player,char key_press, monster_t mons_arr[], chest_t chest_arr[]);
-int *check_obj(map_t *map,player_t *player,int obj_array[2]);
+void init_player(player_t *player, int account_id, int game_mode);
+void move(map_t *map, player_t *player);
+void object_found(map_t *map, player_t *player, char key_press, monster_t mons_arr[], chest_t chest_arr[]);
+int *check_obj(map_t *map, player_t *player, int obj_array[2]);
 void player_die(player_t *player);
-void get_stats(player_t *player, monster_t monsters[],map_t *map);
-int attack(float accuracy,float damage,float armor);
-void open_chest(chest_t chest,player_t *player);
+void get_stats(player_t *player, monster_t monsters[], map_t *map);
+int attack(float accuracy, float damage, float armor);
+void open_chest(chest_t chest, player_t *player);
 int check_level_up(monster_t mons_arr[], map_t *map);
 void player_check_max_stats(player_t *player);
-
 
 #endif
