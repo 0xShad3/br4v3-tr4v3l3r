@@ -227,7 +227,7 @@ char *on_player_update_stats(player_t *player)
     return buffer;
 }
 
-void decode_on_monster_death(monster_t *monster, char *buffer_to_decode)
+int decode_on_monster_death(monster_t *monster, char *buffer_to_decode)
 {
     char *token;
     strtok(buffer_to_decode, NET_DELIM);
@@ -238,7 +238,7 @@ void decode_on_monster_death(monster_t *monster, char *buffer_to_decode)
     return 0;
 }
 
-void decode_on_moster_update_stats(monster_t *monster, char *buffer_to_decode)
+int decode_on_moster_update_stats(monster_t *monster, char *buffer_to_decode)
 {
     //[202][MON Accuracy][MON Armor][MON Attack][MON Health][MON isBoss][MON is_dead][MON monster_id][MON X][MON Y]
     char *token;
@@ -273,7 +273,7 @@ void decode_on_moster_update_stats(monster_t *monster, char *buffer_to_decode)
     return 0;
 }
 
-void decode_on_player_update_stats(player_t *player, char *buffer_to_decode)
+int decode_on_player_update_stats(player_t *player, char *buffer_to_decode)
 {
     char *token;
     strtok(buffer_to_decode, NET_DELIM);
@@ -322,7 +322,7 @@ void decode_on_player_update_stats(player_t *player, char *buffer_to_decode)
     return 0;
 }
 
-void decode_on_player_death(player_t *player, char *buffer_to_decode)
+int decode_on_player_death(player_t *player, char *buffer_to_decode)
 {
     char *token;
     strtok(buffer_to_decode, NET_DELIM);
@@ -333,7 +333,7 @@ void decode_on_player_death(player_t *player, char *buffer_to_decode)
     return 0;
 }
 
-void decode_on_chest_open(chest_t *chest, char *buffer_to_decode)
+int decode_on_chest_open(chest_t *chest, char *buffer_to_decode)
 {
     char *token;
     strtok(buffer_to_decode, NET_DELIM);
@@ -344,7 +344,7 @@ void decode_on_chest_open(chest_t *chest, char *buffer_to_decode)
     return 0;
 }
 
-void decode_on_player_move(player_t *player, char *buffer_to_decode)
+int decode_on_player_move(player_t *player, char *buffer_to_decode)
 {
     char *token;
     strtok(buffer_to_decode, NET_DELIM);
@@ -357,6 +357,7 @@ void decode_on_player_move(player_t *player, char *buffer_to_decode)
 
     token = strtok(NULL, NET_DELIM);
     player->y = atoi(token);
+    return 0;
 }
 
 int decode_on_map_receive(map_t *map, char *buffer_to_decode)

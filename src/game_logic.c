@@ -407,7 +407,7 @@ void win(player_t *player)
     exit(EXIT_SUCCESS);
 }
 
-int check_game_over(player_t *player, account_t *account, int mode)
+int check_game_over(player_t *player, int mode)
 {
     if (player->isDead == TRUE)
     {

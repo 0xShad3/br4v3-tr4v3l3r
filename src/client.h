@@ -16,5 +16,6 @@ typedef struct client_t
     char name[32]; /*probably not gonna need this*/
 } client_t;
 
+void sigint_handler(int exit_flag);
 int connect_server(client_t* client);
 #endif // client.h
