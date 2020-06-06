@@ -361,7 +361,7 @@ void *multi_game_handler(void *args)
     return NULL;
 }
 
-void *multi_recv_handler(void *game)
+void *multi_recv_handler(void *args)
 {
     return NULL;
 }
