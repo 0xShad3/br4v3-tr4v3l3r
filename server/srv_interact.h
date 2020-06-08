@@ -4,9 +4,7 @@
 #define MAX_CLIENTS 4
 
 #include "../src/client.h"
-static int uid = 0;
 client_t *clients[MAX_CLIENTS];
-static _Atomic unsigned int cli_count = 0;
 int search_hash(char *client_hash);
 int register_hash(char *client_hash);
 void broadcast_packet(char *s, int uid);

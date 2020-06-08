@@ -83,7 +83,7 @@ void broadcast_packet(char *s, int uid)
         {
             if (clients[i]->uid != uid)
             {
-                if (write(clients[i]->sockfd, s, strlen(s)) < 0)
+                if (send(clients[i]->sockfd, s, strlen(s),0) < 0)
                 {
                     perror("ERROR: write to descriptor failed");
                     break;

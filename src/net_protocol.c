@@ -82,8 +82,6 @@ int wait_team(account_t *account, client_t *client)
 {
     char buff[sizeof(int)];
     recv(client->sockfd, buff, sizeof(int), 0);
-    printf("%s\n",buff);
-    
     if (atoi(buff) == 1)
     {
         return 0;

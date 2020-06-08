@@ -167,7 +167,6 @@ int main(int argc, char *argv[])
 
             greenprint("Password: ");
             scanf("%s", account.password);
-            printf("username: %s| pw : %s|\n", account.username, account.password);
             if (login_check_multi(&account, &client) != 0)
             {
                 i = 0;

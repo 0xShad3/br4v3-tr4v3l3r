@@ -158,9 +158,9 @@ void init_game_single(account_t *account, int mode)
             }
 
             if (!check_game_over(&player, mode))
-            
+
             {
-                 //system("clear");
+                //system("clear");
                 player.health = health_holder;
                 player.isDead = FALSE;
                 break;
@@ -195,7 +195,7 @@ void init_game_single(account_t *account, int mode)
         update_objects(&map, mons_arr, chest_arr);
         player.x = 18;
         player.y = 48;
-        save_game(&map, account, &player, mons_arr, chest_arr);  
+        save_game(&map, account, &player, mons_arr, chest_arr);
         // this is the autosave feature for every level
     }
 }
@@ -273,6 +273,11 @@ void init_game_multi(account_t *account, client_t *client)
         {
             redprint_slow("K CYA!");
         }
+
+        /**
+         * Reduce CPU consumption
+         */
+        sleep(1);
     }
 
     close(client->sockfd);
@@ -361,7 +366,7 @@ void *multi_game_handler(void *args)
         game->players[game->client->uid].x = 18;
         game->players[game->client->uid].y = 48;
     }
-     to_print(&game->map, &game->players[game->client->uid], game->mons_arr, game->chest_arr);
+    to_print(&game->map, &game->players[game->client->uid], game->mons_arr, game->chest_arr);
 
     return NULL;
 }
@@ -369,104 +374,105 @@ void *multi_game_handler(void *args)
 void *multi_recv_handler(void *args)
 {
 
-    
-      char *response_id;
-      char comp[3];
+    char *response_id;
+    char comp[3];
+    int receive_sz = 0;
+    game_t *game = (game_t *)args;
+    char net_buffer[SOCK_BUFF_SZ];
+    char net_buffer_cp[SOCK_BUFF_SZ];
+    while (1)
+    {
 
-    
-    //   game_t *game = (game_t *)args;
-    //   char net_buffer[SOCK_BUFF_SZ];
-    //   char net_buffer_cp[SOCK_BUFF_SZ];
-    //   while (1)
-    //   {
+        /**
+         * !MAJOR BUG
+         * Player functions need to get recognised through id
+         * so that we know which players
+         * characteristics need to be changed
+         * !MAJOR BUG
+         *
+         */
+        receive_sz = recv(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
+        if (receive_sz > 0)
+        {
+            strcpy(net_buffer_cp, net_buffer);
+            response_id = strtok(net_buffer_cp, NET_DELIM);
 
-    //       /**
-    //        * !MAJOR BUG
-    //        * Player functions need to get recognised through id 
-    //        * so that we know which players
-    //        * characteristics need to be changed 
-    //        * !MAJOR BUG
-    //        * 
-    //        */
+            /**
+            * Player Functions1
+            */
 
-    //       recv(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
-    //       strcpy(net_buffer_cp,net_buffer);
-    //       response_id = strtok(net_buffer_cp, NET_DELIM);
+            itoa(PLR_DEATH_ID_P, comp, 10);
+            if (!strcmp(response_id, comp))
+            {
+                if (decode_on_player_death(game->players, net_buffer) != 0)
+                {
+                    // send message to server for message loss
+                }
+            }
 
-    //       /**
-    //        * Player Functions1
-    //        */
+            itoa(PLR_MOVE_ID_P, comp, 10);
+            if (!strcmp(response_id, comp))
+            {
+                if (decode_on_player_move(game->players, net_buffer) != 0)
+                {
+                    // send message to server for message loss
+                }
+            }
 
-    //       itoa(PLR_DEATH_ID_P, comp, 10);
-    //       if (!strcmp(response_id, comp))
-    //       {
-    //           if (decode_on_player_death(game->players, net_buffer) != 0)
-    //           {
-    //                 // send message to server for message loss
-    //           }
-    //       }
+            itoa(PLR_UPDATE_ID_P, comp, 10);
+            if (!strcmp(response_id, comp))
+            {
+                if (decode_on_player_update_stats(game->players, net_buffer) != 0)
+                {
+                    // send message to server for message loss
+                }
+            }
 
-    //       itoa(PLR_MOVE_ID_P, comp, 10);
-    //       if (!strcmp(response_id, comp))
-    //       {
-    //           if (decode_on_player_move(game->players, net_buffer) != 0)
-    //           {
-    //                 // send message to server for message loss
-    //           }
-    //       }
+            itoa(PLR_UPDATE_ID_P, comp, 10);
+            if (!strcmp(response_id, comp))
+            {
+                if (decode_on_player_update_stats(game->players, net_buffer) != 0)
+                {
+                    // send message to server for message loss
+                }
+            }
 
-    //       itoa(PLR_UPDATE_ID_P, comp, 10);
-    //       if (!strcmp(response_id, comp))
-    //       {
-    //           if (decode_on_player_update_stats(game->players, net_buffer) != 0)
-    //           {
-    //                 // send message to server for message loss
-    //           }
-    //       }
+            /**
+            * Monster Functions
+            */
 
-    //       itoa(PLR_UPDATE_ID_P, comp, 10);
-    //       if (!strcmp(response_id, comp))
-    //       {
-    //           if (decode_on_player_update_stats(game->players, net_buffer) != 0)
-    //           {
-    //                 // send message to server for message loss
-    //           }
-    //       }
+            itoa(MNSTR_DEATH_ID_M, comp, 10);
+            if (!strcmp(response_id, comp))
+            {
+                if (decode_on_monster_death(game->mons_arr, net_buffer) != 0)
+                {
+                    // send message to server for message loss
+                }
+            }
 
-    //       /**
-    //        * Monster Functions
-    //        */
+            itoa(MNSTR_UPDATE_ID_M, comp, 10);
+            if (!strcmp(response_id, comp))
+            {
+                if (decode_on_monster_update_stats(game->mons_arr, net_buffer) != 0)
+                {
+                    // send message to server for message loss
+                }
+            }
 
-    //       itoa(MNSTR_DEATH_ID_M, comp, 10);
-    //       if (!strcmp(response_id, comp))
-    //       {
-    //           if (decode_on_monster_death(game->mons_arr, net_buffer) != 0)
-    //           {
-    //                // send message to server for message loss
-    //           }
-    //       }
+            /**
+            * Chest functions
+            */
+            itoa(CHEST_OPEN_ID_C, comp, 10);
+            if (!strcmp(response_id, comp))
+            {
+                if (decode_on_chest_open(game->chest_arr, net_buffer) != 0)
+                {
+                    // send message to server for message loss
+                }
+            }
+        }
 
-    //       itoa(MNSTR_UPDATE_ID_M, comp, 10);
-    //       if (!strcmp(response_id, comp))
-    //       {
-    //           if (decode_on_monster_update_stats(game->mons_arr, net_buffer) != 0)
-    //           {
-    //                // send message to server for message loss
-    //           }
-    //       }
-
-    //       /**
-    //        * Chest functions 
-    //        */
-    //       itoa(CHEST_OPEN_ID_C, comp, 10);
-    //       if (!strcmp(response_id, comp))
-    //       {
-    //           if (decode_on_chest_open(game->chest_arr, net_buffer) != 0)
-    //           {
-    //                 // send message to server for message loss
-    //           }
-    //       }
-          
-    //  }
+        memset(net_buffer, 0, sizeof(net_buffer));
+    }
     return NULL;
 }
