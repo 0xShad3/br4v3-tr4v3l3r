@@ -8,8 +8,9 @@
 // Maximum is 13 cause thats the number of maximum monsters that can be found on the game
 #define MAX_LINES 18
 #define MAX_TOKENS 15
+#define SINGLE_PLR 0
+#define MULTI_PLR 1
 
-int check_game_over(player_t *player, int mode);
 void add_stats(player_t *player);
 char key_input(char *key);
 void to_print(map_t *map, player_t *player, monster_t monsters[], chest_t chests[]);
@@ -21,6 +22,8 @@ void update_objects(map_t *map, monster_t mons_arr[], chest_t chest_arr[]);
 void level_up(player_t *player, monster_t monsters[], map_t *map);
 void win(player_t *player);
 void game_over(player_t *player);
+int check_game_over_single(player_t *player);
+int check_game_over_multi(player_t players[]);
 
 void kill_all(monster_t mons_arr[], map_t *map);
 
