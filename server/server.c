@@ -18,6 +18,9 @@
 #define BUFFER_SZ 2048
 #define BACKLOG 4
 
+static _Atomic unsigned int cli_count = 0;
+static int uid = 0;
+
 /**
  * This has to be changed
  */
@@ -108,6 +111,7 @@ void *handle_client(void *arg)
     /// KEEP FLAG TO TERMINATE CLIENT
     int leave_flag = 0;
     int check_flag;
+    int receive_sz = 0;
     cli_count++;
     client_t *cli = (client_t *)arg;
     //exw peiraksei aytes tis grammes
@@ -198,12 +202,33 @@ void *handle_client(void *arg)
     char *map_buffer = on_load_map(9);
     bzero(buff_out, BUFFER_SZ);
     strcpy(buff_out, map_buffer);
-    loginfo(cli->uid,"Receiving map's hash");
+    loginfo(cli->uid, "Receiving map's hash");
     send(cli->sockfd, buff_out, strlen(buff_out), 0);
     bzero(buff_out, BUFFER_SZ);
     free(map_buffer);
     pthread_mutex_unlock(&clients_mutex1);
-    broadcast_packet(buff_out, uid);
+
+    while (1)
+    {
+        receive_sz = recv(cli->sockfd, buff_out, BUFFER_SZ, 0);
+
+        if (leave_flag)
+        {
+            break;
+        }
+
+        if (receive_sz > 0)
+        {
+            broadcast_packet(buff_out, uid);
+        }
+        else if (!strcmp(buff_out, "hard_exit"))
+        {
+            broadcast_packet(buff_out, uid);
+            leave_flag = 1;
+        }
+
+        bzero(buff_out, BUFFER_SZ);
+    }
 
     close(cli->sockfd);
     queue_remove(cli->uid);
