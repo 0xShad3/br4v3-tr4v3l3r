@@ -13,9 +13,11 @@ To compile and run the game simply copy and paste the following commands (assumi
 ```c
  git clone https://github.com/0xShad3/br4v3-tr4v3l3r.git
  cd br4v3-tr4v3l3r
- make
+ make game.bin 
+ make server.bin
+
 ```
-This will give you as output 2 binaries 
+This will give you as output 2 binaries. It is preferable to run the server binary on port 9999 since that`s the default port that clients are trying to connect to.
 
 ## Disclaimer
 
