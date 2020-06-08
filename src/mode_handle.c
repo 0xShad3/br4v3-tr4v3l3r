@@ -157,7 +157,7 @@ void init_game_single(account_t *account, int mode)
                 break;
             }
 
-            if (!check_game_over(&player, mode))
+            if (!check_game_over_single(&player))
 
             {
                 //system("clear");
@@ -289,6 +289,7 @@ void *multi_game_handler(void *args)
     char key_press = ' ';
     char key[2];
     game_t *game = (game_t *)args;
+    char *net_buffer;
 
     while (1)
     {
@@ -308,38 +309,47 @@ void *multi_game_handler(void *args)
                 game->players[game->client->uid].direction = key_press;
                 object_found(&game->map, &game->players[game->client->uid], key_press, game->mons_arr, game->chest_arr);
                 move(&game->map, &game->players[game->client->uid]);
+                //bzero(net_buffer, SOCK_BUFF_SZ);
+                net_buffer = on_player_move(&game->players[game->client->uid]);
+                send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
             }
 
             /**
-         * Save the game press #
-         */
+            * Save the game press #
+            */
 
             //  save game function
 
             /**
-         * Check if conditions match to level up
-         */
+            * Check if conditions match to level up
+            */
             if (!check_level_up(game->mons_arr, &game->map))
             {
+                bzero(net_buffer, SOCK_BUFF_SZ);
                 system("clear");
                 kill_all(game->mons_arr, &game->map);
                 level_up(&game->players[game->client->uid], game->mons_arr, &game->map);
                 break;
             }
             /**
-         * Check if conditions match to game over
-         */
+            * Check if conditions match to game over
+            */
 
-            if (!check_game_over(&game->players[game->client->uid], MULTI_MODE))
+            if (!check_game_over_multi(game->players))
             {
-                game->players[game->client->uid].health = game->health_holder;
-                game->players[game->client->uid].isDead = FALSE;
+                bzero(net_buffer, SOCK_BUFF_SZ);
+                for (int i = 0; i < 3; i++)
+                {
+                    game->players[i].health = game->health_holder;
+                    game->players[i].isDead = FALSE;
+                }
                 break;
             }
 
             /**
-        * When no direction key is pressed
-        */
+            * When no direction key is pressed
+            */
+            sleep(2);
             system("clear");
             player_check_max_stats(&game->players[game->client->uid]);
             to_print(&game->map, &game->players[game->client->uid], game->mons_arr, game->chest_arr);
@@ -394,12 +404,13 @@ void *multi_recv_handler(void *args)
         receive_sz = recv(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
         if (receive_sz > 0)
         {
+
             strcpy(net_buffer_cp, net_buffer);
             response_id = strtok(net_buffer_cp, NET_DELIM);
 
             /**
-            * Player Functions1
-            */
+              * Player Functions1
+              */
 
             itoa(PLR_DEATH_ID_P, comp, 10);
             if (!strcmp(response_id, comp))
@@ -438,13 +449,13 @@ void *multi_recv_handler(void *args)
             }
 
             /**
-            * Monster Functions
-            */
+              * Monster Functions
+              */
 
             itoa(MNSTR_DEATH_ID_M, comp, 10);
             if (!strcmp(response_id, comp))
             {
-                if (decode_on_monster_death(game->mons_arr, net_buffer) != 0)
+                if (decode_on_monster_death(game->mons_arr, net_buffer,&game->map) != 0)
                 {
                     // send message to server for message loss
                 }
@@ -453,19 +464,19 @@ void *multi_recv_handler(void *args)
             itoa(MNSTR_UPDATE_ID_M, comp, 10);
             if (!strcmp(response_id, comp))
             {
-                if (decode_on_monster_update_stats(game->mons_arr, net_buffer) != 0)
+                if (decode_on_monster_update_stats(game->mons_arr, net_buffer,&game->map) != 0)
                 {
                     // send message to server for message loss
                 }
             }
 
             /**
-            * Chest functions
-            */
+              * Chest functions
+              */
             itoa(CHEST_OPEN_ID_C, comp, 10);
             if (!strcmp(response_id, comp))
             {
-                if (decode_on_chest_open(game->chest_arr, net_buffer) != 0)
+                if (decode_on_chest_open(game->chest_arr, net_buffer, &game->map) != 0)
                 {
                     // send message to server for message loss
                 }

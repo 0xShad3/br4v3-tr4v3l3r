@@ -14,7 +14,6 @@
 
 char *on_monster_death(monster_t *monster)
 {
-    int i;
     char starting_fn_msg[4];
     char *help_sym = ":";
     char *update = malloc(sizeof(char) * 3);
@@ -286,7 +285,7 @@ int decode_on_monster_update_stats(monster_t mons_arr[], char *buffer_to_decode,
     return 0;
 }
 
-int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode, map_t *map)
+int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode)
 {
     char *token;
     int i;
@@ -341,7 +340,6 @@ int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode
 int decode_on_player_death(player_t players_arr[], char *buffer_to_decode)
 {
     char *token;
-    char *id;
     int i;
     strtok(buffer_to_decode, NET_DELIM);
     token = strtok(NULL, NET_DELIM); //player id

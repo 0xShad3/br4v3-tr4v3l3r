@@ -219,6 +219,7 @@ void *handle_client(void *arg)
 
         if (receive_sz > 0)
         {
+            loginfo(cli->uid,buff_out);
             broadcast_packet(buff_out, uid);
         }
         else if (!strcmp(buff_out, "hard_exit"))
