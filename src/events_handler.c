@@ -238,7 +238,7 @@ int decode_on_monster_death(monster_t *monster, char *buffer_to_decode)
     return 0;
 }
 
-int decode_on_moster_update_stats(monster_t *monster, char *buffer_to_decode)
+int decode_on_monster_update_stats(monster_t *monster, char *buffer_to_decode)
 {
     //[202][MON Accuracy][MON Armor][MON Attack][MON Health][MON isBoss][MON is_dead][MON monster_id][MON X][MON Y]
     char *token;

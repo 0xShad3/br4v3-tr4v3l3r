@@ -34,7 +34,7 @@ char *on_player_update_stats(player_t *player);
 int decode_on_chest_open(chest_t *chest,char *buffer_to_decode);
 int decode_on_player_death(player_t *player,char *buffer_to_decode);
 int decode_on_player_update_stats(player_t *player,char *buffer_to_decode);
-int decode_on_moster_update_stats(monster_t *monster,char *buffer_to_decode);
+int decode_on_monster_update_stats(monster_t *monster,char *buffer_to_decode);
 int decode_on_monster_death(monster_t *monster,char *buffer_to_decode);
 int decode_on_player_move(player_t *player,char *buffer_to_decode);
 int decode_on_map_receive(map_t* map,char* buffer_to_decode);

@@ -15,6 +15,7 @@ typedef struct game_t
     player_t players[3];
     monster_t *mons_arr;
     chest_t *chest_arr;
+    client_t* client;
     int boss_arr[TOTAL_LVLS][2];
     int health_holder;
 } game_t;

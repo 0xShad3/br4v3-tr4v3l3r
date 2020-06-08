@@ -17,6 +17,9 @@
 #include "client.h"
 #include "util.h"
 
+/**
+ * 501:md5(username+password)
+ */
 int login_check_multi(account_t *account, client_t *client)
 {
 
