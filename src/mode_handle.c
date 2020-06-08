@@ -455,7 +455,7 @@ void *multi_recv_handler(void *args)
             itoa(MNSTR_DEATH_ID_M, comp, 10);
             if (!strcmp(response_id, comp))
             {
-                if (decode_on_monster_death(game->mons_arr, net_buffer) != 0)
+                if (decode_on_monster_death(game->mons_arr, net_buffer,&game->map) != 0)
                 {
                     // send message to server for message loss
                 }
@@ -464,7 +464,7 @@ void *multi_recv_handler(void *args)
             itoa(MNSTR_UPDATE_ID_M, comp, 10);
             if (!strcmp(response_id, comp))
             {
-                if (decode_on_monster_update_stats(game->mons_arr, net_buffer) != 0)
+                if (decode_on_monster_update_stats(game->mons_arr, net_buffer,&game->map) != 0)
                 {
                     // send message to server for message loss
                 }
@@ -476,7 +476,7 @@ void *multi_recv_handler(void *args)
             itoa(CHEST_OPEN_ID_C, comp, 10);
             if (!strcmp(response_id, comp))
             {
-                if (decode_on_chest_open(game->chest_arr, net_buffer) != 0)
+                if (decode_on_chest_open(game->chest_arr, net_buffer, &game->map) != 0)
                 {
                     // send message to server for message loss
                 }
