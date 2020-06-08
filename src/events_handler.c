@@ -14,6 +14,7 @@
 
 char *on_monster_death(monster_t *monster)
 {
+    int i;
     char starting_fn_msg[4];
     char *help_sym = ":";
     char *update = malloc(sizeof(char) * 3);
@@ -22,6 +23,8 @@ char *on_monster_death(monster_t *monster)
     itoa(MNSTR_DEATH_ID_M, starting_fn_msg, 10);
     strcat(starting_fn_msg, ":");
     strcat(buffer, starting_fn_msg);
+
+
     itoa(monster->monster_id, update, 10);
     strcat(buffer, update);
     strcat(buffer, help_sym);
@@ -46,7 +49,7 @@ char *on_moster_update_stats(monster_t *monster)
 
     strcat(buffer, starting_fn_msg);
 
-    itoa(monster->accuracy, update, 10);
+    itoa(monster->monster_id, update, 10);
     strcat(buffer, update);
     strcat(buffer, help_sym);
 
@@ -70,7 +73,7 @@ char *on_moster_update_stats(monster_t *monster)
     strcat(buffer, update);
     strcat(buffer, help_sym);
 
-    itoa(monster->monster_id, update, 10);
+    itoa(monster->accuracy, update, 10);
     strcat(buffer, update);
     strcat(buffer, help_sym);
 
@@ -227,93 +230,106 @@ char *on_player_update_stats(player_t *player)
     return buffer;
 }
 
-int decode_on_monster_death(monster_t *monster, char *buffer_to_decode)
+int decode_on_monster_death(monster_t mons_arr[], char *buffer_to_decode, map_t *map)
 {
+    int i;
     char *token;
     strtok(buffer_to_decode, NET_DELIM);
     token = strtok(NULL, NET_DELIM); //monster id
-    token = strtok(NULL, NET_DELIM);
-    //get the second number which is 1 -> force monster to die
-    monster->isDead = atoi(token); //kill monster
+    for(i=0; i<map->monsters_num; i++){
+        if(mons_arr[i].monster_id == atoi(token)){
+            token = strtok(NULL, NET_DELIM); //get the second number which is 1 -> force monster to die
+            mons_arr[i].isDead = atoi(token);
+            break;
+        }
+    }
     return 0;
 }
 
-int decode_on_monster_update_stats(monster_t *monster, char *buffer_to_decode)
+int decode_on_monster_update_stats(monster_t mons_arr[], char *buffer_to_decode, map_t *map)
 {
-    //[202][MON Accuracy][MON Armor][MON Attack][MON Health][MON isBoss][MON is_dead][MON monster_id][MON X][MON Y]
+    //[202][MON monster_id][MON Armor][MON Attack][MON Health][MON isBoss][MON is_dead][MON Accuracy][MON X][MON Y]
     char *token;
+    int i;
     strtok(buffer_to_decode, NET_DELIM);
 
     token = strtok(NULL, NET_DELIM);
-    monster->accuracy = atoi(token);
+    
+    for(i=0; i<map->monsters_num; i++){
+        if(mons_arr[i].monster_id == atoi(token)){
+            token = strtok(NULL, NET_DELIM);
+            mons_arr[i].armor = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    monster->armor = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            mons_arr[i].attack = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    monster->attack = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            mons_arr[i].health = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    monster->health = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            mons_arr[i].is_boss = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    monster->is_boss = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            mons_arr[i].isDead = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    monster->isDead = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            mons_arr[i].accuracy = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    monster->monster_id = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            mons_arr[i].x = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    monster->x = atoi(token);
-
-    token = strtok(NULL, NET_DELIM);
-    monster->y = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            mons_arr[i].y = atoi(token);
+            break;
+        }
+    }
     return 0;
 }
 
-int decode_on_player_update_stats(player_t *player, char *buffer_to_decode)
+int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode, map_t *map)
 {
     char *token;
+    int i;
     strtok(buffer_to_decode, NET_DELIM);
 
-    token = strtok(NULL, NET_DELIM);
-    player->id = atoi(token);
+    token = strtok(NULL, NET_DELIM); //player id
+    for(i=0; i<3; i++){
+        if(players_arr[i].id == atoi(token)){
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].x = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    player->x = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].y = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    player->y = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].isDead = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    player->isDead = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].loses = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    player->loses = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].wins = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    player->wins = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].isOnline = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    player->isOnline = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].level = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    player->level = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].accuracy = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    player->accuracy = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].armor = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    player->armor = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].attack = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    player->attack = atoi(token);
-
-    token = strtok(NULL, NET_DELIM);
-    player->health = atoi(token);
-
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].health = atoi(token);
+            break;
+        }
+    }
     // token = strtok(NULL,NET_DELIM);
     // player->direction = token;
 
@@ -322,41 +338,61 @@ int decode_on_player_update_stats(player_t *player, char *buffer_to_decode)
     return 0;
 }
 
-int decode_on_player_death(player_t *player, char *buffer_to_decode)
+int decode_on_player_death(player_t players_arr[], char *buffer_to_decode)
 {
     char *token;
+    char *id;
+    int i;
     strtok(buffer_to_decode, NET_DELIM);
     token = strtok(NULL, NET_DELIM); //player id
-    token = strtok(NULL, NET_DELIM);
-    //get the second number which is 1 -> force player to die
-    player->isDead = atoi(token); //kill player
+    // id = token;
+    // token = strtok(NULL, NET_DELIM);
+    for(i=0; i< 3; i++){
+        if(players_arr[i].id == atoi(token)){
+            token = strtok(NULL, NET_DELIM);
+            //get the second number which is 1 -> force player to die
+            players_arr[i].isDead = atoi(token); //kill player
+            break;
+        }
+    }
     return 0;
 }
 
-int decode_on_chest_open(chest_t *chest, char *buffer_to_decode)
+int decode_on_chest_open(chest_t chests_arr[], char *buffer_to_decode, map_t *map)
 {
     char *token;
+    int i;
     strtok(buffer_to_decode, NET_DELIM);
     token = strtok(NULL, NET_DELIM); //chest id
-    token = strtok(NULL, NET_DELIM);
-    //get the second number which is 1 -> force chest to open
-    chest->isOpen = atoi(token); //open chest
+
+    for(i=0; i<map->level; i++){ //map level cause chests number = map level
+        if(chests_arr[i].chest_id == atoi(token)){
+            token = strtok(NULL, NET_DELIM);
+            //get the second number which is 1 -> force chest to open
+            chests_arr[i].isOpen = atoi(token); //open chest
+            break;
+        }
+    }
     return 0;
 }
 
-int decode_on_player_move(player_t *player, char *buffer_to_decode)
-{
+int decode_on_player_move(player_t players_arr[], char *buffer_to_decode)
+{   
     char *token;
+    int i;
     strtok(buffer_to_decode, NET_DELIM);
 
-    token = strtok(NULL, NET_DELIM);
-    player->id = atoi(token);
+    token = strtok(NULL, NET_DELIM); //player id
+    for(i=0;i<3;i++){
+        if(players_arr[i].id == atoi(token)){
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].x = atoi(token);
 
-    token = strtok(NULL, NET_DELIM);
-    player->x = atoi(token);
-
-    token = strtok(NULL, NET_DELIM);
-    player->y = atoi(token);
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].y = atoi(token);
+            break;
+        }
+    }
     return 0;
 }
 
