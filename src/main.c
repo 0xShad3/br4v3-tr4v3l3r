@@ -181,9 +181,9 @@ int main(int argc, char *argv[])
                 printf("\033[0;0m\n"); // color reset
                 return 0;
             }
-            printf("Hello %s. \n", account.username);
-
-            greenprint("Waiting for all the players to join the game ...");
+            greenprint("Hello ");
+            orangeprint(account.username);
+            greenprint(" Waiting for all the players to join the game ...\n\n");
             if (!wait_team(&account, &client))
             {
                 init_game_multi(&account, &client);
@@ -213,8 +213,9 @@ int main(int argc, char *argv[])
             {
                 if (!register_multi(&account, &client))
                 {
-                    printf("Hello %s. \n", account.username);
-                    greenprint("Waiting for all the players to join the game ...");
+                    greenprint("Hello ");
+                    orangeprint(account.username);
+                    greenprint(" Waiting for all the players to join the game ...\n\n");
                     if (!wait_team(&account, &client))
                     {
                         init_game_multi(&account, &client);
