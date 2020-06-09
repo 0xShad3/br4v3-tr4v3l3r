@@ -19,6 +19,7 @@
 #include "events_handler.h"
 
 volatile sig_atomic_t exit_flag = FALSE;
+int set_counter = 1;
 
 /**
  * Main game function
@@ -219,16 +220,18 @@ void init_game_multi(account_t *account, client_t *client)
      */
     recv(client->sockfd, net_pass_buffer, sizeof(int), 0);
     game.client->uid = atoi(net_pass_buffer);
-    init_player(&game.players[game.client->uid], atoi(net_pass_buffer), MULTI_MODE);
+    for (int i = 0; i < 3; i++)
+    {
+        init_player(&game.players[i], i, MULTI_MODE);
+    }
     add_stats(&game.players[game.client->uid]);
-    net_buffer = on_player_update_stats(&game.players[game.client->uid]);
+    net_buffer = on_player_move(&game.players[game.client->uid]);
     send(client->sockfd, net_buffer, strlen(net_buffer), 0);
 
     /***
      * Check the hash of the file to be read
      */
-    recv(client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
-
+    recv(client->sockfd, net_buffer, 38, 0);
     if (!decode_on_map_receive(&game.map, net_buffer))
     {
         redprint("[ERROR] The map file may be corrupted or modified!");
@@ -290,7 +293,7 @@ void *multi_game_handler(void *args)
     char key[2];
     game_t *game = (game_t *)args;
     char *net_buffer;
-
+    
     while (1)
     {
         while (1)
@@ -308,16 +311,15 @@ void *multi_game_handler(void *args)
                 game->players[game->client->uid].prev_direction = game->players[game->client->uid].direction;
                 game->players[game->client->uid].direction = key_press;
                 object_found(&game->map, &game->players[game->client->uid], key_press, game->mons_arr, game->chest_arr);
-                move(&game->map, &game->players[game->client->uid]);
-                //bzero(net_buffer, SOCK_BUFF_SZ);
-                net_buffer = on_player_move(&game->players[game->client->uid]);
+                move_multi(&game->map, game->players,game->client->uid);
+                net_buffer = on_player_update_stats(&game->players[game->client->uid],&game->map);
                 send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
             }
 
             /**
             * Save the game press #
             */
-
+            
             //  save game function
 
             /**
@@ -352,7 +354,7 @@ void *multi_game_handler(void *args)
             sleep(2);
             system("clear");
             player_check_max_stats(&game->players[game->client->uid]);
-            to_print(&game->map, &game->players[game->client->uid], game->mons_arr, game->chest_arr);
+            to_print(&game->map, game->players, game->mons_arr, game->chest_arr);
             update_objects(&game->map, game->mons_arr, game->chest_arr);
             usleep(10000);
             fflush(stderr);
@@ -376,7 +378,7 @@ void *multi_game_handler(void *args)
         game->players[game->client->uid].x = 18;
         game->players[game->client->uid].y = 48;
     }
-    to_print(&game->map, &game->players[game->client->uid], game->mons_arr, game->chest_arr);
+    to_print_multi(&game->map, game->players, game->mons_arr, game->chest_arr);
 
     return NULL;
 }
@@ -385,29 +387,21 @@ void *multi_recv_handler(void *args)
 {
 
     char *response_id;
-    char comp[3];
+    char comp[10];
     int receive_sz = 0;
     game_t *game = (game_t *)args;
     char net_buffer[SOCK_BUFF_SZ];
-    char net_buffer_cp[SOCK_BUFF_SZ];
+    char *net_buffer_cp;
     while (1)
     {
-
-        /**
-         * !MAJOR BUG
-         * Player functions need to get recognised through id
-         * so that we know which players
-         * characteristics need to be changed
-         * !MAJOR BUG
-         *
-         */
         receive_sz = recv(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
+
         if (receive_sz > 0)
         {
-
+            net_buffer_cp = (char *)calloc(sizeof(char), strlen(net_buffer));
             strcpy(net_buffer_cp, net_buffer);
-            response_id = strtok(net_buffer_cp, NET_DELIM);
 
+            response_id = strtok(net_buffer_cp, NET_DELIM);
             /**
               * Player Functions1
               */
@@ -455,7 +449,7 @@ void *multi_recv_handler(void *args)
             itoa(MNSTR_DEATH_ID_M, comp, 10);
             if (!strcmp(response_id, comp))
             {
-                if (decode_on_monster_death(game->mons_arr, net_buffer,&game->map) != 0)
+                if (decode_on_monster_death(game->mons_arr, net_buffer, &game->map) != 0)
                 {
                     // send message to server for message loss
                 }
@@ -464,7 +458,7 @@ void *multi_recv_handler(void *args)
             itoa(MNSTR_UPDATE_ID_M, comp, 10);
             if (!strcmp(response_id, comp))
             {
-                if (decode_on_monster_update_stats(game->mons_arr, net_buffer,&game->map) != 0)
+                if (decode_on_monster_update_stats(game->mons_arr, net_buffer, &game->map) != 0)
                 {
                     // send message to server for message loss
                 }
@@ -481,8 +475,10 @@ void *multi_recv_handler(void *args)
                     // send message to server for message loss
                 }
             }
+            memset(comp, 0, sizeof(comp));
+            free(net_buffer_cp);
+            net_buffer_cp = NULL;
         }
-
         memset(net_buffer, 0, sizeof(net_buffer));
     }
     return NULL;

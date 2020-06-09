@@ -16,7 +16,7 @@ void init_player(player_t *player, int account_id, int game_mode)
     {
         player->x = 18 + account_id;
     }
-    
+
     player->y = 48;
     player->health = 50;
     player->armor = 20;
@@ -70,6 +70,53 @@ void move(map_t *map, player_t *player)
     map_set(map, PSYMBOL, player->y, player->x);
 }
 
+/**
+ * @id refers to the id of the player of the current client
+ */
+void move_multi(map_t *map, player_t players[], int id)
+{
+    int temp_x = players[id].x;
+    int temp_y = players[id].y;
+    if (players[id].direction == RIGHT_C || players[id].direction == RIGHT_S)
+    {
+        if (map->map_array[players[id].y][players[id].x + 1] == ' ')
+        {
+            players[id].x++;
+        }
+    }
+    else if (players[id].direction == LEFT_C || players[id].direction == LEFT_S)
+    {
+        if (map->map_array[players[id].y][players[id].x - 1] == ' ')
+        {
+            players[id].x--;
+        }
+    }
+    else if (players[id].direction == UP_C || players[id].direction == UP_S)
+    {
+        if (map->map_array[players[id].y - 1][players[id].x] == ' ')
+        {
+            players[id].y--;
+        }
+    }
+    else if (players[id].direction == DOWN_C || players[id].direction == DOWN_S)
+    {
+        if (map->map_array[players[id].y + 1][players[id].x] == ' ')
+        {
+            players[id].y++;
+        }
+    }
+    map_set(map, MAP_P_SYMBOL, temp_y, temp_x);
+    map_set(map, PSYMBOL, players[id].y, players[id].x);
+
+    for (int i = 0; i < 3; i++)
+    {
+        if (i != id)
+        {
+            map_set(map, PSYMBOL, players[i].y, players[i].x);
+        }
+    }
+}
+
 void player_die(player_t *player)
 {
     player->isDead = 1;
@@ -109,6 +156,62 @@ void get_stats(player_t *player, monster_t monsters[], map_t *map)
     printf("%d\n", map->level);
     printf("\033[0m");
 
+    printf("Monsters left:   [");
+
+    for (i = 0; i < map->level + 3; i++)
+    {
+        if (monsters[i].isDead == 0 && monsters[i].is_boss == 0)
+        {
+            printf("*");
+        }
+        else if (monsters[i].isDead == 1)
+        {
+            printf(" ");
+        }
+        else if (monsters[i].isDead == 0 && monsters[i].is_boss == 1)
+        {
+            redprint_char('B');
+        }
+    }
+    printf("]\n");
+    printf("Save and exit by pressing #\n");
+}
+void get_stats_multi(player_t players[], monster_t monsters[], map_t *map)
+{
+    int i;
+    for (i = 0; i < 3; i++)
+    {
+        printf("\033[1;33m"); //Set the text to the color red
+        printf("HP: %d    ", players[i].health);
+        printf("\033[0m");
+
+        printf("\033[1;34m");
+        printf("AC: %d    ", players[i].accuracy);
+        printf("\033[0m");
+
+        printf("\033[1;35m");
+        printf("AR: %d    ", players[i].armor);
+        printf("\033[0m");
+
+        printf("\033[1;36m");
+        printf("AT: %d    \n", players[i].attack);
+        printf("\033[0m");
+
+        printf("\033[1;32m");
+        printf("Wins: ");
+        printf("%d", players[i].wins);
+        printf("\033[0m");
+
+        printf("\033[1;31m");
+        printf("   Loses: ");
+        printf("%d", players[i].loses);
+        printf("\033[0m");
+
+        printf("\033[1;37m");
+        printf("  Level: ");
+        printf("%d\n", map->level);
+        printf("\033[0m");
+    }
     printf("Monsters left:   [");
 
     for (i = 0; i < map->level + 3; i++)

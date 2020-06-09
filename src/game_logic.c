@@ -20,6 +20,11 @@ void to_print(map_t *map, player_t *player, monster_t monsters[], chest_t chests
     print_map(map, monsters);
     get_stats(player, monsters, map);
 }
+void to_print_multi(map_t *map, player_t players[], monster_t monsters[], chest_t chests[])
+{
+    print_map(map, monsters);
+    get_stats(players, monsters, map);
+}
 /**
  * Modifies the initial values of player stats giving him a buff of 50 points
  * to share between his stats. 
@@ -82,7 +87,7 @@ void add_stats(player_t *player)
         i++;
     }
     printf("\033[0;0m"); // color reset
-    sleep(2);
+    //sleep(2);
 }
 
 /**
