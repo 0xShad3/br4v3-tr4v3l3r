@@ -405,7 +405,6 @@ void *multi_recv_handler(void *args)
             /**
               * Player Functions1
               */
-            printf("Repsone :id %s",response_id);
             itoa(PLR_DEATH_ID_P, comp, 10);
             if (!strcmp(response_id, comp))
             {
@@ -416,11 +415,11 @@ void *multi_recv_handler(void *args)
             }
 
             itoa(PLR_MOVE_ID_P, comp, 10);
-            if (strcmp(response_id, comp)==0)
+            if (!strcmp(response_id, comp))
             {
                 if (decode_on_player_move(game->players, net_buffer) != 0)
                 {
-                   printf("WEASDASDASDASD\n\n");
+                   // send message to server for message loss
                 }
             }
 
