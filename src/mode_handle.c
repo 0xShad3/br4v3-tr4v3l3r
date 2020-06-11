@@ -426,7 +426,7 @@ void *multi_recv_handler(void *args)
             itoa(PLR_UPDATE_ID_P, comp, 10);
                 if (!strcmp(response_id, comp))
                 {
-                if (decode_on_player_update_stats(game->players, net_buffer) != 0)
+                if (decode_on_player_update_stats(game->players, net_buffer, &game->map) != 0)
                 {
                     // send message to server for message loss
                 }

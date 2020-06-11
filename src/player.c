@@ -33,6 +33,8 @@ void init_player(player_t *player, int account_id, int game_mode)
     player->name = malloc(50 * sizeof(char));
     player->pcolor = PCOLOR;
     player->psymbol = PSYMBOL;
+    player->prev_y=49;
+    player->prev_x = 18 + account_id;
 }
 void move(map_t *map, player_t *player)
 {
@@ -75,8 +77,8 @@ void move(map_t *map, player_t *player)
  */
 void move_multi(map_t *map, player_t players[], int id)
 {
-    int temp_x = players[id].x;
-    int temp_y = players[id].y;
+    players[id].prev_x = players[id].x;
+    players[id].prev_y = players[id].y;
     if (players[id].direction == RIGHT_C || players[id].direction == RIGHT_S)
     {
         if (map->map_array[players[id].y][players[id].x + 1] == ' ')
@@ -105,16 +107,7 @@ void move_multi(map_t *map, player_t players[], int id)
             players[id].y++;
         }
     }
-    map_set(map, MAP_P_SYMBOL, temp_y, temp_x);
-    map_set(map, PSYMBOL, players[id].y, players[id].x);
 
-    for (int i = 0; i < 3; i++)
-    {
-        if (i != id)
-        {
-            map_set(map, PSYMBOL, players[i].y, players[i].x);
-        }
-    }
 }
 
 void player_die(player_t *player)

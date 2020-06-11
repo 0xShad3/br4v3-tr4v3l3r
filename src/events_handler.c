@@ -231,6 +231,14 @@ char *on_player_update_stats(player_t *player, map_t *map)
     strcat(buffer, update);
     printf("%s\n\n", buffer);
 
+    itoa(player->prev_x, update, 10);
+    strcat(buffer, help_sym);
+    strcat(buffer, update);
+
+    itoa(player->prev_y, update, 10);
+    strcat(buffer, help_sym);
+    strcat(buffer, update);
+
     buffer[strlen(buffer)] = '\0';
     return buffer;
 }
@@ -295,7 +303,7 @@ int decode_on_monster_update_stats(monster_t mons_arr[], char *buffer_to_decode,
     return 0;
 }
 
-int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode)
+int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode,map_t *map)
 {
     char *token;
     int i;
@@ -341,18 +349,26 @@ int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode
 
             token = strtok(NULL, NET_DELIM);
             players_arr[i].direction = token[0];
+            
             token = strtok(NULL, NET_DELIM);
             players_arr[i].prev_direction = token[0];
             
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].prev_x = atoi(token);
+            
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].prev_y = atoi(token);
             break;
         }
     }
-
-    // token = strtok(NULL,NET_DELIM);
-    // player->direction = token;
-
-    // token = strtok(NULL,NET_DELIM);
-    // player->prev_direction = token;
+    for (int i = 0; i < 3; i++)
+    {
+        map_set(map, PSYMBOL, players_arr[i].y, players_arr[i].x);
+        if(players_arr[i].prev_x != players_arr[i].x || players_arr[i].prev_y != players_arr[i].y){
+            map_set(map, MAP_P_SYMBOL,players_arr[i].prev_y, players_arr[i].prev_x);
+        }
+        
+    }
     return 0;
 }
 

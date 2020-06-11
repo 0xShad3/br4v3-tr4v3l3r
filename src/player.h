@@ -44,6 +44,8 @@ typedef struct player_t
     char *name;
     char *pcolor;
     char psymbol;
+    int prev_x;
+    int prev_y;
 
 } player_t;
 
