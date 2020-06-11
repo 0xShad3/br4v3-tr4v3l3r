@@ -169,11 +169,12 @@ void get_stats(player_t *player, monster_t monsters[], map_t *map)
     printf("]\n");
     printf("Save and exit by pressing #\n");
 }
-void get_stats_multi(player_t players[], monster_t monsters[], map_t *map)
+void get_stats_multi(player_t players[], monster_t monsters[], map_t *map, int my_id)
 {
     int i;
     for (i = 0; i < 3; i++)
     {
+        if(my_id == i) printf("\033[1;37mMe: \033[0m ");
         printf("\033[1;33m"); //Set the text to the color red
         printf("HP: %d    ", players[i].health);
         printf("\033[0m");

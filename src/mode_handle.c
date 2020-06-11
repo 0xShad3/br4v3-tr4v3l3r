@@ -354,7 +354,7 @@ void *multi_game_handler(void *args)
             sleep(2);
             system("clear");
             player_check_max_stats(&game->players[game->client->uid]);
-            to_print(&game->map, game->players, game->mons_arr, game->chest_arr);
+            to_print_multi(&game->map, game->players, game->mons_arr, game->chest_arr,game->client->uid);
             update_objects(&game->map, game->mons_arr, game->chest_arr);
             usleep(10000);
             fflush(stderr);
@@ -378,7 +378,7 @@ void *multi_game_handler(void *args)
         game->players[game->client->uid].x = 18;
         game->players[game->client->uid].y = 48;
     }
-    to_print_multi(&game->map, game->players, game->mons_arr, game->chest_arr);
+    to_print_multi(&game->map, game->players, game->mons_arr, game->chest_arr,game->client->uid);
 
     return NULL;
 }

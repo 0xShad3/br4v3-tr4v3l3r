@@ -14,7 +14,7 @@
 void add_stats(player_t *player);
 char key_input(char *key);
 void to_print(map_t *map, player_t *player, monster_t monsters[], chest_t chests[]);
-void to_print_multi(map_t *map,player_t players[],monster_t monsters[], chest_t chests[]);
+void to_print_multi(map_t *map,player_t players[],monster_t monsters[], chest_t chests[],int my_id);
 int load_game(account_t *account, map_t *map, player_t *player, int mons_buffer[MAX_MONSTERS][MONS_ELMNTS], int chest_buffer[MAX_CHESTS]);
 int save_game(map_t *map, account_t *account, player_t *player, monster_t mons_arr[], chest_t chest_arr[]);
 void memset_arrays(int mons_buffer[][MONS_ELMNTS], int chest_buffer[MAX_CHESTS]);

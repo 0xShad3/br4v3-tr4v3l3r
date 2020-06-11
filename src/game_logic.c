@@ -20,10 +20,10 @@ void to_print(map_t *map, player_t *player, monster_t monsters[], chest_t chests
     print_map(map, monsters);
     get_stats(player, monsters, map);
 }
-void to_print_multi(map_t *map, player_t players[], monster_t monsters[], chest_t chests[])
+void to_print_multi(map_t *map, player_t players[], monster_t monsters[], chest_t chests[], int my_id)
 {
     print_map(map, monsters);
-    get_stats(players, monsters, map);
+    get_stats_multi(players, monsters, map, my_id);
 }
 /**
  * Modifies the initial values of player stats giving him a buff of 50 points

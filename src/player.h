@@ -56,7 +56,7 @@ void object_found(map_t *map, player_t *player, char key_press, monster_t mons_a
 int *check_obj(map_t *map, player_t *player, int obj_array[2]);
 void player_die(player_t *player);
 void get_stats(player_t *player, monster_t monsters[], map_t *map);
-void get_stats_multi(player_t players[], monster_t monster[], map_t *map);
+void get_stats_multi(player_t players[], monster_t monster[], map_t *map, int my_id);
 int attack(float accuracy, float damage, float armor);
 void open_chest(chest_t chest, player_t *player);
 int check_level_up(monster_t mons_arr[], map_t *map);
