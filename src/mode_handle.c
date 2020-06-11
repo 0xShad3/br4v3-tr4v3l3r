@@ -225,7 +225,7 @@ void init_game_multi(account_t *account, client_t *client)
         init_player(&game.players[i], i, MULTI_MODE);
     }
     add_stats(&game.players[game.client->uid]);
-    net_buffer = on_player_move(&game.players[game.client->uid]);
+    net_buffer = on_player_update_stats(&game.players[game.client->uid],&game.map);
     send(client->sockfd, net_buffer, strlen(net_buffer), 0);
 
     /***

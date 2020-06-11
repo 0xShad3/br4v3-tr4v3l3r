@@ -100,8 +100,6 @@ int main(int argc, char **argv)
 
         queue_add(cli);
         pthread_create(&tid, NULL, &handle_client, (void *)cli);
-
-        sleep(1);
     }
 }
 void *handle_client(void *arg)

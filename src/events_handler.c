@@ -156,7 +156,7 @@ char *on_player_move(player_t *player)
     return buffer;
 }
 
-char *on_player_update_stats(player_t *player,map_t* map)
+char *on_player_update_stats(player_t *player, map_t *map)
 {
     char starting_fn_msg[4];
     char *help_sym = ":";
@@ -214,15 +214,22 @@ char *on_player_update_stats(player_t *player,map_t* map)
     itoa(player->health, update, 10);
     strcat(buffer, help_sym);
     strcat(buffer, update);
-/*
-    itoa(player->direction, update, 10);
+
+    update[0] = player->direction;
+    update[1] = '\0';
     strcat(buffer, help_sym);
     strcat(buffer, update);
 
-    itoa(player->prev_direction, update, 10);
+    //itoa(player->prev_direction, update, 10);
     strcat(buffer, help_sym);
+    
+    update[0] = player->prev_direction;
+    while(update[0] == ' '){
+        update[0]=player->prev_direction;
+    }
+    update[1] = '\0';
     strcat(buffer, update);
-  */  printf("%s\n", buffer);
+    printf("%s\n\n", buffer);
 
     buffer[strlen(buffer)] = '\0';
     return buffer;
@@ -331,9 +338,16 @@ int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode
 
             token = strtok(NULL, NET_DELIM);
             players_arr[i].health = atoi(token);
+
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].direction = token[0];
+            token = strtok(NULL, NET_DELIM);
+            players_arr[i].prev_direction = token[0];
+            
             break;
         }
     }
+
     // token = strtok(NULL,NET_DELIM);
     // player->direction = token;
 
