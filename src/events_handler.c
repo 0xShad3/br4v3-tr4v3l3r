@@ -402,8 +402,8 @@ int decode_on_chest_open(chest_t chests_arr[], char *buffer_to_decode, map_t *ma
         {
             token = strtok(NULL, NET_DELIM);
             //get the second number which is 1 -> force chest to open
-            chests_arr[i].isOpen = 1; //open chest
-            //map_set(map,' ',chests_arr[i].y,chests_arr[i].x); //clear dead monster
+            chests_arr[i].isOpen = atoi(token); //open chest
+            map_set(map,' ',chests_arr[i].y,chests_arr[i].x); //clear dead monster
             break;
         }
     }
