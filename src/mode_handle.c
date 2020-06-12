@@ -310,7 +310,7 @@ void *multi_game_handler(void *args)
             {
                 game->players[game->client->uid].prev_direction = game->players[game->client->uid].direction;
                 game->players[game->client->uid].direction = key_press;
-                object_found(&game->map, &game->players[game->client->uid], key_press, game->mons_arr, game->chest_arr);
+                object_found_multi(game->client,&game->map, &game->players[game->client->uid], key_press, game->mons_arr, game->chest_arr);
                 move_multi(&game->map, game->players,game->client->uid);
                 net_buffer = on_player_update_stats(&game->players[game->client->uid],&game->map);
                 send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
@@ -351,7 +351,6 @@ void *multi_game_handler(void *args)
             /**
             * When no direction key is pressed
             */
-            sleep(2);
             system("clear");
             player_check_max_stats(&game->players[game->client->uid]);
             to_print_multi(&game->map, game->players, game->mons_arr, game->chest_arr,game->client->uid);

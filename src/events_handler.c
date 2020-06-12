@@ -255,6 +255,7 @@ int decode_on_monster_death(monster_t mons_arr[], char *buffer_to_decode, map_t 
         {
             token = strtok(NULL, NET_DELIM); //get the second number which is 1 -> force monster to die
             mons_arr[i].isDead = atoi(token);
+            map_set(map,' ',mons_arr[i].y,mons_arr[i].x); //clear dead monster
             break;
         }
     }
