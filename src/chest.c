@@ -11,5 +11,5 @@ void init_chest(chest_t *chest, int id, int x1, int y1)
     chest->level = 1;
     chest->isOpen = 0;
     chest->chest_level = 0;
-    chest->chest_id = 0;
+    chest->chest_id = id;
 }
