@@ -266,11 +266,15 @@ int load_game_multi(map_t *map, player_t players[], int monsters[MAX_MONSTERS][M
     {
         chests[i] = atoi(player_buff[i]);
     }
+    for (i = 0; i < MAX_CHESTS - counter; i++)
+    {
+        chests[i + counter] = 0;
+    }
     memset(player_buff, '0', sizeof(char) * MAX_TOKENS * 4);
     for (j = 0; j < MAX_MONSTERS; j++)
     {
         /// + 3 -> + MAX_PLAYERS
-        token = strtok(line_buff[j + 1 + 4 + 3], ",");
+        token = strtok(line_buff[j + 4 + 3], ",");
         i = 0;
         while (token != NULL)
         {
@@ -384,7 +388,6 @@ int save_game_multi(map_t *map, player_t players[], monster_t monsters[], chest_
     fclose(fd);
     return 1;
 }
-
 
 /**
  *  Setting the values of the two arrays to 0
