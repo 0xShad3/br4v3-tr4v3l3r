@@ -35,7 +35,7 @@ void init_player(player_t *player, int account_id, int game_mode)
     player->name = malloc(50 * sizeof(char));
     player->pcolor = PCOLOR;
     player->psymbol = PSYMBOL;
-    player->prev_y=49;
+    player->prev_y = 49;
     player->prev_x = 18 + account_id;
 }
 void move(map_t *map, player_t *player)
@@ -109,7 +109,6 @@ void move_multi(map_t *map, player_t players[], int id)
             players[id].y++;
         }
     }
-
 }
 
 void player_die(player_t *player)
@@ -176,7 +175,8 @@ void get_stats_multi(player_t players[], monster_t monsters[], map_t *map, int m
     int i;
     for (i = 0; i < 3; i++)
     {
-        if(my_id == i) printf("\033[1;37mMe: \033[0m ");
+        if (my_id == i)
+            printf("\033[1;37mMe: \033[0m ");
         printf("\033[1;33m"); //Set the text to the color red
         printf("HP: %d    ", players[i].health);
         printf("\033[0m");
@@ -311,7 +311,7 @@ void object_found(map_t *map, player_t *player, char key_press, monster_t mons_a
     }
 }
 
-void object_found_multi(client_t *client ,map_t *map, player_t *player, char key_press, monster_t mons_arr[], chest_t chest_arr[])
+void object_found_multi(client_t *client, map_t *map, player_t *player, char key_press, monster_t mons_arr[], chest_t chest_arr[])
 {
     int i;
     char *net_buffer;
@@ -346,7 +346,7 @@ void object_found_multi(client_t *client ,map_t *map, player_t *player, char key
                     mons_arr[i].isDead = TRUE;
                     net_buffer = on_monster_death(&mons_arr[i]);
                     send(client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
-                    
+                    net_buffer = NULL;
                 }
             }
         }
@@ -362,11 +362,13 @@ void object_found_multi(client_t *client ,map_t *map, player_t *player, char key
             {
                 chest_arr[i].isOpen = TRUE;
                 open_chest(chest_arr[i], player);
+                net_buffer = on_chest_open(&chest_arr[i]);
+                send(client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
+                net_buffer = NULL;
             }
         }
     }
 }
-
 
 int check_level_up(monster_t mons_arr[], map_t *map)
 {
