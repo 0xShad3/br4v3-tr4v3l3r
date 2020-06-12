@@ -4,7 +4,9 @@
 #include "player.h"
 #include "map.h"
 #include "monster.h"
+#include "client.h"
 #include "custom_effects.h"
+#include "events_handler.h"
 
 void init_player(player_t *player, int account_id, int game_mode)
 {
@@ -33,7 +35,7 @@ void init_player(player_t *player, int account_id, int game_mode)
     player->name = malloc(50 * sizeof(char));
     player->pcolor = PCOLOR;
     player->psymbol = PSYMBOL;
-    player->prev_y=49;
+    player->prev_y = 49;
     player->prev_x = 18 + account_id;
 }
 void move(map_t *map, player_t *player)
@@ -107,7 +109,6 @@ void move_multi(map_t *map, player_t players[], int id)
             players[id].y++;
         }
     }
-
 }
 
 void player_die(player_t *player)
@@ -174,7 +175,8 @@ void get_stats_multi(player_t players[], monster_t monsters[], map_t *map, int m
     int i;
     for (i = 0; i < 3; i++)
     {
-        if(my_id == i) printf("\033[1;37mMe: \033[0m ");
+        if (my_id == i)
+            printf("\033[1;37mMe: \033[0m ");
         printf("\033[1;33m"); //Set the text to the color red
         printf("HP: %d    ", players[i].health);
         printf("\033[0m");
@@ -308,6 +310,66 @@ void object_found(map_t *map, player_t *player, char key_press, monster_t mons_a
         }
     }
 }
+
+void object_found_multi(client_t *client, map_t *map, player_t *player, char key_press, monster_t mons_arr[], chest_t chest_arr[])
+{
+    int i;
+    char *net_buffer;
+    int mons_attack, player_attack;
+    for (i = 0; i < map->monsters_num; i++)
+    {
+        if ((mons_arr[i].y == player->y + 1 && mons_arr[i].x == player->x && (key_press == DOWN_C || key_press == DOWN_S)) ||
+            (mons_arr[i].y == player->y - 1 && mons_arr[i].x == player->x && (key_press == UP_C || key_press == UP_S)) ||
+            (mons_arr[i].y == player->y && mons_arr[i].x == player->x + 1 && (key_press == RIGHT_C || key_press == RIGHT_S)) ||
+            (mons_arr[i].y == player->y && mons_arr[i].x == player->x - 1 && (key_press == LEFT_C || key_press == LEFT_S)))
+        {
+            if (mons_arr[i].isDead != TRUE)
+            {
+                if (player->health > 0)
+                {
+                    player_attack = attack((float)mons_arr[i].accuracy, (float)mons_arr[i].attack, (float)player->armor);
+                    player->health -= player_attack;
+                    if (player->health <= 0)
+                        player_die(player); //second check for life after health so the player can t have negative hp
+                }
+                else
+                {
+                    player_die(player);
+                }
+                if (mons_arr[i].health > 0)
+                {
+                    mons_attack = attack((float)player->accuracy, (float)player->attack, (float)mons_arr[i].armor);
+                    mons_arr[i].health -= mons_attack;
+                }
+                else
+                {
+                    mons_arr[i].isDead = TRUE;
+                    net_buffer = on_monster_death(&mons_arr[i]);
+                    send(client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
+                    net_buffer = NULL;
+                }
+            }
+        }
+    }
+    for (i = 0; i < map->chests_num; i++)
+    {
+        if ((chest_arr[i].y == player->y + 1 && chest_arr[i].x == player->x && (key_press == DOWN_C || key_press == DOWN_S)) ||
+            (chest_arr[i].y == player->y - 1 && chest_arr[i].x == player->x && (key_press == UP_C || key_press == UP_S)) ||
+            (chest_arr[i].y == player->y && chest_arr[i].x == player->x + 1 && (key_press == RIGHT_C || key_press == RIGHT_S)) ||
+            (chest_arr[i].y == player->y && chest_arr[i].x == player->x - 1 && (key_press == LEFT_C || key_press == LEFT_S)))
+        {
+            if (chest_arr[i].isOpen != TRUE)
+            {
+                chest_arr[i].isOpen = TRUE;
+                open_chest(chest_arr[i], player);
+                net_buffer = on_chest_open(&chest_arr[i]);
+                send(client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
+                net_buffer = NULL;
+            }
+        }
+    }
+}
+
 int check_level_up(monster_t mons_arr[], map_t *map)
 {
     int i;

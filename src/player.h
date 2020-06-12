@@ -3,6 +3,7 @@
 
 #include "map.h"
 #include "monster.h"
+#include "client.h"
 #define PCOLOR "[0;34m"
 #define PSYMBOL 'Y'
 
@@ -61,5 +62,6 @@ int attack(float accuracy, float damage, float armor);
 void open_chest(chest_t chest, player_t *player);
 int check_level_up(monster_t mons_arr[], map_t *map);
 void player_check_max_stats(player_t *player);
+void object_found_multi(client_t *client ,map_t *map, player_t *player, char key_press, monster_t mons_arr[], chest_t chest_arr[]);
 
 #endif

@@ -30,7 +30,6 @@ char *on_monster_death(monster_t *monster)
 
     itoa(monster->isDead, update, 10);
     strcat(buffer, update);
-
     return buffer;
 }
 
@@ -249,6 +248,7 @@ int decode_on_monster_death(monster_t mons_arr[], char *buffer_to_decode, map_t 
         {
             token = strtok(NULL, NET_DELIM); //get the second number which is 1 -> force monster to die
             mons_arr[i].isDead = atoi(token);
+            map_set(map,' ',mons_arr[i].y,mons_arr[i].x); //clear dead monster
             break;
         }
     }
@@ -302,8 +302,9 @@ int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode
     char *token;
     int i;
     strtok(buffer_to_decode, NET_DELIM);
-
+    int temp_id;
     token = strtok(NULL, NET_DELIM); //player id
+    temp_id = token;
     for (i = 0; i < 3; i++)
     {
         if (players_arr[i].id == atoi(token))
@@ -356,12 +357,13 @@ int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode
         }
     }
     for (int i = 0; i < 3; i++)
-    {
+    {   
         map_set(map, PSYMBOL, players_arr[i].y, players_arr[i].x);
         if(players_arr[i].prev_x != players_arr[i].x || players_arr[i].prev_y != players_arr[i].y){
             map_set(map, MAP_P_SYMBOL,players_arr[i].prev_y, players_arr[i].prev_x);
         }
-        
+        players_arr[i].prev_x = players_arr[i].x;
+        players_arr[i].prev_y = players_arr[i].y;
     }
     return 0;
 }
@@ -400,7 +402,8 @@ int decode_on_chest_open(chest_t chests_arr[], char *buffer_to_decode, map_t *ma
         {
             token = strtok(NULL, NET_DELIM);
             //get the second number which is 1 -> force chest to open
-            chests_arr[i].isOpen = atoi(token); //open chest
+            chests_arr[i].isOpen = 1; //open chest
+            //map_set(map,' ',chests_arr[i].y,chests_arr[i].x); //clear dead monster
             break;
         }
     }
