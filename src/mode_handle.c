@@ -356,7 +356,7 @@ void *multi_game_handler(void *args)
             update_objects(&game->map, game->mons_arr, game->chest_arr);
             to_print_multi(&game->map, game->players, game->mons_arr, game->chest_arr,game->client->uid);
             
-            usleep(10000);
+            usleep(100000);
             fflush(stderr);
             fflush(stdin);
             fflush(stdout);
