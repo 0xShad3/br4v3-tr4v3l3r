@@ -228,29 +228,34 @@ char *on_load_map(int level)
 char *servside_constr_save_filename(int name_array[3])
 {
     char *buffer = (char *)calloc(sizeof(char), SOCK_BUFF_SZ);
+    char temp_num_cons[5];
+
     const char base[] = "./saves/multi/";
     const char file_extension[] = ".rpg\0";
     char str[10];
     int temp = 0;
+    int i = 0;
+    int j = 0;
 
     for (int i = 0; i < 3; i++)
     {
-        for (int j = 0; j < 3; j++)
+        for (int j = i + 1; j < 3; j++)
         {
-            if (name_array[j] > name_array[j + i])
+            if (name_array[i] > name_array[j])
             {
-                temp = name_array[j];
-                name_array[j + 1] = name_array[j];
+                temp = name_array[i];
+                name_array[i] = name_array[j];
                 name_array[j] = temp;
             }
         }
     }
-    //!!IMPORTANT
-    itoa()
-
-    strcat(buffer,base);
-    strcat();
-    strcat(buffer)
-    
+    strcat(buffer, base);
+    itoa(name_array[0], temp_num_cons, 10);
+    strcat(buffer, temp_num_cons);
+    itoa(name_array[1], temp_num_cons, 10);
+    strcat(buffer, temp_num_cons);
+    itoa(name_array[2], temp_num_cons, 10);
+    strcat(buffer, temp_num_cons);
+    strcat(buffer, file_extension);
     return buffer;
 }

@@ -354,7 +354,8 @@ int save_game_multi(char *net_buffer, map_t *map, player_t players[], monster_t 
     strtok(net_buffer, NET_DELIM);
 
     token = strtok(NULL, NET_DELIM);
-    filename = save_constr_fn_multi(token);
+    filename = token;
+    printf("%s\n\n\n\n\n\n", filename);
     FILE *fd = fopen(filename, "w+");
     if (fd == NULL)
     {

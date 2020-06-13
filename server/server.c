@@ -132,7 +132,9 @@ void *handle_client(void *arg)
         if (!search_hash(buff_out))
         {
             strcpy(store_hash, buff_out);
+
             hash_id = search_hash_id(store_hash);
+            name_array[cli->uid] = hash_id;
             bzero(buff_out, BUFFER_SZ);
             itoa(1, buff_out, 10);
             send(cli->sockfd, buff_out, sizeof(int), 0);
@@ -151,6 +153,7 @@ void *handle_client(void *arg)
         {
             strcpy(store_hash, buff_out);
             hash_id = search_hash_id(store_hash);
+            name_array[cli->uid] = hash_id;
             bzero(buff_out, BUFFER_SZ);
             itoa(1, buff_out, 10);
             send(cli->sockfd, buff_out, sizeof(int), 0);
@@ -225,8 +228,9 @@ void *handle_client(void *arg)
             bzero(buff_out,BUFFER_SZ);
             strcpy(buff_out, "900");
             strcat(buff_out,NET_DELIM);
-            //!IMPORTANT 
-            save_filename = servside_constr_save_filename();
+            printf("%s:%d\n",store_hash,hash_id);
+            save_filename = servside_constr_save_filename(name_array);
+            printf("BUFFER: %s",save_filename);
             strcat(buff_out,save_filename);
             broadcast_packet(buff_out, uid);
             leave_flag = 1;
@@ -251,12 +255,6 @@ void *handle_client(void *arg)
 
         bzero(buff_out, BUFFER_SZ);
     }
-
-    bzero(buff_out, BUFFER_SZ);
-    pthread_mutex_lock(&clients_mutex1);
-    name_array[cli->uid] = hash_id;
-    pthread_mutex_lock(&clients_mutex1);
-
     close(cli->sockfd);
     queue_remove(cli->uid);
     free(cli);
