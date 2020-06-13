@@ -278,8 +278,9 @@ void init_game_multi(account_t *account, client_t *client)
 
     while (1)
     {
-        if (hard_exit_flag != 0)
+        if (hard_exit_flag == TRUE || save_flag == TRUE)
         {
+            sleep(5);
             break;
         }
 
@@ -308,13 +309,13 @@ void *multi_game_handler(void *args)
 
             key_press = key_input(key);
             if ((key_press == LEFT_C ||
-                key_press == LEFT_S ||
-                key_press == RIGHT_C ||
-                key_press == RIGHT_S ||
-                key_press == UP_C ||
-                key_press == UP_S ||
-                key_press == DOWN_C ||
-                key_press == DOWN_S) &&
+                 key_press == LEFT_S ||
+                 key_press == RIGHT_C ||
+                 key_press == RIGHT_S ||
+                 key_press == UP_C ||
+                 key_press == UP_S ||
+                 key_press == DOWN_C ||
+                 key_press == DOWN_S) &&
                 game->players[game->client->uid].isDead == FALSE)
             {
                 game->players[game->client->uid].prev_direction = game->players[game->client->uid].direction;
@@ -324,7 +325,6 @@ void *multi_game_handler(void *args)
                 net_buffer = on_player_update_stats(&game->players[game->client->uid], &game->map);
                 send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
             }
-            
 
             /**
             * Save the game press #
@@ -386,13 +386,12 @@ void *multi_game_handler(void *args)
             system("clear");
             player_check_max_stats(&game->players[game->client->uid]);
             update_objects(&game->map, game->mons_arr, game->chest_arr);
-            to_print_multi(&game->map, game->players, game->mons_arr, game->chest_arr,game->client->uid);
-            
+            to_print_multi(&game->map, game->players, game->mons_arr, game->chest_arr, game->client->uid);
+
             usleep(700000);
             fflush(stderr);
             fflush(stdin);
             fflush(stdout);
-            
         }
         /**
          * In case were break is called the 2 arrays are getting freed and reallocated 
@@ -414,7 +413,6 @@ void *multi_game_handler(void *args)
         update_objects(&game->map, game->mons_arr, game->chest_arr);
         game->players[game->client->uid].x = 18 + (game->client->uid);
         game->players[game->client->uid].y = 48;
-    
     }
 
     return NULL;
@@ -445,7 +443,7 @@ void *multi_recv_handler(void *args)
             itoa(PLR_DEATH_ID_P, comp, 10);
             if (!strcmp(response_id, comp))
             {
-                if (decode_on_player_death(&game->map,game->players, net_buffer) != 0)
+                if (decode_on_player_death(&game->map, game->players, net_buffer) != 0)
                 {
                     // send message to server for message loss
                 }
@@ -506,7 +504,7 @@ void *multi_recv_handler(void *args)
             itoa(SAVE_GAME_ID, comp, 10);
             if (!strcmp(response_id, comp))
             {
-                save_game_multi(&game->map, game->players, game->mons_arr, game->chest_arr);
+                save_game_multi(net_buffer, &game->map, game->players, game->mons_arr, game->chest_arr);
                 save_flag = TRUE;
                 break;
             }

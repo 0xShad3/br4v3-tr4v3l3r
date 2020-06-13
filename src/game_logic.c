@@ -12,6 +12,7 @@
 #include "chest.h"
 #include "monster.h"
 #include "custom_effects.h"
+#include "events_handler.h"
 
 char *win_msg = "Congratulations! You are a br4v3 tr4v3l3r!";
 
@@ -342,13 +343,19 @@ int save_game(map_t *map, account_t *account, player_t *player, monster_t mons_a
     fclose(fd);
     return 1;
 }
-int save_game_multi(map_t *map, player_t players[], monster_t monsters[], chest_t chests[])
+int save_game_multi(char *net_buffer, map_t *map, player_t players[], monster_t monsters[], chest_t chests[])
 {
     char buffer[200];
     int counter = 0;
     int offset = 0;
     int i;
-    FILE *fd = fopen("1.rpg", "w+");
+    char *token;
+    char *filename;
+    strtok(net_buffer, NET_DELIM);
+
+    token = strtok(NULL, NET_DELIM);
+    filename = save_constr_fn_multi(token);
+    FILE *fd = fopen(filename, "w+");
     if (fd == NULL)
     {
         redprint("There was an error saving your game!Exiting...");

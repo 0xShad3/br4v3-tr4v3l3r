@@ -53,8 +53,6 @@ int login_check(account_t *account)
     return -1;
 }
 
-
-
 int do_register(account_t *login)
 {
     login->id = get_lastid() + 1;
@@ -172,10 +170,21 @@ void exists_error()
 */
 void save_constr_fn(account_t *account)
 {
-    const char base[] = "./saves/";
+    const char base[] = "./saves/single/";
     const char file_extension[] = ".rpg\0";
     char str[10];
     strcpy(account->save_file, base);
     strcat(account->save_file, itoa(account->id, str, 10));
     strcat(account->save_file, file_extension);
+}
+
+char *save_constr_fn_multi(char *core_name)
+{
+    char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
+    const char base[] = "./saves/multi/";
+    const char file_extension[] = "./rpg\0";
+    strcpy(buffer, base);
+    strcat(buffer, core_name);
+    strcat(buffer, file_extension);
+    return buffer;
 }

@@ -190,6 +190,7 @@ void loginfo(int uid, char *buff)
 {
     printf("[LOG] Uid:%d -> %s\n", uid, buff);
 }
+
 char *on_load_map(int level)
 {
     const char base[] = "./maps/map";
@@ -221,5 +222,35 @@ char *on_load_map(int level)
     content_md5 = NULL;
     fclose(fd);
 
+    return buffer;
+}
+
+char *servside_constr_save_filename(int name_array[3])
+{
+    char *buffer = (char *)calloc(sizeof(char), SOCK_BUFF_SZ);
+    const char base[] = "./saves/multi/";
+    const char file_extension[] = ".rpg\0";
+    char str[10];
+    int temp = 0;
+
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            if (name_array[j] > name_array[j + i])
+            {
+                temp = name_array[j];
+                name_array[j + 1] = name_array[j];
+                name_array[j] = temp;
+            }
+        }
+    }
+    //!!IMPORTANT
+    itoa()
+
+    strcat(buffer,base);
+    strcat();
+    strcat(buffer)
+    
     return buffer;
 }

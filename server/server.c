@@ -116,6 +116,7 @@ void *handle_client(void *arg)
     int receive_sz = 0;
     cli_count++;
     client_t *cli = (client_t *)arg;
+    char* save_filename;
     //exw peiraksei aytes tis grammes
     // Name
     recv(cli->sockfd, name, BUFFER_SZ, 0);
@@ -217,19 +218,19 @@ void *handle_client(void *arg)
     while (1)
     {
         receive_sz = recv(cli->sockfd, buff_out, BUFFER_SZ, 0);
-
-        if (leave_flag)
-        {
-            break;
-        }
         if (!strcmp(buff_out, "hard_save"))
         {
             loginfo(cli->uid, "Requested save game");
             //recv save_file
             bzero(buff_out,BUFFER_SZ);
             strcpy(buff_out, "900");
+            strcat(buff_out,NET_DELIM);
+            //!IMPORTANT 
+            save_filename = servside_constr_save_filename();
+            strcat(buff_out,save_filename);
             broadcast_packet(buff_out, uid);
             leave_flag = 1;
+            break;
         }
 
         if (!strcmp(buff_out, "hard_exit"))
@@ -240,6 +241,7 @@ void *handle_client(void *arg)
             broadcast_packet(buff_out, uid);
             sleep(1);
             leave_flag = 1;
+            break;
         }
         if (receive_sz > 0)
         {
