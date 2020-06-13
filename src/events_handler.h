@@ -32,7 +32,7 @@ char *on_player_update_stats(player_t *player, map_t* map);
 
 //Decoding funcs
 int decode_on_chest_open(chest_t chests_arr[], char *buffer_to_decode, map_t *map); //checked
-int decode_on_player_death(player_t players_arr[], char *buffer_to_decode); // checked
+int decode_on_player_death(map_t *map,player_t players_arr[], char *buffer_to_decode); // checked
 int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode, map_t *map); //checked
 int decode_on_monster_update_stats(monster_t mons_arr[], char *buffer_to_decode, map_t *map); //check later
 int decode_on_monster_death(monster_t mons_arr[], char *buffer_to_decode, map_t *map); //checked

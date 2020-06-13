@@ -190,8 +190,16 @@ void get_stats_multi(player_t players[], monster_t monsters[], map_t *map, int m
         printf("\033[0m");
 
         printf("\033[1;36m");
-        printf("AT: %d    \n", players[i].attack);
+        printf("AT: %d  ", players[i].attack);
         printf("\033[0m");
+
+        if(players[i].isDead == TRUE)
+        {
+            printf("\033[1;31m");
+            printf("  *DEAD* ");
+            printf("\033[0m\n");
+        }
+        else printf("\n");
 
         printf("\033[1;32m");
         printf("Wins: ");
@@ -207,6 +215,8 @@ void get_stats_multi(player_t players[], monster_t monsters[], map_t *map, int m
         printf("  Level: ");
         printf("%d\n", map->level);
         printf("\033[0m");
+
+        
     }
     printf("Monsters left:   [");
 
@@ -329,8 +339,13 @@ void object_found_multi(client_t *client, map_t *map, player_t *player, char key
                 {
                     player_attack = attack((float)mons_arr[i].accuracy, (float)mons_arr[i].attack, (float)player->armor);
                     player->health -= player_attack;
-                    if (player->health <= 0)
+                    if (player->health <= 0){
                         player_die(player); //second check for life after health so the player can t have negative hp
+                        net_buffer = on_player_death(player);
+                        send(client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
+                        net_buffer = NULL;
+                    }
+                       
                 }
                 else
                 {
