@@ -189,6 +189,109 @@ int load_game(account_t *account, map_t *map, player_t *player, int mons_buffer[
     return 1;
 }
 
+int load_game_multi(map_t *map, player_t players[], int monsters[MAX_MONSTERS][MONS_ELMNTS], int chests[MAX_CHESTS])
+{
+    char load_buffer[1024];
+    char line_buff[MAX_LINES][40];
+    char player_buff[MAX_TOKENS][4];
+    int counter;
+    int j;
+    FILE *fd = fopen("1.rpg", "r");
+    if (fd == NULL)
+    {
+        printf("There was an error trying to load your save");
+        return 0;
+        exit(EXIT_FAILURE);
+    }
+
+    fread(load_buffer, 1024, sizeof(char), fd);
+    char *token;
+    token = strtok(load_buffer, "\n");
+    int i = 0;
+    while (token != NULL)
+    {
+
+        if (token != NULL)
+        {
+            strcpy(line_buff[i], token);
+            token = strtok(NULL, "\n");
+        }
+        i++;
+    }
+
+    // Load the level
+    map->level = atoi(line_buff[0]);
+    for (i = 0; i < 3; i++)
+    {
+        token = strtok(line_buff[i + 1], ",");
+        j = 0;
+        while (token != NULL)
+        {
+
+            if (token != NULL)
+            {
+                strcpy(player_buff[j], token);
+            }
+
+            token = strtok(NULL, ",");
+            j++;
+        }
+
+        // Load Player statistics needed
+        players[i].id = atoi(player_buff[0]);
+        players[i].x = atoi(player_buff[1]);
+        players[i].y = atoi(player_buff[2]);
+        players[i].health = atoi(player_buff[3]);
+        players[i].armor = atoi(player_buff[4]);
+        players[i].attack = atoi(player_buff[5]);
+        players[i].accuracy = atoi(player_buff[6]);
+        players[i].wins = atoi(player_buff[7]);
+        players[i].loses = atoi(player_buff[8]);
+        players[i].isDead = atoi(player_buff[9]);
+        memset(player_buff, '0', sizeof(char) * MAX_TOKENS * 4);
+    }
+    counter = atoi(strtok(line_buff[4], ","));
+    token = strtok(line_buff[5], ",");
+    i = 0;
+    while (token != NULL)
+    {
+        if (token != NULL)
+        {
+            strcpy(player_buff[i], token);
+        }
+        token = strtok(NULL, ",");
+        i++;
+    }
+    for (i = 0; i < counter; i++)
+    {
+        chests[i] = atoi(player_buff[i]);
+    }
+    for (i = 0; i < MAX_CHESTS - counter; i++)
+    {
+        chests[i + counter] = 0;
+    }
+    memset(player_buff, '0', sizeof(char) * MAX_TOKENS * 4);
+    for (j = 0; j < MAX_MONSTERS; j++)
+    {
+        /// + 3 -> + MAX_PLAYERS
+        token = strtok(line_buff[j + 4 + 3], ",");
+        i = 0;
+        while (token != NULL)
+        {
+            if (token != NULL)
+            {
+                strcpy(player_buff[i], token);
+            }
+            token = strtok(NULL, ",");
+            i++;
+        }
+        monsters[j][0] = atoi(player_buff[MONS_ID]);
+        monsters[j][1] = atoi(player_buff[MONS_HP]);
+    }
+    fclose(fd);
+    return 1;
+}
+
 /**
  * Saves the current game with the format [id].rpg in
  * the saves directory
@@ -239,6 +342,53 @@ int save_game(map_t *map, account_t *account, player_t *player, monster_t mons_a
     fclose(fd);
     return 1;
 }
+int save_game_multi(map_t *map, player_t players[], monster_t monsters[], chest_t chests[])
+{
+    char buffer[200];
+    int counter = 0;
+    int offset = 0;
+    int i;
+    FILE *fd = fopen("1.rpg", "w+");
+    if (fd == NULL)
+    {
+        redprint("There was an error saving your game!Exiting...");
+        return 0;
+    }
+    fprintf(fd, "%d\n", map->level);
+
+    for (i = 0; i < 3; i++)
+    {
+        fprintf(fd, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n", players[i].id, players[i].x, players[i].y, players[i].health, players[i].armor, players[i].attack, players[i].accuracy, players[i].wins, players[i].loses, players[i].isDead);
+    }
+    for (i = 0; i < map->chests_num; i++)
+    {
+        if (chests[i].isOpen == FALSE)
+        {
+            offset += sprintf(buffer + offset, "%d,", chests[i].chest_id);
+            counter++;
+        }
+    }
+    fprintf(fd, "%d\n", counter);
+    fprintf(fd, "%s", buffer);
+    fseek(fd, -1, SEEK_CUR);
+    fprintf(fd, "\n");
+    memset(buffer, '0', sizeof(buffer));
+    offset = 0;
+    counter = 0;
+    for (i = 0; i < map->monsters_num; i++)
+    {
+        if (monsters[i].isDead == FALSE)
+        {
+            offset += sprintf(buffer + offset, "%d,%d\n", monsters[i].health, monsters[i].monster_id);
+            counter++;
+        }
+    }
+    fprintf(fd, "%d\n", counter);
+    fprintf(fd, "%s", buffer);
+    fclose(fd);
+    return 1;
+}
+
 /**
  *  Setting the values of the two arrays to 0
  */

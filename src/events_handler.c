@@ -15,7 +15,6 @@
 char *on_monster_death(monster_t *monster)
 {
     char starting_fn_msg[4];
-    char *help_sym = ":";
     char *update = malloc(sizeof(char) * 3);
     char *buffer = malloc(sizeof(char) * 16);
 
@@ -25,7 +24,7 @@ char *on_monster_death(monster_t *monster)
 
     itoa(monster->monster_id, update, 10);
     strcat(buffer, update);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
 
     monster->isDead = 1; //force monster to die
 
@@ -37,46 +36,45 @@ char *on_monster_death(monster_t *monster)
 char *on_moster_update_stats(monster_t *monster)
 {
     char starting_fn_msg[4];
-    char *help_sym = ":";
     char *update = malloc(sizeof(char) * 3);
     char *buffer = malloc(sizeof(char) * 32);
 
     itoa(MNSTR_UPDATE_ID_M, starting_fn_msg, 10);
-    strcat(starting_fn_msg, ":");
+    strcat(starting_fn_msg, NET_DELIM);
 
     strcat(buffer, starting_fn_msg);
 
     itoa(monster->monster_id, update, 10);
     strcat(buffer, update);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
 
     itoa(monster->armor, update, 10);
     strcat(buffer, update);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
 
     itoa(monster->attack, update, 10);
     strcat(buffer, update);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
 
     itoa(monster->health, update, 10);
     strcat(buffer, update);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
 
     itoa(monster->is_boss, update, 10);
     strcat(buffer, update);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
 
     itoa(monster->isDead, update, 10);
     strcat(buffer, update);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
 
     itoa(monster->accuracy, update, 10);
     strcat(buffer, update);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
 
     itoa(monster->x, update, 10);
     strcat(buffer, update);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
 
     itoa(monster->y, update, 10);
     strcat(buffer, update);
@@ -86,7 +84,6 @@ char *on_moster_update_stats(monster_t *monster)
 char *on_chest_open(chest_t *chest)
 {
     char starting_fn_msg[4];
-    char *help_sym = ":";
     char *update = malloc(sizeof(char) * 3);
     char *buffer = malloc(sizeof(char) * 16);
 
@@ -97,7 +94,7 @@ char *on_chest_open(chest_t *chest)
 
     itoa(chest->chest_id, update, 10);
     strcat(buffer, update);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
 
     chest->isOpen = 1;
     itoa(chest->isOpen, update, 10);
@@ -109,7 +106,6 @@ char *on_chest_open(chest_t *chest)
 char *on_player_death(player_t *player)
 {
     char starting_fn_msg[4];
-    char *help_sym = ":";
     char *update = malloc(sizeof(char) * 3);
     char *buffer = malloc(sizeof(char) * 16);
 
@@ -120,7 +116,7 @@ char *on_player_death(player_t *player)
 
     itoa(player->id, update, 10);
     strcat(buffer, update);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
 
     player->isDead = 1; //Force player to die
     itoa(player->isDead, update, 10);
@@ -132,7 +128,6 @@ char *on_player_death(player_t *player)
 char *on_player_move(player_t *player)
 {
     char starting_fn_msg[4];
-    char *help_sym = ":";
     char *update = malloc(sizeof(char) * 3);
     char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
 
@@ -143,11 +138,11 @@ char *on_player_move(player_t *player)
 
     itoa(player->id, update, 10);
     strcat(buffer, update);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
 
     itoa(player->x, update, 10);
     strcat(buffer, update);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
 
     itoa(player->y, update, 10);
     strcat(buffer, update);
@@ -158,7 +153,6 @@ char *on_player_move(player_t *player)
 char *on_player_update_stats(player_t *player, map_t *map)
 {
     char starting_fn_msg[4];
-    char *help_sym = ":";
     char *update = malloc(sizeof(char) * 3);
     char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
 
@@ -167,60 +161,60 @@ char *on_player_update_stats(player_t *player, map_t *map)
     strcat(buffer, starting_fn_msg);
 
     itoa(player->id, update, 10);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
     strcat(buffer, update);
 
     itoa(player->x, update, 10);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
     strcat(buffer, update);
 
     itoa(player->y, update, 10);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
     strcat(buffer, update);
 
     itoa(player->isDead, update, 10);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
     strcat(buffer, update);
 
     itoa(player->loses, update, 10);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
     strcat(buffer, update);
 
     itoa(player->wins, update, 10);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
     strcat(buffer, update);
 
     itoa(player->isOnline, update, 10);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
     strcat(buffer, update);
 
     itoa(map->level, update, 10);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
     strcat(buffer, update);
 
     itoa(player->accuracy, update, 10);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
     strcat(buffer, update);
 
     itoa(player->armor, update, 10);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
     strcat(buffer, update);
 
     itoa(player->attack, update, 10);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
     strcat(buffer, update);
 
     itoa(player->health, update, 10);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
     strcat(buffer, update);
 
     update[0] = player->direction;
     update[1] = '\0';
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
     strcat(buffer, update);
 
     //itoa(player->prev_direction, update, 10);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
     
     update[0] = player->prev_direction;
     while(update[0] == ' '){
@@ -231,11 +225,11 @@ char *on_player_update_stats(player_t *player, map_t *map)
     printf("%s\n\n", buffer);
 
     itoa(player->prev_x, update, 10);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
     strcat(buffer, update);
 
     itoa(player->prev_y, update, 10);
-    strcat(buffer, help_sym);
+    strcat(buffer, NET_DELIM);
     strcat(buffer, update);
 
     buffer[strlen(buffer)] = '\0';
@@ -409,8 +403,8 @@ int decode_on_chest_open(chest_t chests_arr[], char *buffer_to_decode, map_t *ma
         {
             token = strtok(NULL, NET_DELIM);
             //get the second number which is 1 -> force chest to open
-            chests_arr[i].isOpen = 1; //open chest
-            //map_set(map,' ',chests_arr[i].y,chests_arr[i].x); //clear dead monster
+            chests_arr[i].isOpen = atoi(token); //open chest
+            map_set(map,' ',chests_arr[i].y,chests_arr[i].x); //clear dead monster
             break;
         }
     }

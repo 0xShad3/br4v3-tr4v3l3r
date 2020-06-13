@@ -376,9 +376,9 @@ void object_found_multi(client_t *client, map_t *map, player_t *player, char key
             if (chest_arr[i].isOpen != TRUE)
             {
                 chest_arr[i].isOpen = TRUE;
-                open_chest(chest_arr[i], player);
                 net_buffer = on_chest_open(&chest_arr[i]);
                 send(client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
+                open_chest(chest_arr[i], player);
                 net_buffer = NULL;
             }
         }
