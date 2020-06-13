@@ -288,7 +288,7 @@ void init_game_multi(account_t *account, client_t *client)
 
 void *multi_game_handler(void *args)
 {
-
+    int i;
     char key_press = ' ';
     char key[2];
     game_t *game = (game_t *)args;
@@ -330,7 +330,8 @@ void *multi_game_handler(void *args)
             */
             if (!check_level_up(game->mons_arr, &game->map))
             {
-                bzero(net_buffer, SOCK_BUFF_SZ);
+                //bzero(net_buffer, SOCK_BUFF_SZ);
+                net_buffer = NULL;
                 system("clear");
                 kill_all(game->mons_arr, &game->map);
                 level_up(&game->players[game->client->uid], game->mons_arr, &game->map);
@@ -342,7 +343,8 @@ void *multi_game_handler(void *args)
 
             if (!check_game_over_multi(game->players))
             {
-                bzero(net_buffer, SOCK_BUFF_SZ);
+                //bzero(net_buffer, SOCK_BUFF_SZ);
+                net_buffer = NULL;
                 for (int i = 0; i < 3; i++)
                 {
                     game->players[i].health = game->health_holder;
@@ -363,6 +365,7 @@ void *multi_game_handler(void *args)
             fflush(stderr);
             fflush(stdin);
             fflush(stdout);
+            
         }
         /**
          * In case were break is called the 2 arrays are getting freed and reallocated 
@@ -370,15 +373,15 @@ void *multi_game_handler(void *args)
          * Also the map gets loaded and the point values are getting passed to the 2 arrays
          * 
          */
-        free(game->mons_arr);
+        //free(game->mons_arr);
         game->mons_arr = NULL;
-        free(game->chest_arr);
+        //free(game->chest_arr);
         game->chest_arr = NULL;
         game->mons_arr = (monster_t *)calloc(sizeof(monster_t), game->map.level + 3);
         game->chest_arr = (chest_t *)calloc(sizeof(chest_t), game->map.level);
         load_map(&game->map, game->mons_arr, game->chest_arr, game->boss_arr);
         update_objects(&game->map, game->mons_arr, game->chest_arr);
-        game->players[game->client->uid].x = 18;
+        game->players[game->client->uid].x = 18 + (game->client->uid);
         game->players[game->client->uid].y = 48;
     }
     to_print_multi(&game->map, game->players, game->mons_arr, game->chest_arr,game->client->uid);
