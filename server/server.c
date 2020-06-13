@@ -20,6 +20,7 @@
 
 static _Atomic unsigned int cli_count = 0;
 static int uid = 0;
+int name_array[3];
 
 /**
  * This has to be changed
@@ -101,6 +102,7 @@ int main(int argc, char **argv)
         queue_add(cli);
         pthread_create(&tid, NULL, &handle_client, (void *)cli);
     }
+    return 0;
 }
 void *handle_client(void *arg)
 {
@@ -109,6 +111,8 @@ void *handle_client(void *arg)
     /// KEEP FLAG TO TERMINATE CLIENT
     int leave_flag = 0;
     int check_flag;
+    int hash_id;
+    char store_hash[33];
     int receive_sz = 0;
     cli_count++;
     client_t *cli = (client_t *)arg;
@@ -126,6 +130,8 @@ void *handle_client(void *arg)
     {
         if (!search_hash(buff_out))
         {
+            strcpy(store_hash, buff_out);
+            hash_id = search_hash_id(store_hash);
             bzero(buff_out, BUFFER_SZ);
             itoa(1, buff_out, 10);
             send(cli->sockfd, buff_out, sizeof(int), 0);
@@ -142,6 +148,8 @@ void *handle_client(void *arg)
     {
         if (!register_hash(buff_out))
         {
+            strcpy(store_hash, buff_out);
+            hash_id = search_hash_id(store_hash);
             bzero(buff_out, BUFFER_SZ);
             itoa(1, buff_out, 10);
             send(cli->sockfd, buff_out, sizeof(int), 0);
@@ -214,20 +222,38 @@ void *handle_client(void *arg)
         {
             break;
         }
-
-        if (receive_sz > 0)
+        if (!strcmp(buff_out, "hard_save"))
         {
-            loginfo(cli->uid,buff_out);
-            broadcast_packet(buff_out, uid);
-        }
-        else if (!strcmp(buff_out, "hard_exit"))
-        {
+            loginfo(cli->uid, "Requested save game");
+            //recv save_file
+            bzero(buff_out,BUFFER_SZ);
+            strcpy(buff_out, "900");
             broadcast_packet(buff_out, uid);
             leave_flag = 1;
         }
 
+        if (!strcmp(buff_out, "hard_exit"))
+        {
+            loginfo(cli->uid, "Requested hard exit");
+            bzero(buff_out,BUFFER_SZ);
+            strcpy(buff_out, "901");
+            broadcast_packet(buff_out, uid);
+            sleep(1);
+            leave_flag = 1;
+        }
+        if (receive_sz > 0)
+        {
+            loginfo(cli->uid, buff_out);
+            broadcast_packet(buff_out, uid);
+        }
+
         bzero(buff_out, BUFFER_SZ);
     }
+
+    bzero(buff_out, BUFFER_SZ);
+    pthread_mutex_lock(&clients_mutex1);
+    name_array[cli->uid] = hash_id;
+    pthread_mutex_lock(&clients_mutex1);
 
     close(cli->sockfd);
     queue_remove(cli->uid);

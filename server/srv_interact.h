@@ -6,6 +6,7 @@
 #include "../src/client.h"
 client_t *clients[MAX_CLIENTS];
 int search_hash(char *client_hash);
+int search_hash_id(char *client_hash);
 int register_hash(char *client_hash);
 void broadcast_packet(char *s, int uid);
 void str_trim_lf(char *arr, int length);

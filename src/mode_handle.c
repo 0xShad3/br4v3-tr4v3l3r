@@ -18,9 +18,14 @@
 #include "client.h"
 #include "events_handler.h"
 
-volatile sig_atomic_t exit_flag = FALSE;
+volatile sig_atomic_t hard_exit_flag = FALSE;
+int save_flag = FALSE;
 int set_counter = 1;
 
+void hard_exit_handler(int sig)
+{
+    hard_exit_flag = 1;
+}
 /**
  * Main game function
  * its responsible for running the game for single player mode
@@ -225,7 +230,7 @@ void init_game_multi(account_t *account, client_t *client)
         init_player(&game.players[i], i, MULTI_MODE);
     }
     add_stats(&game.players[game.client->uid]);
-    net_buffer = on_player_update_stats(&game.players[game.client->uid],&game.map);
+    net_buffer = on_player_update_stats(&game.players[game.client->uid], &game.map);
     send(client->sockfd, net_buffer, strlen(net_buffer), 0);
 
     /***
@@ -246,6 +251,7 @@ void init_game_multi(account_t *account, client_t *client)
      * Fetch health to health holder
      */
     game.health_holder = game.players[game.client->uid].health;
+    signal(SIGINT, hard_exit_handler);
     /**
      * 
      * Need to fill players array
@@ -272,15 +278,16 @@ void init_game_multi(account_t *account, client_t *client)
 
     while (1)
     {
-        if (exit_flag != 0)
+        if (hard_exit_flag != 0)
         {
-            redprint_slow("K CYA!");
+            break;
         }
 
         /**
          * Reduce CPU consumption
          */
-        sleep(1);
+
+        sleep(3);
     }
 
     close(client->sockfd);
@@ -293,7 +300,7 @@ void *multi_game_handler(void *args)
     char key[2];
     game_t *game = (game_t *)args;
     char *net_buffer;
-    
+
     while (1)
     {
         while (1)
@@ -310,24 +317,28 @@ void *multi_game_handler(void *args)
             {
                 game->players[game->client->uid].prev_direction = game->players[game->client->uid].direction;
                 game->players[game->client->uid].direction = key_press;
-                object_found_multi(game->client,&game->map, &game->players[game->client->uid], key_press, game->mons_arr, game->chest_arr); //buffer is send inside function
-                move_multi(&game->map, game->players,game->client->uid);
-                net_buffer = on_player_update_stats(&game->players[game->client->uid],&game->map);
+                object_found_multi(game->client, &game->map, &game->players[game->client->uid], key_press, game->mons_arr, game->chest_arr); //buffer is send inside function
+                move_multi(&game->map, game->players, game->client->uid);
+                net_buffer = on_player_update_stats(&game->players[game->client->uid], &game->map);
                 send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
             }
 
             /**
             * Save the game press #
             */
-            
-            //  save game function
 
+            if (key_press == '#')
+            {
+                net_buffer = on_player_request_save();
+                send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
+                save_flag = TRUE;
+            }
             /**
             * Check if conditions match to level up
             */
             if (!check_level_up(game->mons_arr, &game->map))
             {
-                bzero(net_buffer, SOCK_BUFF_SZ);
+
                 system("clear");
                 kill_all(game->mons_arr, &game->map);
                 level_up(&game->players[game->client->uid], game->mons_arr, &game->map);
@@ -339,7 +350,6 @@ void *multi_game_handler(void *args)
 
             if (!check_game_over_multi(game->players))
             {
-                bzero(net_buffer, SOCK_BUFF_SZ);
                 for (int i = 0; i < 3; i++)
                 {
                     game->players[i].health = game->health_holder;
@@ -348,14 +358,30 @@ void *multi_game_handler(void *args)
                 break;
             }
 
+            if (save_flag == TRUE)
+            {
+                system("clear");
+                redprint_slow("Your game has been saved successfully!\nC0ntr0l 1s 4n 1llus10n!\n");
+                break;
+            }
+
+            if (hard_exit_flag == TRUE)
+            {
+
+                net_buffer = on_player_hard_exit();
+                send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
+                system("clear");
+                redprint_slow("Your game stopped violently either by you or one of your teammates\nC0ntr0l 1s 4n 1llus10n!\n");
+                break;
+            }
             /**
             * When no direction key is pressed
             */
             system("clear");
             player_check_max_stats(&game->players[game->client->uid]);
             update_objects(&game->map, game->mons_arr, game->chest_arr);
-            to_print_multi(&game->map, game->players, game->mons_arr, game->chest_arr,game->client->uid);
-            
+            to_print_multi(&game->map, game->players, game->mons_arr, game->chest_arr, game->client->uid);
+
             usleep(100000);
             fflush(stderr);
             fflush(stdin);
@@ -367,6 +393,10 @@ void *multi_game_handler(void *args)
          * Also the map gets loaded and the point values are getting passed to the 2 arrays
          * 
          */
+        if (save_flag == TRUE || hard_exit_flag == TRUE)
+        {
+            break;
+        }
         free(game->mons_arr);
         game->mons_arr = NULL;
         free(game->chest_arr);
@@ -377,8 +407,8 @@ void *multi_game_handler(void *args)
         update_objects(&game->map, game->mons_arr, game->chest_arr);
         game->players[game->client->uid].x = 18;
         game->players[game->client->uid].y = 48;
+    
     }
-    to_print_multi(&game->map, game->players, game->mons_arr, game->chest_arr,game->client->uid);
 
     return NULL;
 }
@@ -419,13 +449,13 @@ void *multi_recv_handler(void *args)
             {
                 if (decode_on_player_move(game->players, net_buffer) != 0)
                 {
-                   // send message to server for message loss
+                    // send message to server for message loss
                 }
             }
 
             itoa(PLR_UPDATE_ID_P, comp, 10);
-                if (!strcmp(response_id, comp))
-                {
+            if (!strcmp(response_id, comp))
+            {
                 if (decode_on_player_update_stats(game->players, net_buffer, &game->map) != 0)
                 {
                     // send message to server for message loss
@@ -464,6 +494,20 @@ void *multi_recv_handler(void *args)
                 {
                     // send message to server for message loss
                 }
+            }
+
+            itoa(SAVE_GAME_ID, comp, 10);
+            if (!strcmp(response_id, comp))
+            {
+                save_game_multi(&game->map, game->players, game->mons_arr, game->chest_arr);
+                save_flag = TRUE;
+                break;
+            }
+            itoa(HARD_EXIT_ID, comp, 10);
+            if (!strcmp(response_id, comp))
+            {
+                hard_exit_flag = TRUE;
+                break;
             }
             memset(comp, 0, sizeof(comp));
             free(net_buffer_cp);

@@ -12,18 +12,11 @@
 #include "util.h"
 #include "custom_effects.h"
 
-
-void sigint_handler(volatile sig_atomic_t exit_flag)
-{
-    exit_flag = TRUE;
-}
-
 int connect_server(client_t *client)
 {
     char *localhost = "127.0.0.1";
     int port = 9999;
     struct sockaddr_in server_addr;
-    signal(SIGINT, sigint_handler);
     client->sockfd = socket(AF_INET, SOCK_STREAM, 0);
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(port);
@@ -34,7 +27,8 @@ int connect_server(client_t *client)
         redprint("[ERROR] Server seems to be down!!\n");
         return 0;
     }
-    else{
+    else
+    {
         greenprint("[INFO] Server's up! :)\n");
         return 1;
     }

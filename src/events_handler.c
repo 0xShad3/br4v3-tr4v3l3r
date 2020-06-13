@@ -215,10 +215,11 @@ char *on_player_update_stats(player_t *player, map_t *map)
 
     //itoa(player->prev_direction, update, 10);
     strcat(buffer, NET_DELIM);
-    
+
     update[0] = player->prev_direction;
-    while(update[0] == ' '){
-        update[0]=player->prev_direction;
+    while (update[0] == ' ')
+    {
+        update[0] = player->prev_direction;
     }
     update[1] = '\0';
     strcat(buffer, update);
@@ -236,6 +237,19 @@ char *on_player_update_stats(player_t *player, map_t *map)
     return buffer;
 }
 
+char *on_player_request_save()
+{
+    char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
+    strcpy(buffer, "hard_save");
+    return buffer;
+}
+
+char *on_player_hard_exit()
+{
+    char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
+    strcpy(buffer, "hard_exit");
+    return buffer;
+}
 int decode_on_monster_death(monster_t mons_arr[], char *buffer_to_decode, map_t *map)
 {
     int i;
@@ -248,7 +262,7 @@ int decode_on_monster_death(monster_t mons_arr[], char *buffer_to_decode, map_t 
         {
             token = strtok(NULL, NET_DELIM); //get the second number which is 1 -> force monster to die
             mons_arr[i].isDead = atoi(token);
-            map_set(map,' ',mons_arr[i].y,mons_arr[i].x); //clear dead monster
+            map_set(map, ' ', mons_arr[i].y, mons_arr[i].x); //clear dead monster
             break;
         }
     }
@@ -297,7 +311,7 @@ int decode_on_monster_update_stats(monster_t mons_arr[], char *buffer_to_decode,
     return 0;
 }
 
-int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode,map_t *map)
+int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode, map_t *map)
 {
     char *token;
     int i;
@@ -344,23 +358,24 @@ int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode
 
             token = strtok(NULL, NET_DELIM);
             players_arr[i].direction = token[0];
-            
+
             token = strtok(NULL, NET_DELIM);
             players_arr[i].prev_direction = token[0];
-            
+
             token = strtok(NULL, NET_DELIM);
             players_arr[i].prev_x = atoi(token);
-            
+
             token = strtok(NULL, NET_DELIM);
             players_arr[i].prev_y = atoi(token);
             break;
         }
     }
     for (int i = 0; i < 3; i++)
-    {   
+    {
         map_set(map, PSYMBOL, players_arr[i].y, players_arr[i].x);
-        if(players_arr[i].prev_x != players_arr[i].x || players_arr[i].prev_y != players_arr[i].y){
-            map_set(map, MAP_P_SYMBOL,players_arr[i].prev_y, players_arr[i].prev_x);
+        if (players_arr[i].prev_x != players_arr[i].x || players_arr[i].prev_y != players_arr[i].y)
+        {
+            map_set(map, MAP_P_SYMBOL, players_arr[i].prev_y, players_arr[i].prev_x);
         }
         players_arr[i].prev_x = players_arr[i].x;
         players_arr[i].prev_y = players_arr[i].y;

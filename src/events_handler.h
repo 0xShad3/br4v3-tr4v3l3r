@@ -21,6 +21,8 @@
 #define MNSTR_UPDATE_ID_M 202
 #define CHEST_OPEN_ID_C 301
 #define MAP_OPEN_ID 401
+#define SAVE_GAME_ID 900
+#define HARD_EXIT_ID 901
 #define NET_DELIM ":" 
 //Encodeing Funcs
 char *on_monster_death(monster_t *monster);
@@ -29,7 +31,8 @@ char *on_chest_open(chest_t *chest);
 char *on_player_death(player_t *player);
 char *on_player_move(player_t *player);
 char *on_player_update_stats(player_t *player, map_t* map);
-
+char *on_player_request_save();
+char *on_player_hard_exit();
 //Decoding funcs
 int decode_on_chest_open(chest_t chests_arr[], char *buffer_to_decode, map_t *map); //checked
 int decode_on_player_death(player_t players_arr[], char *buffer_to_decode); // checked

@@ -37,6 +37,33 @@ int search_hash(char *client_hash)
     fclose(fd);
     return -1;
 }
+int search_hash_id(char *client_hash)
+{
+    char *line = NULL;
+    size_t len = 0;
+    char *hash_buffer;
+    int i = 0;
+    FILE *fd = fopen("./res/hashes.csv", "r");
+    if (fd == NULL)
+    {
+        printf("Internal error hash file may be corrupted");
+    }
+    while (getline(&line, &len, fd) != -1)
+    {
+        hash_buffer = line;
+        hash_buffer[strlen(hash_buffer) - 1] = '\0';
+        if (!strcmp(hash_buffer, client_hash))
+        {
+            fclose(fd);
+            free(line);
+            return i;
+        }
+        i++;
+    }
+
+    fclose(fd);
+    return -1;
+}
 
 int register_hash(char *client_hash)
 {
@@ -83,7 +110,7 @@ void broadcast_packet(char *s, int uid)
         {
             if (clients[i]->uid != uid)
             {
-                if (send(clients[i]->sockfd, s, strlen(s),0) < 0)
+                if (send(clients[i]->sockfd, s, strlen(s), 0) < 0)
                 {
                     perror("ERROR: write to descriptor failed");
                     break;
@@ -93,19 +120,6 @@ void broadcast_packet(char *s, int uid)
     }
 
     pthread_mutex_unlock(&clients_mutex);
-}
-
-void str_trim_lf(char *arr, int length)
-{
-    int i;
-    for (i = 0; i < length; i++)
-    { // trim \n
-        if (arr[i] == '\n')
-        {
-            arr[i] = '\0';
-            break;
-        }
-    }
 }
 
 void print_client_addr(struct sockaddr_in addr)
@@ -183,7 +197,7 @@ char *on_load_map(int level)
     char str[10];
     char level_buffer[2];
     char filename[40];
-    char *buffer = (char*) calloc(sizeof(char),SOCK_BUFF_SZ);
+    char *buffer = (char *)calloc(sizeof(char), SOCK_BUFF_SZ);
     char content[5050];
     strcpy(filename, base);
     strcat(filename, itoa(level, str, 10));
@@ -193,7 +207,7 @@ char *on_load_map(int level)
     {
         printf("[ERROR] Could not load map file !");
     }
-    bzero(content,5050);
+    bzero(content, 5050);
     fread(content, sizeof(content), sizeof(char), fd);
     char *content_md5 = strmd5(content, strlen(content));
     itoa(MAP_OPEN_ID, buffer, 10);
