@@ -388,7 +388,7 @@ void *multi_game_handler(void *args)
             update_objects(&game->map, game->mons_arr, game->chest_arr);
             to_print_multi(&game->map, game->players, game->mons_arr, game->chest_arr, game->client->uid);
 
-            usleep(700000);
+            usleep(500000);
             fflush(stderr);
             fflush(stdin);
             fflush(stdout);
@@ -411,8 +411,10 @@ void *multi_game_handler(void *args)
         game->chest_arr = (chest_t *)calloc(sizeof(chest_t), game->map.level);
         load_map(&game->map, game->mons_arr, game->chest_arr, game->boss_arr);
         update_objects(&game->map, game->mons_arr, game->chest_arr);
-        game->players[game->client->uid].x = 18 + (game->client->uid);
-        game->players[game->client->uid].y = 48;
+        for(i=0;i<3;i++){
+            game->players[i].x = 18 + i;
+            game->players[i].y = 48;
+        }
     }
 
     return NULL;

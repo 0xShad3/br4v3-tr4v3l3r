@@ -225,8 +225,10 @@ char *on_load_map(int level)
     return buffer;
 }
 
+
 char *servside_constr_save_filename(int name_array[3])
 {
+    /*
     char *buffer = (char *)calloc(sizeof(char), SOCK_BUFF_SZ);
     const char base[] = "./saves/multi/";
     const char file_extension[] = ".rpg\0";
@@ -253,4 +255,5 @@ char *servside_constr_save_filename(int name_array[3])
     strcat(buffer)
     
     return buffer;
+    */
 }
