@@ -220,17 +220,17 @@ void get_stats_multi(player_t players[], monster_t monsters[], map_t *map, int m
     }
     printf("Monsters left:   [");
 
-    for (i = 0; i < map->level + 3; i++)
+    for (i = 0; i < map->monsters_num; i++)
     {
-        if (monsters[i].isDead == 0 && monsters[i].is_boss == 0)
+        if (monsters[i].isDead == 0 && monsters[i].is_boss == 0 || map->map_array[monsters[i].y][monsters[i].x] == MSYMBOL)
         {
             printf("*");
         }
-        else if (monsters[i].isDead == 1)
+        else if (monsters[i].isDead == 1 || map->map_array[monsters[i].y][monsters[i].x] != MSYMBOL)
         {
             printf(" ");
         }
-        else if (monsters[i].isDead == 0 && monsters[i].is_boss == 1)
+        else if (monsters[i].isDead == 0 && monsters[i].is_boss == 1 || map->map_array[monsters[i].y][monsters[i].x] == MSYMBOL)
         {
             redprint_char('B');
         }
