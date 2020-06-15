@@ -333,7 +333,7 @@ void object_found_multi(client_t *client, map_t *map, player_t *player, char key
             (mons_arr[i].y == player->y && mons_arr[i].x == player->x + 1 && (key_press == RIGHT_C || key_press == RIGHT_S)) ||
             (mons_arr[i].y == player->y && mons_arr[i].x == player->x - 1 && (key_press == LEFT_C || key_press == LEFT_S)))
         {
-            if (mons_arr[i].isDead != TRUE)
+            if (mons_arr[i].isDead != TRUE && map->map_array[mons_arr[i].y][mons_arr[i].x] == MSYMBOL)
             {
                 if (player->health > 0)
                 {
@@ -373,7 +373,7 @@ void object_found_multi(client_t *client, map_t *map, player_t *player, char key
             (chest_arr[i].y == player->y && chest_arr[i].x == player->x + 1 && (key_press == RIGHT_C || key_press == RIGHT_S)) ||
             (chest_arr[i].y == player->y && chest_arr[i].x == player->x - 1 && (key_press == LEFT_C || key_press == LEFT_S)))
         {
-            if (chest_arr[i].isOpen != TRUE)
+            if (chest_arr[i].isOpen != TRUE && map->map_array[chest_arr[i].y][chest_arr[i].x] == CSYMBOL)
             {
                 chest_arr[i].isOpen = TRUE;
                 net_buffer = on_chest_open(&chest_arr[i]);
