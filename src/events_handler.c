@@ -121,6 +121,7 @@ char *on_player_death(player_t *player)
     player->isDead = 1; //Force player to die
     itoa(player->isDead, update, 10);
     strcat(buffer, update);
+    strcat(buffer,"\0");
 
     return buffer;
 }
@@ -217,10 +218,10 @@ char *on_player_update_stats(player_t *player, map_t *map)
     strcat(buffer, NET_DELIM);
 
     update[0] = player->prev_direction;
-    while (update[0] == ' ')
-    {
-        update[0] = player->prev_direction;
-    }
+    // while (update[0] == ' ')
+    // {
+    //     update[0] = player->prev_direction;
+    // }
     update[1] = '\0';
     strcat(buffer, update);
     printf("%s\n\n", buffer);

@@ -19,7 +19,8 @@
 #include "events_handler.h"
 
 volatile sig_atomic_t hard_exit_flag = FALSE;
-int save_flag = FALSE;
+volatile int save_flag = FALSE;
+volatile int lock_flag = FALSE;
 int set_counter = 1;
 
 void hard_exit_handler(int sig)
@@ -316,8 +317,8 @@ void *multi_game_handler(void *args)
                 key_press == UP_S ||
                 key_press == DOWN_C ||
                 key_press == DOWN_S) &&
-                game->players[game->client->uid].isDead == FALSE)
-            {
+                game->players[game->client->uid].isDead == FALSE && lock_flag == FALSE)
+            {   
                 game->players[game->client->uid].prev_direction = game->players[game->client->uid].direction;
                 game->players[game->client->uid].direction = key_press;
                 object_found_multi(game->client, &game->map, &game->players[game->client->uid], key_press, game->mons_arr, game->chest_arr); //buffer is send inside function
@@ -326,12 +327,13 @@ void *multi_game_handler(void *args)
                 send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
             }
             
+            
 
             /**
             * Save the game press #
             */
 
-            if (key_press == '#')
+            if (key_press == '#' && lock_flag == FALSE)
             {
                 net_buffer = on_player_request_save();
                 send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
@@ -340,7 +342,7 @@ void *multi_game_handler(void *args)
             /**
             * Check if conditions match to level up
             */
-            if (!check_level_up(game->mons_arr, &game->map))
+            if (!check_level_up(game->mons_arr, &game->map) && lock_flag == FALSE)
             {
                 //bzero(net_buffer, SOCK_BUFF_SZ);
                 net_buffer = NULL;
@@ -353,7 +355,7 @@ void *multi_game_handler(void *args)
             * Check if conditions match to game over
             */
 
-            if (!check_game_over_multi(game->players))
+            if (!check_game_over_multi(game->players) && lock_flag == FALSE)
             {
                 //bzero(net_buffer, SOCK_BUFF_SZ);
                 net_buffer = NULL;
@@ -365,14 +367,14 @@ void *multi_game_handler(void *args)
                 break;
             }
 
-            if (save_flag == TRUE)
+            if (save_flag == TRUE && lock_flag == FALSE)
             {
                 system("clear");
                 redprint_slow("Your game has been saved successfully!\nC0ntr0l 1s 4n 1llus10n!\n");
                 break;
             }
 
-            if (hard_exit_flag == TRUE)
+            if (hard_exit_flag == TRUE && lock_flag == FALSE)
             {
 
                 net_buffer = on_player_hard_exit();
@@ -437,6 +439,7 @@ void *multi_recv_handler(void *args)
 
         if (receive_sz > 0)
         {
+            lock_flag = TRUE;
             net_buffer_cp = (char *)calloc(sizeof(char), strlen(net_buffer));
             strcpy(net_buffer_cp, net_buffer);
 
@@ -451,6 +454,7 @@ void *multi_recv_handler(void *args)
                 {
                     // send message to server for message loss
                 }
+                lock_flag = FALSE;
             }
 
             itoa(PLR_MOVE_ID_P, comp, 10);
@@ -460,6 +464,7 @@ void *multi_recv_handler(void *args)
                 {
                     // send message to server for message loss
                 }
+                lock_flag = FALSE;
             }
 
             itoa(PLR_UPDATE_ID_P, comp, 10);
@@ -469,6 +474,7 @@ void *multi_recv_handler(void *args)
                 {
                     // send message to server for message loss
                 }
+                lock_flag = FALSE;
             }
 
             /**
@@ -482,6 +488,7 @@ void *multi_recv_handler(void *args)
                 {
                     // send message to server for message loss
                 }
+                lock_flag = FALSE;
             }
 
             itoa(MNSTR_UPDATE_ID_M, comp, 10);
@@ -491,6 +498,7 @@ void *multi_recv_handler(void *args)
                 {
                     // send message to server for message loss
                 }
+                lock_flag = FALSE;
             }
 
             /**
@@ -503,6 +511,7 @@ void *multi_recv_handler(void *args)
                 {
                     // send message to server for message loss
                 }
+                lock_flag = FALSE;
             }
 
             itoa(SAVE_GAME_ID, comp, 10);
@@ -510,6 +519,7 @@ void *multi_recv_handler(void *args)
             {
                 save_game_multi(net_buffer,&game->map, game->players, game->mons_arr, game->chest_arr);
                 save_flag = TRUE;
+                lock_flag = FALSE;
                 break;
             }
 
@@ -517,6 +527,7 @@ void *multi_recv_handler(void *args)
             if (!strcmp(response_id, comp))
             {
                 hard_exit_flag = TRUE;
+                lock_flag = FALSE;
                 break;
             }
             memset(comp, 0, sizeof(comp));
