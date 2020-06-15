@@ -386,6 +386,8 @@ void *multi_game_handler(void *args)
             /**
             * When no direction key is pressed
             */
+
+            patch_function(&game->map,game->players);
             system("clear");
             player_check_max_stats(&game->players[game->client->uid]);
             update_objects(&game->map, game->mons_arr, game->chest_arr);

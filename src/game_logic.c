@@ -676,3 +676,16 @@ void kill_all(monster_t mons_arr[], map_t *map)
         mons_arr[i].isDead = TRUE;
     }
 }
+
+void patch_function(map_t *map, player_t players[])
+{
+    int i = 0;
+    for (i = 0; i < 3; i++)
+    {
+        if (players[i].isDead == TRUE)
+        {
+            map_set(map,MAP_P_SYMBOL,players[i].y,players[i].x);
+            players[i].health = 0;
+        }
+    }
+}
