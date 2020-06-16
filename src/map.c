@@ -122,7 +122,7 @@ void map_parser(map_t *map, monster_t mons_arr[], chest_t chest_arr[])
 	for (i = 0; i < MAP_HEIGHT; i++)
 	{
 
-		fread(hold_buffer, 101, sizeof(char), fd);
+		fread(hold_buffer, sizeof(char), 101, fd);
 		hold_buffer[101] = '\0';
 		//printf(hold_buffer);
 		for (j = 0; j < MAP_WIDTH; j++)

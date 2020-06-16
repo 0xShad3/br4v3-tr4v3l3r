@@ -109,7 +109,7 @@ int load_game(account_t *account, map_t *map, player_t *player, int mons_buffer[
         exit(EXIT_FAILURE);
     }
 
-    fread(load_buffer, 1024, sizeof(char), fd);
+    fread(load_buffer, sizeof(char), 1024, fd);
     char *token;
     token = strtok(load_buffer, "\n");
     int i = 0;
@@ -205,7 +205,7 @@ int load_game_multi(map_t *map, player_t players[], int monsters[MAX_MONSTERS][M
         exit(EXIT_FAILURE);
     }
 
-    fread(load_buffer, 1024, sizeof(char), fd);
+    fread(load_buffer, sizeof(char), 1024, fd);
     char *token;
     token = strtok(load_buffer, "\n");
     int i = 0;

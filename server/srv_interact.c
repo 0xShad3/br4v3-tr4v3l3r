@@ -209,7 +209,7 @@ char *on_load_map(int level)
         printf("[ERROR] Could not load map file !");
     }
     bzero(content, 5050);
-    fread(content, sizeof(content), sizeof(char), fd);
+    fread(content, sizeof(char), sizeof(content), fd);
     char *content_md5 = strmd5(content, strlen(content));
     itoa(MAP_OPEN_ID, buffer, 10);
     strcat(buffer, NET_DELIM);
@@ -221,7 +221,7 @@ char *on_load_map(int level)
     free(content_md5);
     content_md5 = NULL;
     fclose(fd);
-
+    
     return buffer;
 }
 

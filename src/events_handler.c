@@ -16,7 +16,7 @@ char *on_monster_death(monster_t *monster)
 {
     char starting_fn_msg[4];
     char *update = malloc(sizeof(char) * 3);
-    char *buffer = malloc(sizeof(char) * 16);
+    char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
 
     itoa(MNSTR_DEATH_ID_M, starting_fn_msg, 10);
     strcat(starting_fn_msg, ":");
@@ -30,6 +30,7 @@ char *on_monster_death(monster_t *monster)
 
     itoa(monster->isDead, update, 10);
     strcat(buffer, update);
+    buffer[strlen(buffer)] = '\0';
     return buffer;
 }
 
@@ -37,7 +38,7 @@ char *on_moster_update_stats(monster_t *monster)
 {
     char starting_fn_msg[4];
     char *update = malloc(sizeof(char) * 3);
-    char *buffer = malloc(sizeof(char) * 32);
+    char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
 
     itoa(MNSTR_UPDATE_ID_M, starting_fn_msg, 10);
     strcat(starting_fn_msg, NET_DELIM);
@@ -78,6 +79,7 @@ char *on_moster_update_stats(monster_t *monster)
 
     itoa(monster->y, update, 10);
     strcat(buffer, update);
+    buffer[strlen(buffer)] = '\0';
     return (buffer);
 }
 
@@ -85,7 +87,7 @@ char *on_chest_open(chest_t *chest)
 {
     char starting_fn_msg[4];
     char *update = malloc(sizeof(char) * 3);
-    char *buffer = malloc(sizeof(char) * 16);
+    char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
 
     itoa(CHEST_OPEN_ID_C, starting_fn_msg, 10);
     strcat(starting_fn_msg, ":");
@@ -99,7 +101,7 @@ char *on_chest_open(chest_t *chest)
     chest->isOpen = 1;
     itoa(chest->isOpen, update, 10);
     strcat(buffer, update);
-
+    buffer[strlen(buffer)] = '\0';
     return (buffer);
 }
 
@@ -107,7 +109,7 @@ char *on_player_death(player_t *player)
 {
     char starting_fn_msg[4];
     char *update = malloc(sizeof(char) * 3);
-    char *buffer = malloc(sizeof(char) * 16);
+    char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
 
     itoa(PLR_DEATH_ID_P, starting_fn_msg, 10);
     strcat(starting_fn_msg, ":");
@@ -122,7 +124,7 @@ char *on_player_death(player_t *player)
     itoa(player->isDead, update, 10);
     strcat(buffer, update);
     strcat(buffer,"\0");
-
+    buffer[strlen(buffer)] = '\0';
     return buffer;
 }
 
@@ -147,7 +149,7 @@ char *on_player_move(player_t *player)
 
     itoa(player->y, update, 10);
     strcat(buffer, update);
-
+    buffer[strlen(buffer)] = '\0';
     return buffer;
 }
 
@@ -479,11 +481,12 @@ int decode_on_map_receive(map_t *map, char *buffer_to_decode)
         exit(EXIT_FAILURE);
     }
     bzero(content, 5050);
-    fread(content, sizeof(content), sizeof(char), fd);
+    fread(content, sizeof(char), sizeof(content), fd);
 
     char *content_md5 = strmd5(content, strlen(content));
     if (!strcmp(content_md5, md5_map))
-    {
+    {   
+        bzero(content,sizeof(content));
         fclose(fd);
         return 1;
     }

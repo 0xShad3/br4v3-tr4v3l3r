@@ -232,7 +232,7 @@ void init_game_multi(account_t *account, client_t *client)
     }
     add_stats(&game.players[game.client->uid]);
     net_buffer = on_player_update_stats(&game.players[game.client->uid], &game.map);
-    send(client->sockfd, net_buffer, strlen(net_buffer), 0);
+    send(client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
 
     /***
      * Check the hash of the file to be read
@@ -321,7 +321,7 @@ void *multi_game_handler(void *args)
             {   
                 game->players[game->client->uid].prev_direction = game->players[game->client->uid].direction;
                 game->players[game->client->uid].direction = key_press;
-                object_found_multi(game->client, &game->map, &game->players[game->client->uid], key_press, game->mons_arr, game->chest_arr); //buffer is send inside function
+                object_found_multi(game->client, &game->map, &game->players[game->client->uid], key_press, game->mons_arr, game->chest_arr);
                 move_multi(&game->map, game->players, game->client->uid);
                 net_buffer = on_player_update_stats(&game->players[game->client->uid], &game->map);
                 send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
@@ -397,7 +397,7 @@ void *multi_game_handler(void *args)
             fflush(stderr);
             fflush(stdin);
             fflush(stdout);
-            
+            net_buffer = NULL;
         }
         /**
          * In case were break is called the 2 arrays are getting freed and reallocated 
@@ -409,6 +409,7 @@ void *multi_game_handler(void *args)
         {
             break;
         }
+        net_buffer = NULL;
         free(game->mons_arr);
         game->mons_arr = NULL;
         //free(game->chest_arr);
@@ -421,6 +422,10 @@ void *multi_game_handler(void *args)
             game->players[i].x = 18 + i;
             game->players[i].y = 48;
         }
+        
+        net_buffer = on_player_update_stats(&game->players[game->client->uid], &game->map);
+        send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
+        net_buffer = NULL;
     }
 
     return NULL;
