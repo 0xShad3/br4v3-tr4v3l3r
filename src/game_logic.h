@@ -18,7 +18,7 @@ void to_print_multi(map_t *map, player_t players[], monster_t monsters[], chest_
 int load_game(account_t *account, map_t *map, player_t *player, int mons_buffer[MAX_MONSTERS][MONS_ELMNTS], int chest_buffer[MAX_CHESTS]);
 int load_game_multi(map_t *map, player_t players[], int monsters[MAX_MONSTERS][MONS_ELMNTS], int chests[MAX_CHESTS]);
 int save_game(map_t *map, account_t *account, player_t *player, monster_t mons_arr[], chest_t chest_arr[]);
-int save_game_multi(char *net_buffer, map_t *map, player_t players[], monster_t monsters[], chest_t chests[]);
+int save_game_multi(char *filename, map_t *map, player_t players[], monster_t monsters[], chest_t chests[]);
 void memset_arrays(int mons_buffer[][MONS_ELMNTS], int chest_buffer[MAX_CHESTS]);
 void pass_object_values(monster_t mons_arr[], chest_t chest_arr[], int mons_buffer[MAX_MONSTERS][MONS_ELMNTS], int chest_buffer[MAX_CHESTS], map_t *map);
 void update_objects(map_t *map, monster_t mons_arr[], chest_t chest_arr[]);
@@ -28,7 +28,7 @@ void game_over(player_t *player);
 int check_game_over_single(player_t *player);
 int check_game_over_multi(player_t players[]);
 
-void patch_function(map_t* map,player_t players[]);
+void patch_function(map_t *map, player_t players[]);
 
 void kill_all(monster_t mons_arr[], map_t *map);
 

@@ -210,7 +210,8 @@ void init_game_single(account_t *account, int mode)
 void init_game_multi(account_t *account, client_t *client)
 {
     char *net_buffer;
-    char net_pass_buffer[sizeof(int)];
+    char *token;
+    char net_pass_buffer[SOCK_BUFF_SZ];
     game_t game;
 
     game.client = client;
@@ -224,8 +225,13 @@ void init_game_multi(account_t *account, client_t *client)
      * receive global game id and initialize the player
      * 
      */
-    recv(client->sockfd, net_pass_buffer, sizeof(int), 0);
-    game.client->uid = atoi(net_pass_buffer);
+    recv(client->sockfd, net_pass_buffer, SOCK_BUFF_SZ, 0);
+    token = strtok(net_pass_buffer, NET_DELIM);
+
+    game.client->uid = atoi(token);
+    token = strtok(NULL, NET_DELIM);
+    strcpy(game.save_game_code, token);
+
     for (int i = 0; i < 3; i++)
     {
         init_player(&game.players[i], i, MULTI_MODE);
@@ -237,6 +243,7 @@ void init_game_multi(account_t *account, client_t *client)
     /***
      * Check the hash of the file to be read
      */
+
     recv(client->sockfd, net_buffer, 38, 0);
     if (!decode_on_map_receive(&game.map, net_buffer))
     {
@@ -280,7 +287,7 @@ void init_game_multi(account_t *account, client_t *client)
     while (1)
     {
         if (hard_exit_flag == TRUE || save_flag == TRUE)
-        {  
+        {
             sleep(5);
             break;
         }
@@ -310,15 +317,15 @@ void *multi_game_handler(void *args)
 
             key_press = key_input(key);
             if ((key_press == LEFT_C ||
-                key_press == LEFT_S ||
-                key_press == RIGHT_C ||
-                key_press == RIGHT_S ||
-                key_press == UP_C ||
-                key_press == UP_S ||
-                key_press == DOWN_C ||
-                key_press == DOWN_S) &&
+                 key_press == LEFT_S ||
+                 key_press == RIGHT_C ||
+                 key_press == RIGHT_S ||
+                 key_press == UP_C ||
+                 key_press == UP_S ||
+                 key_press == DOWN_C ||
+                 key_press == DOWN_S) &&
                 game->players[game->client->uid].isDead == FALSE && lock_flag == FALSE)
-            {   
+            {
                 game->players[game->client->uid].prev_direction = game->players[game->client->uid].direction;
                 game->players[game->client->uid].direction = key_press;
                 object_found_multi(game->client, &game->map, &game->players[game->client->uid], key_press, game->mons_arr, game->chest_arr); //buffer is send inside function
@@ -326,18 +333,19 @@ void *multi_game_handler(void *args)
                 net_buffer = on_player_update_stats(&game->players[game->client->uid], &game->map);
                 send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
             }
-            
-            
 
             /**
             * Save the game press #
             */
 
-            if (key_press == '#' && lock_flag == FALSE)
+            if ((key_press == '#' && lock_flag == FALSE) || (save_flag == TRUE && lock_flag == FALSE))
             {
-                net_buffer = on_player_request_save();
+                save_game_multi(game->save_game_code, &game->map, game->players, game->mons_arr, game->chest_arr);
+                net_buffer = on_player_request_save(game->save_game_code);
                 send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
-                save_flag = TRUE;
+                system("clear");
+                redprint_slow("Your game has been saved successfully!\nC0ntr0l 1s 4n 1llus10n!\n");
+                break;
             }
             /**
             * Check if conditions match to level up
@@ -369,9 +377,6 @@ void *multi_game_handler(void *args)
 
             if (save_flag == TRUE && lock_flag == FALSE)
             {
-                system("clear");
-                redprint_slow("Your game has been saved successfully!\nC0ntr0l 1s 4n 1llus10n!\n");
-                break;
             }
 
             if (hard_exit_flag == TRUE && lock_flag == FALSE)
@@ -380,24 +385,23 @@ void *multi_game_handler(void *args)
                 net_buffer = on_player_hard_exit();
                 send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
                 system("clear");
-                redprint_slow("Your game stopped violently either by you or one of your teammates\nC0ntr0l 1s 4n 1llus10n!\n");
+                redprint_slow("Your game stopped violently\nC0ntr0l 1s 4n 1llus10n!\n");
                 break;
             }
             /**
             * When no direction key is pressed
             */
 
-            patch_function(&game->map,game->players);
+            patch_function(&game->map, game->players);
             system("clear");
             player_check_max_stats(&game->players[game->client->uid]);
             update_objects(&game->map, game->mons_arr, game->chest_arr);
-            to_print_multi(&game->map, game->players, game->mons_arr, game->chest_arr,game->client->uid);
-            
+            to_print_multi(&game->map, game->players, game->mons_arr, game->chest_arr, game->client->uid);
+
             usleep(700000);
             fflush(stderr);
             fflush(stdin);
             fflush(stdout);
-            
         }
         /**
          * In case were break is called the 2 arrays are getting freed and reallocated 
@@ -417,7 +421,8 @@ void *multi_game_handler(void *args)
         game->chest_arr = (chest_t *)calloc(sizeof(chest_t), game->map.level);
         load_map(&game->map, game->mons_arr, game->chest_arr, game->boss_arr);
         update_objects(&game->map, game->mons_arr, game->chest_arr);
-        for(i=0;i<3;i++){
+        for (i = 0; i < 3; i++)
+        {
             game->players[i].x = 18 + i;
             game->players[i].y = 48;
         }
@@ -452,7 +457,7 @@ void *multi_recv_handler(void *args)
             itoa(PLR_DEATH_ID_P, comp, 10);
             if (!strcmp(response_id, comp))
             {
-                if (decode_on_player_death(&game->map,game->players, net_buffer) != 0)
+                if (decode_on_player_death(&game->map, game->players, net_buffer) != 0)
                 {
                     // send message to server for message loss
                 }
@@ -519,7 +524,7 @@ void *multi_recv_handler(void *args)
             itoa(SAVE_GAME_ID, comp, 10);
             if (!strcmp(response_id, comp))
             {
-                save_game_multi(net_buffer,&game->map, game->players, game->mons_arr, game->chest_arr);
+                save_game_multi(game->save_game_code, &game->map, game->players, game->mons_arr, game->chest_arr);
                 save_flag = TRUE;
                 lock_flag = FALSE;
                 break;

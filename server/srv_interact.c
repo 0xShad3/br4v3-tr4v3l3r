@@ -225,23 +225,18 @@ char *on_load_map(int level)
     return buffer;
 }
 
-
-char *servside_constr_save_filename(int name_array[3])
+char *servside_constr_save_filename()
 {
-    /*
+
     char *buffer = (char *)calloc(sizeof(char), SOCK_BUFF_SZ);
     char temp_num_cons[5];
-
-    const char base[] = "./saves/multi/";
-    const char file_extension[] = ".rpg\0";
-    char str[10];
     int temp = 0;
     int i = 0;
     int j = 0;
 
-    for (int i = 0; i < 3; i++)
+    for (i = 0; i < 3; i++)
     {
-        for (int j = i + 1; j < 3; j++)
+        for (j = i + 1; j < 3; j++)
         {
             if (name_array[i] > name_array[j])
             {
@@ -251,14 +246,36 @@ char *servside_constr_save_filename(int name_array[3])
             }
         }
     }
-    strcat(buffer, base);
     itoa(name_array[0], temp_num_cons, 10);
     strcat(buffer, temp_num_cons);
     itoa(name_array[1], temp_num_cons, 10);
     strcat(buffer, temp_num_cons);
     itoa(name_array[2], temp_num_cons, 10);
     strcat(buffer, temp_num_cons);
-    strcat(buffer, file_extension);
+    strcat(buffer, "\0");
     return buffer;
-    */
+}
+
+int save_game_hash(char *hash)
+{
+    char *filename = servside_constr_save_filename();
+    char base[] = "./saves/server/";
+    char file_extension[] = ".rpg\0";
+    char filename_buffer[50];
+    
+    strcpy(filename_buffer, base);
+    strcat(filename_buffer, filename);
+    strcat(filename_buffer, file_extension);
+    pthread_mutex_lock(&clients_mutex);
+    FILE *fd = fopen(filename_buffer, "w+");
+    if (fd == NULL)
+    {
+        printf("[ERROR] There was an error trying to save the game hash");
+        return -1;
+    }
+    fprintf(fd,"%s\n",hash);
+    fclose(fd);
+    pthread_mutex_unlock(&clients_mutex);
+    
+    return 0;
 }

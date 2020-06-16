@@ -31,7 +31,7 @@ char *on_chest_open(chest_t *chest);
 char *on_player_death(player_t *player);
 char *on_player_move(player_t *player);
 char *on_player_update_stats(player_t *player, map_t* map);
-char *on_player_request_save();
+char *on_player_request_save(char* filename);
 char *on_player_hard_exit();
 //Decoding funcs
 int decode_on_chest_open(chest_t chests_arr[], char *buffer_to_decode, map_t *map); //checked

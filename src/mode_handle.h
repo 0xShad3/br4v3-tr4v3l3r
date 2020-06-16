@@ -18,6 +18,7 @@ typedef struct game_t
     client_t* client;
     int boss_arr[TOTAL_LVLS][2];
     int health_holder;
+    char save_game_code[10];
 } game_t;
 
 void init_game_single(account_t *account, int mode);

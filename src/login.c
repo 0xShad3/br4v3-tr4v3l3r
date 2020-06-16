@@ -182,7 +182,7 @@ char *save_constr_fn_multi(char *core_name)
 {
     char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
     const char base[] = "./saves/multi/";
-    const char file_extension[] = "./rpg\0";
+    const char file_extension[] = ".rpg\0";
     strcpy(buffer, base);
     strcat(buffer, core_name);
     strcat(buffer, file_extension);

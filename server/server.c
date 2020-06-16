@@ -20,7 +20,6 @@
 
 static _Atomic unsigned int cli_count = 0;
 static int uid = 0;
-int name_array[3];
 
 /**
  * This has to be changed
@@ -107,6 +106,7 @@ int main(int argc, char **argv)
 void *handle_client(void *arg)
 {
     char buff_out[BUFFER_SZ];
+    char buff_out_cp[BUFFER_SZ];
     char name[BUFFER_SZ];
     /// KEEP FLAG TO TERMINATE CLIENT
     int leave_flag = 0;
@@ -116,7 +116,7 @@ void *handle_client(void *arg)
     int receive_sz = 0;
     cli_count++;
     client_t *cli = (client_t *)arg;
-    char* save_filename;
+    char *save_filename;
     //exw peiraksei aytes tis grammes
     // Name
     recv(cli->sockfd, name, BUFFER_SZ, 0);
@@ -187,10 +187,14 @@ void *handle_client(void *arg)
     /**
      * Send to each client his id
      */
-    loginfo(cli->uid, "Receiving ID");
+    loginfo(cli->uid, "Receiving ID and save file code");
     bzero(buff_out, BUFFER_SZ);
     itoa(cli->uid, buff_out, 10);
-    send(cli->sockfd, buff_out, sizeof(int), 0);
+    strcat(buff_out, NET_DELIM);
+    save_filename = servside_constr_save_filename();
+    strcat(buff_out, save_filename);
+    loginfo(cli->uid, buff_out);
+    send(cli->sockfd, buff_out, BUFFER_SZ, 0);
 
     /**
      * Player Init
@@ -221,26 +225,30 @@ void *handle_client(void *arg)
     while (1)
     {
         receive_sz = recv(cli->sockfd, buff_out, BUFFER_SZ, 0);
-        if (!strcmp(buff_out, "hard_save"))
+        strcpy(buff_out_cp, buff_out);
+        token = strtok(buff_out_cp, NET_DELIM);
+        if (!strcmp(token, "900"))
         {
             loginfo(cli->uid, "Requested save game");
-            //recv save_file
-            bzero(buff_out,BUFFER_SZ);
-            strcpy(buff_out, "900");
-            strcat(buff_out,NET_DELIM);
-            printf("%s:%d\n",store_hash,hash_id);
-            save_filename = servside_constr_save_filename(name_array);
-            printf("BUFFER: %s",save_filename);
-            strcat(buff_out,save_filename);
-            broadcast_packet(buff_out, uid);
-            leave_flag = 1;
-            break;
+            token = strtok(NULL, NET_DELIM);
+            loginfo(cli->uid,buff_out);
+
+            if (!save_game_hash(token))
+            {
+                bzero(buff_out, BUFFER_SZ);
+                strcpy(buff_out, "900");
+                broadcast_packet(buff_out, uid);
+                sleep(1);
+                leave_flag = 1;
+                break;
+            }
+          
         }
 
         if (!strcmp(buff_out, "hard_exit"))
         {
             loginfo(cli->uid, "Requested hard exit");
-            bzero(buff_out,BUFFER_SZ);
+            bzero(buff_out, BUFFER_SZ);
             strcpy(buff_out, "901");
             broadcast_packet(buff_out, uid);
             sleep(1);
@@ -252,7 +260,7 @@ void *handle_client(void *arg)
             loginfo(cli->uid, buff_out);
             broadcast_packet(buff_out, uid);
         }
-
+        bzero(buff_out_cp, BUFFER_SZ);
         bzero(buff_out, BUFFER_SZ);
     }
     close(cli->sockfd);
