@@ -684,7 +684,7 @@ void patch_function(map_t *map, player_t players[])
     {
         if (players[i].isDead == TRUE)
         {
-            map_set(map,MAP_P_SYMBOL,players[i].y,players[i].x);
+            //map_set(map,MAP_P_SYMBOL,players[i].y,players[i].x);
             players[i].health = 0;
         }
     }

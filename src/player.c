@@ -222,15 +222,15 @@ void get_stats_multi(player_t players[], monster_t monsters[], map_t *map, int m
 
     for (i = 0; i < map->monsters_num; i++)
     {
-        if (monsters[i].isDead == 0 && monsters[i].is_boss == 0 || map->map_array[monsters[i].y][monsters[i].x] == MSYMBOL)
+        if ((monsters[i].isDead == 0 && monsters[i].is_boss == 0) || map->map_array[monsters[i].y][monsters[i].x] == MSYMBOL)
         {
             printf("*");
         }
-        else if (monsters[i].isDead == 1 || map->map_array[monsters[i].y][monsters[i].x] != MSYMBOL)
+        else if ((monsters[i].isDead == 1) || map->map_array[monsters[i].y][monsters[i].x] != MSYMBOL)
         {
             printf(" ");
         }
-        else if (monsters[i].isDead == 0 && monsters[i].is_boss == 1 || map->map_array[monsters[i].y][monsters[i].x] == MSYMBOL)
+        else if ((monsters[i].isDead == 0 && monsters[i].is_boss == 1) || map->map_array[monsters[i].y][monsters[i].x] == MSYMBOL)
         {
             redprint_char('B');
         }
@@ -335,11 +335,11 @@ void object_found_multi(client_t *client, map_t *map, player_t *player, char key
         {
             if (mons_arr[i].isDead != TRUE && map->map_array[mons_arr[i].y][mons_arr[i].x] == MSYMBOL)
             {
-                if (player->health > 0)
+                if (player->health > 0 && player->isDead == FALSE)
                 {
                     player_attack = attack((float)mons_arr[i].accuracy, (float)mons_arr[i].attack, (float)player->armor);
                     player->health -= player_attack;
-                    if (player->health <= 0){
+                    if (player->health <= 0 || player->isDead == TRUE){
                         player_die(player); //second check for life after health so the player can t have negative hp
                         net_buffer = on_player_death(player);
                         send(client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
@@ -350,11 +350,20 @@ void object_found_multi(client_t *client, map_t *map, player_t *player, char key
                 else
                 {
                     player_die(player);
+                    net_buffer = on_player_death(player);
+                    send(client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
+                    net_buffer = NULL;
                 }
-                if (mons_arr[i].health > 0)
+                if ((mons_arr[i].health > 0 && mons_arr[i].isDead == FALSE))
                 {
                     mons_attack = attack((float)player->accuracy, (float)player->attack, (float)mons_arr[i].armor);
                     mons_arr[i].health -= mons_attack;
+                    if(mons_arr[i].health<=0 || mons_arr[i].isDead == TRUE){
+                        mons_arr[i].isDead = TRUE;
+                        net_buffer = on_monster_death(&mons_arr[i]);
+                        send(client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
+                        net_buffer = NULL;
+                    }
                 }
                 else
                 {
