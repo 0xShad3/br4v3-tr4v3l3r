@@ -28,7 +28,7 @@ void game_over(player_t *player);
 int check_game_over_single(player_t *player);
 int check_game_over_multi(player_t players[]);
 
-void patch_function(map_t* map,player_t players[]);
+void on_death_hp_set(map_t* map,player_t players[]);
 
 void kill_all(monster_t mons_arr[], map_t *map);
 
