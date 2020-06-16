@@ -213,6 +213,7 @@ void init_game_multi(account_t *account, client_t *client)
     char *token;
     char net_pass_buffer[SOCK_BUFF_SZ];
     game_t game;
+    int i;
 
     game.client = client;
     /**
@@ -258,7 +259,11 @@ void init_game_multi(account_t *account, client_t *client)
     /**
      * Fetch health to health holder
      */
-    game.health_holder = game.players[game.client->uid].health;
+    for ( i = 0; i < 3; i++)
+    {
+        game.health_holder[i] = game.players[game.client->uid].health;
+    }
+     
     signal(SIGINT, hard_exit_handler);
     /**
      * 
@@ -369,7 +374,7 @@ void *multi_game_handler(void *args)
                 net_buffer = NULL;
                 for (int i = 0; i < 3; i++)
                 {
-                    game->players[i].health = game->health_holder;
+                    game->players[i].health = game->health_holder[i];
                     game->players[i].isDead = FALSE;
                 }
                 break;
@@ -392,7 +397,7 @@ void *multi_game_handler(void *args)
             * When no direction key is pressed
             */
 
-            patch_function(&game->map, game->players);
+            on_death_hp_set(&game->map,game->players);
             system("clear");
             player_check_max_stats(&game->players[game->client->uid]);
             update_objects(&game->map, game->mons_arr, game->chest_arr);
