@@ -17,7 +17,8 @@ typedef struct game_t
     chest_t *chest_arr;
     client_t* client;
     int boss_arr[TOTAL_LVLS][2];
-    int health_holder;
+    int health_holder[3];
+    char save_game_code[10];
 } game_t;
 
 void init_game_single(account_t *account, int mode);

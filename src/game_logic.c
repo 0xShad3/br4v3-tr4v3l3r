@@ -343,20 +343,21 @@ int save_game(map_t *map, account_t *account, player_t *player, monster_t mons_a
     fclose(fd);
     return 1;
 }
-int save_game_multi(char *net_buffer, map_t *map, player_t players[], monster_t monsters[], chest_t chests[])
+int save_game_multi(char* filename, map_t *map, player_t players[], monster_t monsters[], chest_t chests[])
 {
     char buffer[200];
+    char filename_buffer[200];
     int counter = 0;
     int offset = 0;
     int i;
-    char *token;
-    char *filename;
-    strtok(net_buffer, NET_DELIM);
+    char base[] = "./saves/multi/";
+    char file_extension[] = ".rpg\0";
+    
+    strcpy(filename_buffer,base);
+    strcat(filename_buffer,filename);
+    strcat(filename_buffer,file_extension);
 
-    token = strtok(NULL, NET_DELIM);
-    filename = token;
-    printf("%s\n\n\n\n\n\n", filename);
-    FILE *fd = fopen(filename, "w+");
+    FILE *fd = fopen(filename_buffer, "w+");
     if (fd == NULL)
     {
         redprint("There was an error saving your game!Exiting...");
@@ -677,14 +678,13 @@ void kill_all(monster_t mons_arr[], map_t *map)
     }
 }
 
-void patch_function(map_t *map, player_t players[])
+void on_death_hp_set(map_t *map, player_t players[])
 {
     int i = 0;
     for (i = 0; i < 3; i++)
     {
         if (players[i].isDead == TRUE)
         {
-            //map_set(map,MAP_P_SYMBOL,players[i].y,players[i].x);
             players[i].health = 0;
         }
     }

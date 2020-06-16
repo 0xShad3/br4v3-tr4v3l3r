@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <unistd.h>
 #include "player.h"
 #include "util.h"
 #include "chest.h"
@@ -123,8 +124,13 @@ char *on_player_death(player_t *player)
     player->isDead = 1; //Force player to die
     itoa(player->isDead, update, 10);
     strcat(buffer, update);
+<<<<<<< HEAD
     strcat(buffer,"\0");
     buffer[strlen(buffer)] = '\0';
+=======
+    strcat(buffer, "\0");
+
+>>>>>>> d75a591b8e73153c28e89e378049ba575d85bb8a
     return buffer;
 }
 
@@ -240,10 +246,44 @@ char *on_player_update_stats(player_t *player, map_t *map)
     return buffer;
 }
 
-char *on_player_request_save()
+char *on_player_request_save(char *filename)
 {
+
     char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
-    strcpy(buffer, "hard_save");
+    char filename_buffer[50];
+    char base[] = "./saves/multi/";
+    char file_extension[] = ".rpg\0";
+    char *content;
+    char *md5savefile;
+    size_t filesize;
+
+    strcpy(filename_buffer, base);
+    strcat(filename_buffer, filename);
+    strcat(filename_buffer, file_extension);
+
+    itoa(SAVE_GAME_ID, buffer, 10);
+    strcat(buffer, NET_DELIM);
+
+    if (access(filename_buffer, F_OK) != -1)
+    {
+        FILE *fd = fopen(filename_buffer, "r");
+        if (fd == NULL)
+        {
+            printf("THERE WAS AN ERROR");
+            exit(EXIT_FAILURE);
+        }
+        fseek(fd, 0L, SEEK_END);
+        filesize = ftell(fd);
+        fseek(fd, 0L, SEEK_SET);
+        content = calloc(sizeof(char), filesize);
+        fread(content, sizeof(char), filesize, fd);
+        printf("content %s\n\n",content);
+
+        md5savefile = strmd5(content, strlen(content));
+        fclose(fd);
+    }
+    strcat(buffer, md5savefile);
+
     return buffer;
 }
 
@@ -374,15 +414,17 @@ int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode
         }
     }
     for (int i = 0; i < 3; i++)
-    {   
-        if(players_arr[i].isDead != TRUE && players_arr[i].health > 0) map_set(map, PSYMBOL, players_arr[i].y, players_arr[i].x);
-        
-        if((players_arr[i].prev_x != players_arr[i].x || players_arr[i].prev_y != players_arr[i].y) && players_arr[i].isDead == FALSE){
-            map_set(map, MAP_P_SYMBOL,players_arr[i].prev_y, players_arr[i].prev_x);
+    {
+        if (players_arr[i].isDead != TRUE && players_arr[i].health > 0)
+            map_set(map, PSYMBOL, players_arr[i].y, players_arr[i].x);
+
+        if ((players_arr[i].prev_x != players_arr[i].x || players_arr[i].prev_y != players_arr[i].y) && players_arr[i].isDead == FALSE)
+        {
+            map_set(map, MAP_P_SYMBOL, players_arr[i].prev_y, players_arr[i].prev_x);
             // if(players_arr[i].isDead==1){
             //     map_set(map, MAP_P_SYMBOL,players_arr[i].y, players_arr[i].x);
             //     break;
-            // } 
+            // }
         }
         players_arr[i].prev_x = players_arr[i].x;
         players_arr[i].prev_y = players_arr[i].y;
@@ -390,7 +432,7 @@ int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode
     return 0;
 }
 
-int decode_on_player_death(map_t *map,player_t players_arr[], char *buffer_to_decode)
+int decode_on_player_death(map_t *map, player_t players_arr[], char *buffer_to_decode)
 {
     char *token;
     int i;
@@ -405,8 +447,8 @@ int decode_on_player_death(map_t *map,player_t players_arr[], char *buffer_to_de
             token = strtok(NULL, NET_DELIM);
             //get the second number which is 1 -> force player to die
             players_arr[i].isDead = 1; //kill player
-            map_set(map,MAP_P_SYMBOL,players_arr[i].y, players_arr[i].x);
-            map_set(map, MAP_P_SYMBOL,players_arr[i].prev_y, players_arr[i].prev_x);
+            map_set(map, MAP_P_SYMBOL, players_arr[i].y, players_arr[i].x);
+            map_set(map, MAP_P_SYMBOL, players_arr[i].prev_y, players_arr[i].prev_x);
             break;
         }
     }
@@ -427,7 +469,7 @@ int decode_on_chest_open(chest_t chests_arr[], char *buffer_to_decode, map_t *ma
             token = strtok(NULL, NET_DELIM);
             //get the second number which is 1 -> force chest to open
             chests_arr[i].isOpen = atoi(token); //open chest
-            map_set(map,' ',chests_arr[i].y,chests_arr[i].x); //clear dead monster
+            map_set(map,' ',chests_arr[i].y,chests_arr[i].x); //clear open chest
             break;
         }
     }
