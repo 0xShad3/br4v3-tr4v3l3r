@@ -5,6 +5,7 @@
 #include "monster.h"
 #include "chest.h"
 #include "map.h"
+#include "mode_handle.h"
 // Maximum is 13 cause thats the number of maximum monsters that can be found on the game
 #define MAX_LINES 18
 #define MAX_TOKENS 15
@@ -26,7 +27,7 @@ void level_up(player_t *player, monster_t monsters[], map_t *map);
 void win(player_t *player);
 void game_over(player_t *player);
 int check_game_over_single(player_t *player);
-int check_game_over_multi(player_t players[]);
+int check_game_over_multi(player_t players[],game_t *game);
 
 void on_death_hp_set(map_t* map,player_t players[]);
 

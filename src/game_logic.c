@@ -617,8 +617,9 @@ int check_game_over_single(player_t *player)
     return 1;
 }
 
-int check_game_over_multi(player_t players[])
+int check_game_over_multi(player_t players[],game_t *game)
 {
+    int i;
     if (players[0].isDead == TRUE &&
         players[1].isDead == TRUE &&
         players[2].isDead == TRUE)
@@ -658,7 +659,25 @@ int check_game_over_multi(player_t players[])
         {
             players[i].loses++;
         }
-
+        for ( i = 0; i < game->map.level + 3; i++)
+        {
+            game->mons_arr[i].isDead = FALSE;
+            game->mons_arr[i].health = 100;
+            if(game->mons_arr[i].monster_id == game->boss_arr[game->map.level - 1][1]){
+                game->mons_arr[i].is_boss = TRUE;
+                game->mons_arr[i].health = 40;
+                game->mons_arr[i].armor = 15;
+                game->mons_arr[i].attack = 30;
+                game->mons_arr[i].accuracy = 40;
+            }
+            map_set(&game->map,MSYMBOL,game->mons_arr[i].y,game->mons_arr[i].x);
+        }
+        for ( i = 0; i < game->map.level; i++)
+        {
+            game->chest_arr[i].isOpen = FALSE;
+            map_set(&game->map,CSYMBOL,game->chest_arr[i].y,game->chest_arr[i].x);
+        }
+        
         return 0;
 
         /*load the player stats with the load function

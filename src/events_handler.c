@@ -124,13 +124,8 @@ char *on_player_death(player_t *player)
     player->isDead = 1; //Force player to die
     itoa(player->isDead, update, 10);
     strcat(buffer, update);
-<<<<<<< HEAD
     strcat(buffer,"\0");
     buffer[strlen(buffer)] = '\0';
-=======
-    strcat(buffer, "\0");
-
->>>>>>> d75a591b8e73153c28e89e378049ba575d85bb8a
     return buffer;
 }
 

@@ -14,7 +14,7 @@
 #include "chest.h"
 #include "monster.h"
 #include "custom_effects.h"
-
+#include "mode_handle.h"
 #include "client.h"
 #include "events_handler.h"
 
@@ -368,7 +368,7 @@ void *multi_game_handler(void *args)
             * Check if conditions match to game over
             */
 
-            if (!check_game_over_multi(game->players) && lock_flag == FALSE)
+            if (!check_game_over_multi(game->players,game) && lock_flag == FALSE)
             {
                 //bzero(net_buffer, SOCK_BUFF_SZ);
                 net_buffer = NULL;
@@ -376,8 +376,10 @@ void *multi_game_handler(void *args)
                 {
                     game->players[i].health = game->health_holder[i];
                     game->players[i].isDead = FALSE;
+                    game->players[i].x = 18 + i;
+                    game->players[i].y = 48;
                 }
-                break;
+                //break;
             }
 
             if (save_flag == TRUE && lock_flag == FALSE)
