@@ -32,7 +32,6 @@ void init_player(player_t *player, int account_id, int game_mode)
     player->id = account_id;
     player->isOnline = 0;
     player->isDead = 0;
-    player->name = malloc(50 * sizeof(char));
     player->pcolor = PCOLOR;
     player->psymbol = PSYMBOL;
     player->prev_y = 49;

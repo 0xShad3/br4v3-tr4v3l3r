@@ -6,8 +6,8 @@
 void init_monster(monster_t *monster, int id, int x1, int y1)
 {
     monster->is_boss = 0;
-    monster->attack = 300;
-    monster->health = 100;
+    monster->attack = 1;
+    monster->health = 1;
     monster->armor = 10;
     monster->accuracy = 40;
     monster->x = x1;

@@ -42,7 +42,6 @@ typedef struct player_t
     int id;
     int isOnline;
     int isDead;
-    char *name;
     char *pcolor;
     char psymbol;
     int prev_x;

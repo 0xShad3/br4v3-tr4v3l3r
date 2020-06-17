@@ -259,11 +259,11 @@ void init_game_multi(account_t *account, client_t *client)
     /**
      * Fetch health to health holder
      */
-    for ( i = 0; i < 3; i++)
+    for (i = 0; i < 3; i++)
     {
         game.health_holder[i] = game.players[game.client->uid].health;
     }
-     
+
     signal(SIGINT, hard_exit_handler);
     /**
      * 
@@ -338,7 +338,23 @@ void *multi_game_handler(void *args)
                 net_buffer = on_player_update_stats(&game->players[game->client->uid], &game->map);
                 send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
             }
+            if (key_press == 'n')
+            {
+                kill_all(game->mons_arr, &game->map);
+                for (i = 0; i < game->map.monsters_num; i++)
+                {
+                    net_buffer = on_monster_death(&game->mons_arr[i]);
 
+                    while (!strcmp(net_buffer, "11"))
+                    {
+                        net_buffer = NULL;
+                        net_buffer = on_monster_death(&game->mons_arr[i]);
+                    }
+
+                    send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
+                    usleep(500000);
+                }
+            }
             /**
             * Save the game press #
             */
@@ -368,7 +384,7 @@ void *multi_game_handler(void *args)
             * Check if conditions match to game over
             */
 
-            if (!check_game_over_multi(game->players,game) && lock_flag == FALSE)
+            if (!check_game_over_multi(game->players, game) && lock_flag == FALSE)
             {
                 //bzero(net_buffer, SOCK_BUFF_SZ);
                 net_buffer = NULL;
@@ -399,13 +415,13 @@ void *multi_game_handler(void *args)
             * When no direction key is pressed
             */
 
-            on_death_hp_set(&game->map,game->players);
+            on_death_hp_set(&game->map, game->players);
             system("clear");
             player_check_max_stats(&game->players[game->client->uid]);
             update_objects(&game->map, game->mons_arr, game->chest_arr);
             to_print_multi(&game->map, game->players, game->mons_arr, game->chest_arr, game->client->uid);
 
-            usleep(700000);
+            usleep(500000);
             fflush(stderr);
             fflush(stdin);
             fflush(stdout);
@@ -423,7 +439,7 @@ void *multi_game_handler(void *args)
         net_buffer = NULL;
         free(game->mons_arr);
         game->mons_arr = NULL;
-        //free(game->chest_arr);
+        free(game->chest_arr);
         game->chest_arr = NULL;
         game->mons_arr = (monster_t *)calloc(sizeof(monster_t), game->map.level + 3);
         game->chest_arr = (chest_t *)calloc(sizeof(chest_t), game->map.level);
@@ -434,9 +450,7 @@ void *multi_game_handler(void *args)
             game->players[i].x = 18 + i;
             game->players[i].y = 48;
         }
-        
-        net_buffer = on_player_update_stats(&game->players[game->client->uid], &game->map);
-        send(game->client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
+
         net_buffer = NULL;
     }
 

@@ -38,7 +38,7 @@ int login_check_multi(account_t *account, client_t *client)
     free(account_md5);
     account_md5 = NULL;
 
-    buff = (char *)malloc(sizeof(int));
+    buff = (char *)calloc(sizeof(int),1);
     recv(client->sockfd, buff, sizeof(int), 0);
     if (atoi(buff) == 1)
     {
@@ -63,7 +63,7 @@ int register_multi(account_t *account, client_t *client)
     free(account_md5);
     account_md5 = NULL;
 
-    buff = (char *)malloc(sizeof(int));
+    buff = (char *)calloc(sizeof(int),1);
     recv(client->sockfd, buff, sizeof(int), 0);
     if (atoi(buff) == 1)
     {

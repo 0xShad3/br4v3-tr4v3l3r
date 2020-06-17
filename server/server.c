@@ -90,7 +90,7 @@ int main(int argc, char **argv)
             continue;
         }
 
-        client_t *cli = (client_t *)malloc(sizeof(client_t));
+        client_t *cli = (client_t *)calloc(sizeof(client_t),1);
         cli->addr = cli_addr;
         cli->sockfd = connfd;
         cli->uid = uid++;

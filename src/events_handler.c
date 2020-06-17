@@ -16,8 +16,8 @@
 char *on_monster_death(monster_t *monster)
 {
     char starting_fn_msg[4];
-    char *update = malloc(sizeof(char) * 3);
-    char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
+    char *update = calloc(sizeof(char) , 3);
+    char *buffer = calloc(sizeof(char) , SOCK_BUFF_SZ);
 
     itoa(MNSTR_DEATH_ID_M, starting_fn_msg, 10);
     strcat(starting_fn_msg, ":");
@@ -38,8 +38,8 @@ char *on_monster_death(monster_t *monster)
 char *on_moster_update_stats(monster_t *monster)
 {
     char starting_fn_msg[4];
-    char *update = malloc(sizeof(char) * 3);
-    char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
+    char *update = calloc(sizeof(char) , 3);
+    char *buffer = calloc(sizeof(char) , SOCK_BUFF_SZ);
 
     itoa(MNSTR_UPDATE_ID_M, starting_fn_msg, 10);
     strcat(starting_fn_msg, NET_DELIM);
@@ -87,8 +87,8 @@ char *on_moster_update_stats(monster_t *monster)
 char *on_chest_open(chest_t *chest)
 {
     char starting_fn_msg[4];
-    char *update = malloc(sizeof(char) * 3);
-    char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
+    char *update = calloc(sizeof(char) , 3);
+    char *buffer = calloc(sizeof(char) , SOCK_BUFF_SZ);
 
     itoa(CHEST_OPEN_ID_C, starting_fn_msg, 10);
     strcat(starting_fn_msg, ":");
@@ -109,8 +109,8 @@ char *on_chest_open(chest_t *chest)
 char *on_player_death(player_t *player)
 {
     char starting_fn_msg[4];
-    char *update = malloc(sizeof(char) * 3);
-    char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
+    char *update = calloc(sizeof(char) , 3);
+    char *buffer = calloc(sizeof(char) , SOCK_BUFF_SZ);
 
     itoa(PLR_DEATH_ID_P, starting_fn_msg, 10);
     strcat(starting_fn_msg, ":");
@@ -124,7 +124,7 @@ char *on_player_death(player_t *player)
     player->isDead = 1; //Force player to die
     itoa(player->isDead, update, 10);
     strcat(buffer, update);
-    strcat(buffer,"\0");
+    strcat(buffer, "\0");
     buffer[strlen(buffer)] = '\0';
     return buffer;
 }
@@ -132,8 +132,8 @@ char *on_player_death(player_t *player)
 char *on_player_move(player_t *player)
 {
     char starting_fn_msg[4];
-    char *update = malloc(sizeof(char) * 3);
-    char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
+    char *update = calloc(sizeof(char) , 3);
+    char *buffer = calloc(sizeof(char) , SOCK_BUFF_SZ);
 
     itoa(PLR_MOVE_ID_P, starting_fn_msg, 10);
     strcat(starting_fn_msg, ":");
@@ -157,8 +157,8 @@ char *on_player_move(player_t *player)
 char *on_player_update_stats(player_t *player, map_t *map)
 {
     char starting_fn_msg[4];
-    char *update = malloc(sizeof(char) * 3);
-    char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
+    char *update = (char *)calloc(sizeof(char), 3);
+    char *buffer = (char *)calloc(sizeof(char), SOCK_BUFF_SZ);
 
     itoa(PLR_UPDATE_ID_P, starting_fn_msg, 10);
 
@@ -227,7 +227,6 @@ char *on_player_update_stats(player_t *player, map_t *map)
     // }
     update[1] = '\0';
     strcat(buffer, update);
-    printf("%s\n\n", buffer);
 
     itoa(player->prev_x, update, 10);
     strcat(buffer, NET_DELIM);
@@ -244,7 +243,7 @@ char *on_player_update_stats(player_t *player, map_t *map)
 char *on_player_request_save(char *filename)
 {
 
-    char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
+    char *buffer = calloc(sizeof(char) , SOCK_BUFF_SZ);
     char filename_buffer[50];
     char base[] = "./saves/multi/";
     char file_extension[] = ".rpg\0";
@@ -272,7 +271,6 @@ char *on_player_request_save(char *filename)
         fseek(fd, 0L, SEEK_SET);
         content = calloc(sizeof(char), filesize);
         fread(content, sizeof(char), filesize, fd);
-        printf("content %s\n\n",content);
 
         md5savefile = strmd5(content, strlen(content));
         fclose(fd);
@@ -284,7 +282,7 @@ char *on_player_request_save(char *filename)
 
 char *on_player_hard_exit()
 {
-    char *buffer = malloc(sizeof(char) * SOCK_BUFF_SZ);
+    char *buffer = calloc(sizeof(char) , SOCK_BUFF_SZ);
     strcpy(buffer, "hard_exit");
     return buffer;
 }
@@ -463,8 +461,8 @@ int decode_on_chest_open(chest_t chests_arr[], char *buffer_to_decode, map_t *ma
         {
             token = strtok(NULL, NET_DELIM);
             //get the second number which is 1 -> force chest to open
-            chests_arr[i].isOpen = atoi(token); //open chest
-            map_set(map,' ',chests_arr[i].y,chests_arr[i].x); //clear open chest
+            chests_arr[i].isOpen = atoi(token);                  //open chest
+            map_set(map, ' ', chests_arr[i].y, chests_arr[i].x); //clear open chest
             break;
         }
     }
@@ -522,8 +520,8 @@ int decode_on_map_receive(map_t *map, char *buffer_to_decode)
 
     char *content_md5 = strmd5(content, strlen(content));
     if (!strcmp(content_md5, md5_map))
-    {   
-        bzero(content,sizeof(content));
+    {
+        bzero(content, sizeof(content));
         fclose(fd);
         return 1;
     }
