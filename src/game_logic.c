@@ -190,32 +190,68 @@ int load_game(account_t *account, map_t *map, player_t *player, int mons_buffer[
     return 1;
 }
 
-int load_game_multi(map_t *map, player_t players[], int monsters[MAX_MONSTERS][MONS_ELMNTS], int chests[MAX_CHESTS])
+int on_load_game_multi(char *filename, char *net_buffer, map_t *map, player_t players[], int monsters[MAX_MONSTERS][MONS_ELMNTS], int chests[MAX_CHESTS])
 {
     char load_buffer[1024];
     char line_buff[MAX_LINES][40];
     char player_buff[MAX_TOKENS][4];
     int counter;
     int j;
-    FILE *fd = fopen("1.rpg", "r");
+    char *token;
+    char *token1;
+    char *content;
+    char *contentMD5;
+    size_t filesize = 0;
+    char filename_buffer[50];
+    char base[] = "./saves/multi/";
+    char file_extension[] = ".rpg\0";
+
+    strcpy(filename_buffer, base);
+    strcat(filename_buffer, filename);
+    strcat(filename_buffer, file_extension);
+    FILE *fd = fopen(filename_buffer, "r");
     if (fd == NULL)
     {
         printf("There was an error trying to load your save");
         return 0;
         exit(EXIT_FAILURE);
     }
+    //DISCARD LOAD FLAG
+    strtok(net_buffer, NET_DELIM);
+    /**
+     * Calculate the md5 hash of the save file
+     * and return the file descriptor to the start of the file
+     * */
+
+    fseek(fd, 0L, SEEK_END);
+    filesize = ftell(fd);
+    fseek(fd, 0L, SEEK_SET);
+    content = (char *)calloc(sizeof(char), filesize);
+    fread(content, sizeof(char), filesize, fd);
+
+    contentMD5 = strmd5(content, strlen(content));
+    /**
+     * Compaire the two hashed and take relevant action
+     */
+    token = strtok(NULL, NET_DELIM);
+    if (strcmp(token, contentMD5) != 0)
+    {
+        /**
+         * On fail comparison
+         */
+        return 0;
+    }
 
     fread(load_buffer, sizeof(char), 1024, fd);
-    char *token;
-    token = strtok(load_buffer, "\n");
+    char *token2 = strtok(content, "\n");
     int i = 0;
-    while (token != NULL)
+    while (token2 != NULL)
     {
 
-        if (token != NULL)
+        if (token2 != NULL)
         {
-            strcpy(line_buff[i], token);
-            token = strtok(NULL, "\n");
+            strcpy(line_buff[i], token2);
+            token2 = strtok(NULL, "\n");
         }
         i++;
     }
@@ -224,17 +260,17 @@ int load_game_multi(map_t *map, player_t players[], int monsters[MAX_MONSTERS][M
     map->level = atoi(line_buff[0]);
     for (i = 0; i < 3; i++)
     {
-        token = strtok(line_buff[i + 1], ",");
+        token1 = strtok(line_buff[i + 1], ",");
         j = 0;
-        while (token != NULL)
+        while (token1 != NULL)
         {
 
-            if (token != NULL)
+            if (token1 != NULL)
             {
-                strcpy(player_buff[j], token);
+                strcpy(player_buff[j], token1);
             }
 
-            token = strtok(NULL, ",");
+            token1 = strtok(NULL, ",");
             j++;
         }
 
@@ -252,42 +288,39 @@ int load_game_multi(map_t *map, player_t players[], int monsters[MAX_MONSTERS][M
         memset(player_buff, '0', sizeof(char) * MAX_TOKENS * 4);
     }
     counter = atoi(strtok(line_buff[4], ","));
-    token = strtok(line_buff[5], ",");
+    token2 = strtok(line_buff[5], ",");
     i = 0;
-    while (token != NULL)
+    while (token2 != NULL)
     {
-        if (token != NULL)
+        if (token2 != NULL)
         {
-            strcpy(player_buff[i], token);
+            strcpy(player_buff[i], token2);
         }
-        token = strtok(NULL, ",");
+        token2 = strtok(NULL, ",");
         i++;
     }
     for (i = 0; i < counter; i++)
     {
         chests[i] = atoi(player_buff[i]);
     }
-    for (i = 0; i < MAX_CHESTS - counter; i++)
-    {
-        chests[i + counter] = 0;
-    }
+    counter = atoi(strtok(line_buff[6], NET_DELIM));
     memset(player_buff, '0', sizeof(char) * MAX_TOKENS * 4);
     for (j = 0; j < MAX_MONSTERS; j++)
     {
         /// + 3 -> + MAX_PLAYERS
-        token = strtok(line_buff[j + 4 + 3], ",");
+        token2 = strtok(line_buff[j + 4 + 2], ",");
         i = 0;
-        while (token != NULL)
+        while (token2 != NULL)
         {
-            if (token != NULL)
+            if (token2 != NULL)
             {
-                strcpy(player_buff[i], token);
+                strcpy(player_buff[i], token2);
             }
-            token = strtok(NULL, ",");
+            token2 = strtok(NULL, ",");
             i++;
         }
-        monsters[j][0] = atoi(player_buff[MONS_ID]);
-        monsters[j][1] = atoi(player_buff[MONS_HP]);
+        monsters[j][1] = atoi(player_buff[MONS_ID]);
+        monsters[j][0] = atoi(player_buff[MONS_HP]);
     }
     fclose(fd);
     return 1;
@@ -343,7 +376,7 @@ int save_game(map_t *map, account_t *account, player_t *player, monster_t mons_a
     fclose(fd);
     return 1;
 }
-int save_game_multi(char* filename, map_t *map, player_t players[], monster_t monsters[], chest_t chests[])
+int save_game_multi(char *filename, map_t *map, player_t players[], monster_t monsters[], chest_t chests[])
 {
     char buffer[200];
     char filename_buffer[200];
@@ -352,10 +385,10 @@ int save_game_multi(char* filename, map_t *map, player_t players[], monster_t mo
     int i;
     char base[] = "./saves/multi/";
     char file_extension[] = ".rpg\0";
-    
-    strcpy(filename_buffer,base);
-    strcat(filename_buffer,filename);
-    strcat(filename_buffer,file_extension);
+
+    strcpy(filename_buffer, base);
+    strcat(filename_buffer, filename);
+    strcat(filename_buffer, file_extension);
 
     FILE *fd = fopen(filename_buffer, "w+");
     if (fd == NULL)
@@ -470,6 +503,48 @@ void pass_object_values(monster_t mons_arr[], chest_t chest_arr[], int mons_buff
             {
                 chest_arr[j].isOpen = FALSE;
             }
+        }
+    }
+}
+
+void pass_object_values_multi(monster_t mons_arr[], chest_t chest_arr[], int mons_buffer[MAX_MONSTERS][MONS_ELMNTS], int chest_buffer[MAX_CHESTS], map_t *map)
+{
+    int i, j;
+
+    for (j = 0; j < map->monsters_num; j++)
+    {
+
+        mons_arr[j].isDead = TRUE;
+    }
+    for (i = 0; i < map->monsters_num; i++)
+    {
+        if (mons_buffer[i][MONS_HP] != 0)
+        {
+            mons_arr[mons_buffer[i][MONS_ID]].isDead = FALSE;
+            mons_arr[mons_buffer[i][MONS_ID]].health = mons_buffer[i][MONS_HP];
+        }
+    }
+
+    /**
+	 * Set all chests to open
+	 * Receive the ids of the unopened chests
+	 * Set these chests to unopened
+	 */
+
+    for (j = 0; j < map->chests_num; j++)
+    {
+        chest_arr[j].isOpen = TRUE;
+    }
+
+    for (i = 0; i < MAX_CHESTS; i++)
+    {
+        if (chest_buffer[i] != 0)
+        {
+            chest_arr[i].isOpen = FALSE;
+        }
+        if (chest_buffer[i] == 0 && i == 0)
+        {
+            chest_arr[i].isOpen = FALSE;
         }
     }
 }
@@ -611,7 +686,7 @@ int check_game_over_single(player_t *player)
     return 1;
 }
 
-int check_game_over_multi(player_t players[],game_t *game)
+int check_game_over_multi(player_t players[], game_t *game)
 {
     int i;
     if (players[0].isDead == TRUE &&
@@ -653,25 +728,26 @@ int check_game_over_multi(player_t players[],game_t *game)
         {
             players[i].loses++;
         }
-        for ( i = 0; i < game->map.level + 3; i++)
+        for (i = 0; i < game->map.level + 3; i++)
         {
             game->mons_arr[i].isDead = FALSE;
             game->mons_arr[i].health = 100;
-            if(game->mons_arr[i].monster_id == game->boss_arr[game->map.level - 1][1]){
+            if (game->mons_arr[i].monster_id == game->boss_arr[game->map.level - 1][1])
+            {
                 game->mons_arr[i].is_boss = TRUE;
                 game->mons_arr[i].health = 20 + 4 * game->map.level;
                 game->mons_arr[i].armor = 20 + 4 * game->map.level;
                 game->mons_arr[i].attack = 10 + 4 * game->map.level;
                 game->mons_arr[i].accuracy = 10 + 4 * game->map.level;
             }
-            map_set(&game->map,MSYMBOL,game->mons_arr[i].y,game->mons_arr[i].x);
+            map_set(&game->map, MSYMBOL, game->mons_arr[i].y, game->mons_arr[i].x);
         }
-        for ( i = 0; i < game->map.level; i++)
+        for (i = 0; i < game->map.level; i++)
         {
             game->chest_arr[i].isOpen = FALSE;
-            map_set(&game->map,CSYMBOL,game->chest_arr[i].y,game->chest_arr[i].x);
+            map_set(&game->map, CSYMBOL, game->chest_arr[i].y, game->chest_arr[i].x);
         }
-        
+
         return 0;
 
         /*load the player stats with the load function

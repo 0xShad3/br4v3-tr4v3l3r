@@ -352,9 +352,7 @@ int decode_on_player_update_stats(player_t players_arr[], char *buffer_to_decode
     char *token;
     int i;
     strtok(buffer_to_decode, NET_DELIM);
-    int temp_id;
     token = strtok(NULL, NET_DELIM); //player id
-    temp_id = token;
     for (i = 0; i < 3; i++)
     {
         if (players_arr[i].id == atoi(token))

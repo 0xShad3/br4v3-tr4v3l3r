@@ -221,7 +221,7 @@ char *on_load_map(int level)
     free(content_md5);
     content_md5 = NULL;
     fclose(fd);
-    
+
     return buffer;
 }
 
@@ -262,7 +262,7 @@ int save_game_hash(char *hash)
     char base[] = "./saves/server/";
     char file_extension[] = ".rpg\0";
     char filename_buffer[50];
-    
+
     strcpy(filename_buffer, base);
     strcat(filename_buffer, filename);
     strcat(filename_buffer, file_extension);
@@ -273,9 +273,42 @@ int save_game_hash(char *hash)
         printf("[ERROR] There was an error trying to save the game hash");
         return -1;
     }
-    fprintf(fd,"%s\n",hash);
+    fprintf(fd, "%s\n", hash);
     fclose(fd);
     pthread_mutex_unlock(&clients_mutex);
-    
+
     return 0;
+}
+
+char *search_to_load(char *filename)
+{
+    char filename_buffer[50];
+    size_t len = 0;
+    char base[] = "./saves/server/";
+    char file_extension[] = ".rpg\0";
+    char *hash_buffer = (char *)calloc(sizeof(char), SOCK_BUFF_SZ);
+    char *send_buffer = (char *)calloc(sizeof(char), SOCK_BUFF_SZ);
+
+    strcpy(filename_buffer, base);
+    strcat(filename_buffer, filename);
+    strcat(filename_buffer, file_extension);
+
+    if (access(filename_buffer, F_OK) != -1)
+    {
+        FILE *fd = fopen(filename_buffer, "r");
+        if (fd == NULL)
+        {
+            printf("[ERROR] There was an error while openning the save file\n");
+            return NULL;
+        }
+        getline(&hash_buffer, &len, fd);
+
+        itoa(LOAD_GAME_ID, send_buffer, 10);
+        hash_buffer[strlen(hash_buffer) - 1] = '\0';
+        strcat(send_buffer, NET_DELIM);
+        strcat(send_buffer, hash_buffer);
+        return send_buffer;
+    }
+
+    return NULL;
 }

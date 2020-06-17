@@ -23,6 +23,7 @@
 #define MAP_OPEN_ID 401
 #define SAVE_GAME_ID 900
 #define HARD_EXIT_ID 901
+#define LOAD_GAME_ID 902
 #define NET_DELIM ":" 
 //Encodeing Funcs
 char *on_monster_death(monster_t *monster);

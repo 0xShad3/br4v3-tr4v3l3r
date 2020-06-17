@@ -19,4 +19,6 @@ void loginfo(int uid, char *buff);
 char *on_load_map(int level);
 char *servside_constr_save_filename();
 int save_game_hash(char *hash);
+char *search_to_load(char *filename);
+
 #endif
