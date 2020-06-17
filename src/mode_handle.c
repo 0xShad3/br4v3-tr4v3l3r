@@ -398,10 +398,6 @@ void *multi_game_handler(void *args)
                 //break;
             }
 
-            if (save_flag == TRUE && lock_flag == FALSE)
-            {
-            }
-
             if (hard_exit_flag == TRUE && lock_flag == FALSE)
             {
 
@@ -485,7 +481,7 @@ void *multi_recv_handler(void *args)
             {
                 if (decode_on_player_death(&game->map, game->players, net_buffer) != 0)
                 {
-                    // send message to server for message loss
+                    hard_exit_flag = TRUE;
                 }
                 lock_flag = FALSE;
             }
@@ -495,7 +491,7 @@ void *multi_recv_handler(void *args)
             {
                 if (decode_on_player_move(game->players, net_buffer) != 0)
                 {
-                    // send message to server for message loss
+                   hard_exit_flag = TRUE;
                 }
                 lock_flag = FALSE;
             }
@@ -505,7 +501,7 @@ void *multi_recv_handler(void *args)
             {
                 if (decode_on_player_update_stats(game->players, net_buffer, &game->map) != 0)
                 {
-                    // send message to server for message loss
+                    hard_exit_flag = TRUE;
                 }
                 lock_flag = FALSE;
             }
@@ -519,7 +515,12 @@ void *multi_recv_handler(void *args)
             {
                 if (decode_on_monster_death(game->mons_arr, net_buffer, &game->map) != 0)
                 {
-                    // send message to server for message loss
+                    free(net_buffer_cp);
+                    net_buffer_cp = NULL;
+                    net_buffer_cp = on_player_hard_exit();
+                    send(game->client->sockfd, net_buffer_cp, SOCK_BUFF_SZ, 0);
+                    system("clear");
+                    redprint_slow("Your game stopped violently\nC0ntr0l 1s 4n 1llus10n!\n");
                 }
                 lock_flag = FALSE;
             }
@@ -529,7 +530,7 @@ void *multi_recv_handler(void *args)
             {
                 if (decode_on_monster_update_stats(game->mons_arr, net_buffer, &game->map) != 0)
                 {
-                    // send message to server for message loss
+                    hard_exit_flag = TRUE;
                 }
                 lock_flag = FALSE;
             }
@@ -540,9 +541,9 @@ void *multi_recv_handler(void *args)
             itoa(CHEST_OPEN_ID_C, comp, 10);
             if (!strcmp(response_id, comp))
             {
-                if (decode_on_chest_open(game->chest_arr, net_buffer, &game->map) != 0)
+                if (decode_on_chest_open(game->chest_arr, net_buffer, &game->map) == 0)
                 {
-                    // send message to server for message loss
+                    hard_exit_flag = TRUE;
                 }
                 lock_flag = FALSE;
             }

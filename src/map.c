@@ -190,10 +190,10 @@ void set_boss(map_t *map, monster_t mons_arr[], int boss_array[TOTAL_LVLS][2])
 		if (mons_arr[i].monster_id == boss_array[map->level - 1][1])
 		{
 			mons_arr[i].is_boss = TRUE;
-			mons_arr[i].attack = 1;
-			mons_arr[i].health = 1;
-			mons_arr[i].armor = 15;
-			mons_arr[i].accuracy = 40;
+			mons_arr[i].attack = 10 + 4 * map->level;
+			mons_arr[i].health = 20 + 4 * map->level;
+			mons_arr[i].armor = 20 + 4 * map->level;
+			mons_arr[i].accuracy = 10 + 4 * map->level;
 			break;
 		}
 	}

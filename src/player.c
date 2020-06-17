@@ -257,10 +257,10 @@ int attack(float accuracy, float damage, float armor)
  * */
 void open_chest(chest_t chest, player_t *player)
 {
-    player->health += (chest.level) * 5;
-    player->armor += (chest.level) * 2;
-    player->attack += (chest.level) * 2;
-    player->accuracy += (chest.level) * 2;
+    player->health += 5 + player->level;
+    player->armor += 2 + player->level;
+    player->attack += 2 + player->level;
+    player->accuracy += 2 + player->level;
 }
 
 /**

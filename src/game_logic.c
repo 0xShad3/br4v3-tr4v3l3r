@@ -523,12 +523,6 @@ void level_up(player_t *player, monster_t monsters[], map_t *map)
         {
 
             return;
-            /*TODO:
-                Place the save function here which will save the player stats
-                and reload them at the next level. Ex. player hp=20 at=70 ar=65 ac=55
-                These values should be saved at the .rpg file so we can keep the player`s
-                stats for the next level. Each monster should be saved + players stats
-            */
         }
     }
     map->level++;
@@ -665,10 +659,10 @@ int check_game_over_multi(player_t players[],game_t *game)
             game->mons_arr[i].health = 100;
             if(game->mons_arr[i].monster_id == game->boss_arr[game->map.level - 1][1]){
                 game->mons_arr[i].is_boss = TRUE;
-                game->mons_arr[i].health = 40;
-                game->mons_arr[i].armor = 15;
-                game->mons_arr[i].attack = 30;
-                game->mons_arr[i].accuracy = 40;
+                game->mons_arr[i].health = 20 + 4 * game->map.level;
+                game->mons_arr[i].armor = 20 + 4 * game->map.level;
+                game->mons_arr[i].attack = 10 + 4 * game->map.level;
+                game->mons_arr[i].accuracy = 10 + 4 * game->map.level;
             }
             map_set(&game->map,MSYMBOL,game->mons_arr[i].y,game->mons_arr[i].x);
         }
