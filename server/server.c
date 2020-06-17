@@ -90,7 +90,7 @@ int main(int argc, char **argv)
             continue;
         }
 
-        client_t *cli = (client_t *)calloc(sizeof(client_t),1);
+        client_t *cli = (client_t *)calloc(sizeof(client_t), 1);
         cli->addr = cli_addr;
         cli->sockfd = connfd;
         cli->uid = uid++;
@@ -212,16 +212,31 @@ void *handle_client(void *arg)
      * 
      */
 
-    pthread_mutex_lock(&clients_mutex1);
-    char *map_buffer = on_load_map(9);
-    bzero(buff_out, BUFFER_SZ);
-    strcpy(buff_out, map_buffer);
-    loginfo(cli->uid, "Receiving map's hash");
-    send(cli->sockfd, buff_out, strlen(buff_out), 0);
-    bzero(buff_out, BUFFER_SZ);
-    free(map_buffer);
-    pthread_mutex_unlock(&clients_mutex1);
+    char *encode_buffer = search_to_load(save_filename);
+    if (encode_buffer == NULL)
+    {
 
+        pthread_mutex_lock(&clients_mutex1);
+        loginfo(cli->uid, "Save file not found loading new game");
+        char *map_buffer = on_load_map(1);
+        bzero(buff_out, BUFFER_SZ);
+        strcpy(buff_out, map_buffer);
+        loginfo(cli->uid, "Receiving map's hash");
+        loginfo(cli->uid, buff_out);
+        send(cli->sockfd, buff_out, BUFFER_SZ, 0);
+        bzero(buff_out, BUFFER_SZ);
+        free(map_buffer);
+        pthread_mutex_unlock(&clients_mutex1);
+    }
+    else
+    {
+        pthread_mutex_lock(&clients_mutex1);
+        loginfo(cli->uid,"Save file found sending file's hash!");
+        loginfo(cli->uid,encode_buffer);
+        send(cli->sockfd, encode_buffer,strlen(buff_out),0);
+        pthread_mutex_unlock(&clients_mutex1);
+
+    }
     while (1)
     {
         receive_sz = recv(cli->sockfd, buff_out, BUFFER_SZ, 0);
@@ -231,7 +246,7 @@ void *handle_client(void *arg)
         {
             loginfo(cli->uid, "Requested save game");
             token = strtok(NULL, NET_DELIM);
-            loginfo(cli->uid,buff_out);
+            loginfo(cli->uid, buff_out);
 
             if (!save_game_hash(token))
             {
@@ -242,7 +257,6 @@ void *handle_client(void *arg)
                 leave_flag = 1;
                 break;
             }
-          
         }
 
         if (!strcmp(buff_out, "hard_exit"))

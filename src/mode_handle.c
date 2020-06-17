@@ -27,6 +27,7 @@ void hard_exit_handler(int sig)
 {
     hard_exit_flag = 1;
 }
+
 /**
  * Main game function
  * its responsible for running the game for single player mode
@@ -211,9 +212,20 @@ void init_game_multi(account_t *account, client_t *client)
 {
     char *net_buffer;
     char *token;
+
+    char comp_load[5];
+    char comp_new[5];
     char net_pass_buffer[SOCK_BUFF_SZ];
+    char net_pass_buffer_cp[SOCK_BUFF_SZ];
     game_t game;
     int i;
+
+    /***
+     * To load from file
+     * 
+     */
+    int monsters[MAX_MONSTERS][MONS_ELMNTS];
+    int chests[MAX_CHESTS];
 
     game.client = client;
     /**
@@ -237,7 +249,6 @@ void init_game_multi(account_t *account, client_t *client)
     {
         init_player(&game.players[i], i, MULTI_MODE);
     }
-    add_stats(&game.players[game.client->uid]);
     net_buffer = on_player_update_stats(&game.players[game.client->uid], &game.map);
     send(client->sockfd, net_buffer, SOCK_BUFF_SZ, 0);
 
@@ -245,23 +256,53 @@ void init_game_multi(account_t *account, client_t *client)
      * Check the hash of the file to be read
      */
 
-    recv(client->sockfd, net_buffer, 38, 0);
-    if (!decode_on_map_receive(&game.map, net_buffer))
+    bzero(net_pass_buffer, SOCK_BUFF_SZ);
+    recv(client->sockfd, net_pass_buffer, SOCK_BUFF_SZ, 0);
+    strcpy(net_pass_buffer_cp, net_pass_buffer);
+    token = strtok(net_pass_buffer_cp, NET_DELIM);
+
+    itoa(LOAD_GAME_ID, comp_load, 10);
+    itoa(MAP_OPEN_ID, comp_new, 10);
+
+    if (!strcmp(token, comp_new))
     {
-        redprint("[ERROR] The map file may be corrupted or modified!");
-        exit(EXIT_FAILURE);
-    }
+        if (!decode_on_map_receive(&game.map, net_pass_buffer))
+        {
+            redprint("[ERROR] The map file may be corrupted or modified!");
+            exit(EXIT_FAILURE);
+        }
+        add_stats(&game.players[game.client->uid]);
+        game.mons_arr = (monster_t *)calloc(sizeof(monster_t), game.map.level + 3);
+        game.chest_arr = (chest_t *)calloc(sizeof(chest_t), game.map.level);
+        load_map(&game.map, game.mons_arr, game.chest_arr, game.boss_arr);
 
-    game.mons_arr = (monster_t *)calloc(sizeof(monster_t), game.map.level + 3);
-    game.chest_arr = (chest_t *)calloc(sizeof(chest_t), game.map.level);
-    load_map(&game.map, game.mons_arr, game.chest_arr, game.boss_arr);
-
-    /**
+        /**
      * Fetch health to health holder
      */
-    for (i = 0; i < 3; i++)
+        for (i = 0; i < 3; i++)
+        {
+            game.health_holder[i] = game.players[game.client->uid].health;
+        }
+    }
+    else if (!strcmp(token, comp_load))
     {
-        game.health_holder[i] = game.players[game.client->uid].health;
+        memset_arrays(monsters, chests);
+        if (!on_load_game_multi(game.save_game_code, net_pass_buffer, &game.map, game.players, monsters, chests))
+        {
+            redprint("[ERROR] The save file is either corrupted or modified\n");
+            exit(EXIT_FAILURE);
+        }
+        redprint_slow("\n\n[+] Please wait while the game is loading...");
+        game.mons_arr = (monster_t *)calloc(sizeof(monster_t), game.map.level + 3);
+        game.chest_arr = (chest_t *)calloc(sizeof(chest_t), game.map.level);
+        load_map(&game.map, game.mons_arr, game.chest_arr, game.boss_arr);
+        pass_object_values_multi(game.mons_arr, game.chest_arr, monsters, chests, &game.map);
+        update_objects(&game.map, game.mons_arr, game.chest_arr);
+
+        for (i = 0; i < 3; i++)
+        {
+            map_set(&game.map, game.players[i].psymbol, game.players[i].y, game.players[i].x);
+        }
     }
 
     signal(SIGINT, hard_exit_handler);
